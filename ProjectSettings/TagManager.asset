@@ -7,14 +7,17 @@ TagManager:
   - Environment
   - Experiment
   - HUD
-  - Task
-  - Target
   - TargetHighlights
   - TargetObject
   - store
   - ScaledEnvironment
   - Compass
   - LocationColliders
+  - StartPole
+  - HUDtext
+  - Error
+  - Target
+  - Task
   layers:
   - Default
   - TransparentFX
