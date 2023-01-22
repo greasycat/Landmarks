@@ -4,9 +4,9 @@ using System.Collections;
 public class avatarLog : MonoBehaviour {
 
 	[HideInInspector] public bool navLog = false;
-    //private Transform avatar;
-    private Transform body;
-    private Transform head;
+	private Transform avatar;
+	private Transform cameraCon;
+	private Transform cameraRig;
 
 	private GameObject experiment;
 	private dbLog log;
@@ -24,15 +24,14 @@ public class avatarLog : MonoBehaviour {
 		cameraCon =player.transform as Transform;
 		cameraRig =camerarig.transform as Transform;
 
-    void Start () 
-    {
-        manager = FindObjectOfType<Experiment>().GetComponent<Experiment>();
+		experiment = GameObject.FindWithTag ("Experiment");
+		manager = experiment.GetComponent("Experiment") as Experiment;
 		log = manager.dblog;
 		avatar = transform;
 		
 	}
 
-    void Update()
+    private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Alpha0))
         {
@@ -81,7 +80,7 @@ public class avatarLog : MonoBehaviour {
         }
     }
 
-    void OnTriggerStay(Collider other)
+    private void OnTriggerStay(Collider other)
     {
         if (other.gameObject.tag == "LocationColliders")
         {
@@ -94,7 +93,7 @@ public class avatarLog : MonoBehaviour {
         }
     }
 
-    void OnTriggerExit(Collider other)
+    private void OnTriggerExit(Collider other)
 	{
 		if (other.gameObject.tag == "LocationColliders")
 		{
@@ -106,5 +105,4 @@ public class avatarLog : MonoBehaviour {
 	}
 
 
-}
 }
