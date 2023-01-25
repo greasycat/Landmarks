@@ -4,6 +4,114 @@ using System.Collections;
 public class avatarLog : MonoBehaviour {
 
 	[HideInInspector] public bool navLog = false;
+    //private Transform avatar;
+    private Transform body;
+    private Transform head;
+
+    private dbLog log;
+    private Experiment manager;
+    private LM_PlayerController controller;
+
+	private string location = "Nowhere";
+	private string previousLocation = "Nowhere";
+	private string KeyPress;
+
+    void Start () 
+    {
+        manager = FindObjectOfType<Experiment>().GetComponent<Experiment>();
+		log = manager.dblog;
+		//avatar = transform;
+
+        controller = manager.player.GetComponent<LM_PlayerController>();
+        body = controller.collisionObject.transform;
+        head = controller.cam.transform;
+    }
+
+	private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha0))
+        {
+			Debug.Log("Someone is trying to erase us from space-time!");
+			location = "Nowhere";
+        }
+
+        if (previousLocation != location)
+        {
+			Debug.Log("We have left " + previousLocation + ". Now entering " + location);
+        }
+
+	}
+	// Update is called once per frame
+	void FixedUpdate () {
+		
+		// Checking if player pressed button 
+		if (Input.GetKey(KeyCode.Space))
+		{
+			KeyPress= "True";
+		}
+		else
+		{
+			KeyPress= "False";
+		}
+
+        // Log the name of the tracked object, it's body position, body rotation, and camera (head) rotation
+		if (navLog){
+            //print("AVATAR_POS	" + "\t" +  avatar.position.ToString("f3") + "\t" + "AVATAR_Body " + "\t" +  cameraCon.localEulerAngles.ToString("f3") +"\t"+ "AVATAR_Head " + cameraRig.localEulerAngles.ToString("f3"));
+            log.log("Avatar: \t" + controller.name + "\t" +
+                    "Body Position (xyz): \t" + body.position.x + "\t" + body.position.y + "\t" + body.position.z + "\t" +
+                    "Body Rotation (xyz): \t" + body.eulerAngles.x + "\t" + body.eulerAngles.y + "\t" + body.eulerAngles.z + "\t" +
+                    "Camera Position (xyz): \t" + head.position.x + "\t" + head.position.y + "\t" + head.position.z + "\t" +
+                    "Camera Rotation   (xyz): \t" + head.eulerAngles.x + "\t" + head.eulerAngles.y + "\t" + head.eulerAngles.z + "\t"+
+					"Location (Object/Hallway): \t" + location + "\t" + 
+					"Keypress(True/False): \t" + KeyPress + "\t"
+                    , 1);
+        }
+	}
+	
+	void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "LocationColliders")
+        {
+            location = other.gameObject.name;
+            Debug.Log("COLLIDER IS TRIGGERING!!!!");
+        }
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.gameObject.tag == "LocationColliders")
+        {
+			if (location == "Nowhere")
+			{
+				location = other.gameObject.name;
+				Debug.LogWarning("Fixing an error in current location assignment; everything is okay!");
+			}
+			Debug.Log("STILL at " + other.name);
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+	{
+		if (other.gameObject.tag == "LocationColliders")
+		{
+
+			location = "Nowhere";
+			previousLocation = other.gameObject.name;
+			Debug.Log("COLLIDER IS TRIGGERING!!!!");
+		}
+	}
+
+}
+
+
+
+
+/* using UnityEngine;
+using System.Collections;
+
+public class avatarLog : MonoBehaviour {
+
+	[HideInInspector] public bool navLog = false;
 	private Transform avatar;
 	private Transform cameraCon;
 	private Transform cameraRig;
@@ -69,9 +177,9 @@ public class avatarLog : MonoBehaviour {
                     , 1);
         }
 	}
-
+ */
     
-    void OnTriggerEnter(Collider other)
+    /* void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "LocationColliders")
         {
@@ -105,4 +213,4 @@ public class avatarLog : MonoBehaviour {
 	}
 
 
-}
+} */
