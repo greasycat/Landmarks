@@ -13,6 +13,7 @@ using Valve.VR.InteractionSystem;
 public class LM_GoTo : ExperimentTask
 {
     [Header("Task-specific Properties")]
+    public GameObject locationsToArriveAt;
     public GameObject arriveAt;
     public bool hideEnvironment;
     public float orientThreshold = 15.0f;

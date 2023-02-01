@@ -248,7 +248,7 @@ public class Experiment : MonoBehaviour
                 dataPath +
                 config.filename;
 
-
+        if(config.levelNames.Count == 0) config.levelNames.Add(SceneManager.GetActiveScene().name);
         Debug.Log("!!!!!!!!!!!!\t" + SceneManager.GetActiveScene().name + "\t" + config.levelNames[0]);
         if (!Directory.Exists(dataPath))
         {
@@ -280,8 +280,8 @@ public class Experiment : MonoBehaviour
             dblog = new dbPlaybackLog(dataPath + logfile);
         }
 
-        dblog.log("EXPERIMENT:\t" + PlayerPrefs.GetString("expID") + "\tSUBJECT:\t" + config.subject +
-                  "\tSTART_SCENE\t" + config.levelNames[config.levelNumber] + "\tSTART_CONDITION:\t" + config.conditions[config.levelNumber] + "\tUI:\t" + userInterface.ToString(), 1);
+        // dblog.log("EXPERIMENT:\t" + config.experiment + "\tSUBJECT:\t" + config.subject +
+        //           "\tSTART_SCENE\t" + config.levelNames[config.levelNumber] + "\tSTART_CONDITION:\t" + config.conditions[config.levelNumber] + "\tUI:\t" + userInterface.ToString(), 1);
     }
 
 
