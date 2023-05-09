@@ -18,6 +18,7 @@ TagManager:
   - Error
   - Target
   - Task
+  - TargetObjectColliders
   layers:
   - Default
   - TransparentFX

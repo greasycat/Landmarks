@@ -277,6 +277,7 @@ public class Experiment : MonoBehaviour
         {
             CharacterController c = avatar.GetComponent<CharacterController>();
             c.detectCollisions = false;
+            
             dblog = new dbPlaybackLog(dataPath + logfile);
         }
 

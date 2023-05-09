@@ -22,6 +22,8 @@ public class NavigationTask : ExperimentTask
 	public GameObject currentTarget;
 
     public TextAsset NavigationInstruction;
+    public List<GameObject> TargetObjectColliders = new List<GameObject>();
+    public bool isPlayerInside = false;
 
     // Manipulate trial/task termination criteria
     [Tooltip("in meters")]
@@ -64,6 +66,7 @@ public class NavigationTask : ExperimentTask
     private float scaledPlayerDistance = 0;
     private float optimalDistance;
     private LM_DecisionPoint[] decisionPoints;
+    private Collider testPC;
 
 
     // 4/27/2022 Added for Loop Closure Task
@@ -347,36 +350,65 @@ public class NavigationTask : ExperimentTask
 			return KillCurrent ();
 		}
 
-        // if we're letting them say when they think they've arrived
-        if (Time.time - startTime > allowContinueAfter)
-        {
-            if (vrEnabled)
-            {
-                if (vrInput.TriggerButton.GetStateDown(SteamVR_Input_Sources.Any))
+        // if we're letting them say when they think they've arrived (only applicable if inside target object colliders)
+        //testPC = avatar.GetComponent<LM_PlayerController>().collisionObject;
+
+
+        //foreach (GameObject targetobject in TargetObjectColliders)
+        //{
+        //    Collider targetobjectcollider = targetobject.GetComponent<Collider>();
+        //    Bounds targetobjectbounds = targetobjectcollider.bounds;
+
+        //    if (targetobjectbounds.Contains(playerLastPosition))
+        //    {
+        //        isPlayerInside = true;
+        //    }
+        //    //else
+        //    //{
+        //    //isPlayerInside = false;
+        //    //}
+
+            
+
+        //}
+        //return false;
+        ////if ()
+        ////void OnTriggerEnter(Collider other) 
+        ////{ if (other.gameObject.tag == "TargetObjectColliders")
+
+        //if (isPlayerInside == true) 
+        //{ 
+            if (Time.time - startTime > allowContinueAfter)          
                 {
-                    Debug.Log("Participant ended the trial");
-                    log.log("INPUT_EVENT    Player Arrived at Destination    1", 1);
-                    hud.hudPanel.SetActive(false);
-                    hud.setMessage("");
+                    if (vrEnabled)
+                    {
+                        if (vrInput.TriggerButton.GetStateDown(SteamVR_Input_Sources.Any))
+                        {
+                            Debug.Log("Participant ended the trial");
+                            log.log("INPUT_EVENT    Player Arrived at Destination    1", 1);
+                            hud.hudPanel.SetActive(false);
+                            hud.setMessage("");
 
-                    if (haptics) SteamVR_Actions.default_Haptic.Execute(0f, 2.0f, 65f, 1f, SteamVR_Input_Sources.Any);
+                            if (haptics) SteamVR_Actions.default_Haptic.Execute(0f, 2.0f, 65f, 1f, SteamVR_Input_Sources.Any);
 
-                    return true;
+                            return true;
+                        }
+                    }
+                    if (Input.GetKeyDown(KeyCode.Return))
+                    {
+                        Debug.Log("Participant ended the trial");
+                        log.log("INPUT_EVENT    Player Arrived at Destination    1", 1);
+                        hud.hudPanel.SetActive(false);
+                        hud.setMessage("");
+                        return true;
+                    }
                 }
-            }
-            if (Input.GetKeyDown(KeyCode.Return))
-            {
-                Debug.Log("Participant ended the trial");
-                log.log("INPUT_EVENT    Player Arrived at Destination    1", 1);
-                hud.hudPanel.SetActive(false);
-                hud.setMessage("");
-                return true;
-            }
-        }
+                return false;
 
-		return false;
 	}
-
+        
+    //}
+    
 	public override void endTask()
 	{
 		TASK_END();
@@ -417,7 +449,7 @@ public class NavigationTask : ExperimentTask
 
         // re-enable everything on the gameobject we just finished finding
         currentTarget.GetComponent<MeshRenderer>().enabled = true;
-        currentTarget.GetComponent<Collider>().enabled = true;
+        currentTarget.GetComponent<Collider>().enabled = true; // is this the root cause of problem??
         var halo = (Behaviour) currentTarget.GetComponent("Halo");
         if(halo != null) halo.enabled = true;
 
