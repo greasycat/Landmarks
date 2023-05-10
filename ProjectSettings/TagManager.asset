@@ -19,6 +19,7 @@ TagManager:
   - Target
   - Task
   - TargetObjectColliders
+  - RedSphereTag
   layers:
   - Default
   - TransparentFX
