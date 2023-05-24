@@ -23,7 +23,6 @@ public class NavigationTask : ExperimentTask
     [Header("Task-specific Properties")]
     public ObjectList destinations;
     public GameObject currentTarget;
-
     public TextAsset NavigationInstruction;
     public float desiredSphereYPosition = 1.5f;
 
@@ -78,6 +77,11 @@ public class NavigationTask : ExperimentTask
     private Vector3 startXYZ;
     private Vector3 endXYZ;
 
+    //For distance to border logging
+    public string borderObjectTag = "BorderObjects"; // Tag for the border objects
+    private List<float> distancesToBorder = new List<float>(); // List to store frame by frame distances to border
+    private List<GameObject> borderObjects2 = new List<GameObject>();
+    public Vector2 playerBorderSumAndMeasurements;
 
     public float GetStartTime()
     {
@@ -264,6 +268,11 @@ public class NavigationTask : ExperimentTask
 
             if (vrEnabled & haptics) SteamVR_Actions.default_Haptic.Execute(0f, 2.0f, 65f, 1f, SteamVR_Input_Sources.Any);
 
+            foreach (var obj in GameObject.FindGameObjectsWithTag("BorderObjects")) {
+                Debug.Log("BORDER OBJECT -------------------------------" + obj.name);
+                borderObjects2.Add(obj);
+            }
+            
         }
     }
 
@@ -383,6 +392,40 @@ public class NavigationTask : ExperimentTask
         clockwiseTravel += Vector3Angle2D(playerLastPosition, avatar.GetComponent<LM_PlayerController>().collisionObject.transform.position);
         playerLastPosition = avatar.GetComponent<LM_PlayerController>().collisionObject.transform.position;
 
+
+        // Keep updating the calculations for borderDistances
+        //logging distance to border at each frame, then finding the average value for the entire trial 
+        //float closestDistance;
+        //GameObject closestBorderObject;
+
+        var playerBorderDistances = new Dictionary<string, float>();
+        foreach (GameObject borderObject in borderObjects2)
+        {
+            Vector3 closestBorderPoint = borderObject.GetComponent<Collider>().ClosestPointOnBounds(manager.player.transform.position);
+            float player2borderDist = Vector3Distance2D(closestBorderPoint, manager.player.transform.position);
+            playerBorderDistances.Add(borderObject.name, player2borderDist);
+
+            //float distance = Vector3.Distance(avatar.GetComponent<LM_PlayerController>().collisionObject.transform.position, borderObject.transform.position); //calculating distance from player to each border object
+
+            //if (distance < closestDistance) //initially setting the closest object & distance as the first border object's distance & name, then updating and replacing this if smaller distance value is found as script iterates through list of border objects
+            //{
+            //    closestDistance = distance;
+            //    Debug.Log("closestDistance:" + closestDistance);
+            //    closestBorderObject = borderObject;
+            //    Debug.Log("closestBorderObject:" + closestBorderObject);
+            //}
+        }
+        var closestBorder = playerBorderDistances.OrderBy(kvp => kvp.Value).First();
+        Debug.Log(closestBorder.Key + " is the closest border object, located " + closestBorder.Value + "m, orthongonally from the player");
+        playerBorderSumAndMeasurements += new Vector2(closestBorder.Value, 1);
+
+
+        //if (closestBorderObject != null)
+        //{
+        //    distancesToBorder.Add(closestDistance); //adding value to frame by frame distances to border list 
+
+        //}
+
         if (isScaled)
         {
             scaledPlayerDistance += Vector3.Distance(scaledAvatar.transform.position, scaledPlayerLastPosition);
@@ -437,6 +480,7 @@ public class NavigationTask : ExperimentTask
         // fixme - Issue with this method of ending the trial breaking HUD (normal collisions ok)
         if (Time.time - startTime > allowContinueAfter)
         {
+     
             if (vrEnabled)
             {
                 if (vrInput.TriggerButton.GetStateDown(SteamVR_Input_Sources.Any))
@@ -451,19 +495,25 @@ public class NavigationTask : ExperimentTask
                     return true;
                 }
             }
-            if (Input.GetKeyDown(KeyCode.Return))
+            if (Input.GetKeyDown(KeyCode.Space))
             {
+                Debug.Log("Okay, You can go now");
                 Debug.Log("Participant ended the trial");
                 log.log("INPUT_EVENT    Player Arrived at Destination    1", 1);
                 hud.hudPanel.SetActive(false);
                 hud.setMessage("");
                 return true;
             }
+
         }
-
-
         return false;
+
+        
+
+        
+        
     }
+    
 
     public override void endTask()
     {
@@ -591,6 +641,21 @@ public class NavigationTask : ExperimentTask
         // 	masterTask.name + "\t" + masterTask.repeatCount + "\t" + parent.repeatCount + "\t" + currentTarget.name + "\t" + optimalDistance + "\t"+ perfDistance + "\t" + excessPath + "\t" + navTime
         //     , 1);
 
+        //calculating average distance to border for trial 
+        //private void CalculateAverageDistance()
+        float totaldistancesToBorder = 0f;
+
+        foreach (float distanceToBorder in distancesToBorder)
+        {
+            totaldistancesToBorder += distanceToBorder;
+        }
+
+        var avgDist2border = playerBorderSumAndMeasurements[0] / playerBorderSumAndMeasurements[1];
+        Debug.Log("Sum of all Dist measurements: " + playerBorderSumAndMeasurements[0] + "\t Total Measurements: " + playerBorderSumAndMeasurements[1] + "\t Avg Dist: " + avgDist2border);
+
+        float averageDistanceToBorder = totaldistancesToBorder / distancesToBorder.Count;
+        Debug.Log("Average Distance: " + averageDistanceToBorder);
+
         // More concise LM_TrialLog logging
         taskLog.AddData(transform.name + "_target", currentTarget.name);
         taskLog.AddData(transform.name + "_actualPath", perfDistance.ToString());
@@ -598,6 +663,7 @@ public class NavigationTask : ExperimentTask
         taskLog.AddData(transform.name + "_excessPath", excessPath.ToString());
         taskLog.AddData(transform.name + "_clockwiseTravel", clockwiseTravel.ToString());
         taskLog.AddData(transform.name + "_duration", navTime.ToString());
+        taskLog.AddData(transform.name + "averageDistToBorder", avgDist2border.ToString());
         //taskLog.AddData("testtesttest" + "_correctPosition", interfacePivots.correctPosition.ToString());
 
         if (logStartEnd)

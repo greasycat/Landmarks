@@ -52,30 +52,30 @@ public class MoveObject : ExperimentTask {
 			destination = destinations.currentObject();		
 		}
 		
-		currentNavTrialDestination = navTrialDestinations.currentObject();//listing current trial destination 
+		//currentNavTrialDestination = navTrialDestinations.currentObject();//listing current trial destination 
 
-		//checking if footprints have spawned near nav trial destination, and if so, to spawn to another location in the list
-		if (destination.name == currentNavTrialDestination.name)
-        {
-			Debug.Log("Footprints location same as trial destination!! Reassigning footprints Location"); 
-			int position = destinations.objects.IndexOf(destination);
+		////checking if footprints have spawned near nav trial destination, and if so, to spawn to another location in the list
+		//if (destination.name == currentNavTrialDestination.name)
+  //      {
+		//	Debug.Log("Footprints location same as trial destination!! Reassigning footprints Location"); 
+		//	int position = destinations.objects.IndexOf(destination);
 			
-				for (int i=0; i < destinations.objects.Count; i ++)
-			{ 	int newIndex = Random.Range(i, destinations.objects.Count);
+		//		for (int i=0; i < destinations.objects.Count; i ++)
+		//	{ 	int newIndex = Random.Range(i, destinations.objects.Count);
 
-				if (newIndex == position)
-                {
-					int newIndex2 = Random.Range(i, destinations.objects.Count);
-					destination = destinations.objects[newIndex2];
-                }
+		//		if (newIndex == position)
+  //              {
+		//			int newIndex2 = Random.Range(i, destinations.objects.Count);
+		//			destination = destinations.objects[newIndex2];
+  //              }
 
-                else
-                {
-					destination = destinations.objects[newIndex];
-				}
+  //              else
+  //              {
+		//			destination = destinations.objects[newIndex];
+		//		}
 				
-            }
-        }
+  //          }
+  //      }
 
 		//trialIndex = List.Index(navTrialDestinations, navTrialDestinations.currentObject); //finding index of current object in navTrialDestinations list 
 		//position = start.transform.position;

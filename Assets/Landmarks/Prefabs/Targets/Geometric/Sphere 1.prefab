@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4349513605108624955}
   - component: {fileID: 7657540860483896119}
   - component: {fileID: 159450991910753822}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Sphere 1
   m_TagString: RedSphereTag
   m_Icon: {fileID: 0}
