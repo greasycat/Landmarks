@@ -1,5 +1,13 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
 guid: c884b412b746ae842a8ab47cdedc3ee7
+=======
+<<<<<<< HEAD:Assets/AssetStoreOriginals/_SNAPS_PrototypingAssets.meta
+guid: 5593b5c6bfbac42eb8ecb33bfd558614
+=======
+guid: c884b412b746ae842a8ab47cdedc3ee7
+>>>>>>> upstream/majorUpdate_230519:Assets/unity-xr-plugin-master/com.valve.openvr/Runtime.meta
+>>>>>>> upstream/majorUpdate_230519
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

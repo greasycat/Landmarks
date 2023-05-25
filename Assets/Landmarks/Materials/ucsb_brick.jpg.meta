@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< HEAD:Assets/Landmarks/Materials/ucsb_brick.jpg.meta
 guid: c76efbb861f5a420e9a49e14e67342e8
+=======
+guid: e5f5d8b3049cc4c2bb969cb55a7fccab
+>>>>>>> upstream/majorUpdate_230519:Assets/Landmarks/Textures/LM_logo_block.png.meta
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}

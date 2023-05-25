@@ -1,5 +1,13 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
 guid: c187568c9f8494c4da76954f07feb448
+=======
+<<<<<<< HEAD:Assets/FoodAndGrocery/Items/BeerBox/Materials.meta
+guid: a8113ffc95ca641b789ace3fee9b344b
+=======
+guid: c187568c9f8494c4da76954f07feb448
+>>>>>>> upstream/majorUpdate_230519:Assets/unity-xr-plugin-master/com.valve.openvr.meta
+>>>>>>> upstream/majorUpdate_230519
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}
