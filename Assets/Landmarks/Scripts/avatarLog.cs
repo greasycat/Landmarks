@@ -15,8 +15,10 @@ public class avatarLog : MonoBehaviour {
 	private string location = "Nowhere";
 	private string previousLocation = "Nowhere";
 	private string KeyPress;
+	private string TargetObjectVisibility;
+	private GameObject[] targetObjects;
 
-    void Start () 
+	void Start () 
     {
         manager = FindObjectOfType<Experiment>().GetComponent<Experiment>();
 		log = manager.dblog;
@@ -25,47 +27,77 @@ public class avatarLog : MonoBehaviour {
         controller = manager.player.GetComponent<LM_PlayerController>();
         body = controller.collisionObject.transform;
         head = controller.cam.transform;
-    }
+		targetObjects = GameObject.FindGameObjectsWithTag("Target");
+
+	}
 
 	private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Alpha0))
-        {
+	{
+		if (Input.GetKeyDown(KeyCode.Alpha0))
+		{
 			Debug.Log("Someone is trying to erase us from space-time!");
 			location = "Nowhere";
-        }
+		}
 
-        if (previousLocation != location)
-        {
+		if (previousLocation != location)
+		{
 			Debug.Log("We have left " + previousLocation + ". Now entering " + location);
-        }
+		}
+
+		
 
 	}
 	// Update is called once per frame
-	void FixedUpdate () {
-		
+	void FixedUpdate()
+	{
+
 		// Checking if player pressed button 
 		if (Input.GetKey(KeyCode.Space))
 		{
-			KeyPress= "True";
+			KeyPress = "True";
 		}
 		else
 		{
-			KeyPress= "False";
+			KeyPress = "False";
 		}
 
-        // Log the name of the tracked object, it's body position, body rotation, and camera (head) rotation
-		if (navLog){
-            //print("AVATAR_POS	" + "\t" +  avatar.position.ToString("f3") + "\t" + "AVATAR_Body " + "\t" +  cameraCon.localEulerAngles.ToString("f3") +"\t"+ "AVATAR_Head " + cameraRig.localEulerAngles.ToString("f3"));
-            log.log("Avatar: \t" + controller.name + "\t" +
-                    "Body Position (xyz): \t" + body.position.x + "\t" + body.position.y + "\t" + body.position.z + "\t" +
-                    "Body Rotation (xyz): \t" + body.eulerAngles.x + "\t" + body.eulerAngles.y + "\t" + body.eulerAngles.z + "\t" +
-                    "Camera Position (xyz): \t" + head.position.x + "\t" + head.position.y + "\t" + head.position.z + "\t" +
-                    "Camera Rotation   (xyz): \t" + head.eulerAngles.x + "\t" + head.eulerAngles.y + "\t" + head.eulerAngles.z + "\t"+
-					"Location (Object/Hallway): \t" + location + "\t" + 
-					"Keypress(True/False): \t" + KeyPress + "\t"
-                    , 1);
-        }
+		// fixmefixmefixme Checking if target objects are visible as player moves around; 
+
+		//GameObject[] targetObjects = GameObject.FindGameObjectsWithTag("Target");
+
+		foreach (GameObject targetObject in targetObjects)
+		{
+			bool isVisible = IsVisibleFromCamera(targetObject, controller.cam); //uses function defined below
+
+			if (isVisible)
+			{
+				TargetObjectVisibility = targetObject.name + "is visible";
+				Debug.Log(targetObject.name + "is visible");
+			}
+			else
+			{
+				TargetObjectVisibility = "N/A";
+				Debug.Log("N/A");
+			}
+
+
+		}
+
+		// Log the name of the tracked object, it's body position, body rotation, and camera (head) rotation
+		if (navLog)
+		{
+			//print("AVATAR_POS	" + "\t" +  avatar.position.ToString("f3") + "\t" + "AVATAR_Body " + "\t" +  cameraCon.localEulerAngles.ToString("f3") +"\t"+ "AVATAR_Head " + cameraRig.localEulerAngles.ToString("f3"));
+			log.log("Avatar: \t" + controller.name + "\t" +
+					"Body Position (xyz): \t" + body.position.x + "\t" + body.position.y + "\t" + body.position.z + "\t" +
+					"Body Rotation (xyz): \t" + body.eulerAngles.x + "\t" + body.eulerAngles.y + "\t" + body.eulerAngles.z + "\t" +
+					"Camera Position (xyz): \t" + head.position.x + "\t" + head.position.y + "\t" + head.position.z + "\t" +
+					"Camera Rotation   (xyz): \t" + head.eulerAngles.x + "\t" + head.eulerAngles.y + "\t" + head.eulerAngles.z + "\t" +
+					"Location (Object/Hallway): \t" + location + "\t" +
+					"Keypress(True/False): \t" + KeyPress + "\t" +
+					"TargetObjectVisibility: \t" + TargetObjectVisibility + "\t"
+					, 1);
+
+		}
 	}
 	
 	void OnTriggerEnter(Collider other)
@@ -101,6 +133,19 @@ public class avatarLog : MonoBehaviour {
 		}
 	}
 
+	//function to check if target object are truly visible in camera's field of view, by checking if object's renderer bounds intersect with camera's field of view 
+	private bool IsVisibleFromCamera(GameObject targetObject, Camera camera)
+	{
+		Renderer renderer = targetObject.GetComponent<Renderer>();
+
+		if (renderer != null && renderer.isVisible)
+		{
+			Plane[] frustumPlanes = GeometryUtility.CalculateFrustumPlanes(camera);
+			return GeometryUtility.TestPlanesAABB(frustumPlanes, renderer.bounds);
+		}
+
+		return false;
+	}
 }
 
 
