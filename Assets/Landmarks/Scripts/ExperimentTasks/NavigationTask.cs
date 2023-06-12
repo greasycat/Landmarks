@@ -24,6 +24,7 @@ public class NavigationTask : ExperimentTask
     public ObjectList destinations;
     public GameObject currentTarget;
     public ObjectList listOfNavStarts;
+    public GameObject startingLocation;
     public TextAsset NavigationInstruction;
     public float desiredSphereYPosition = 1.5f;
 
@@ -310,12 +311,15 @@ public class NavigationTask : ExperimentTask
 
             if (vrEnabled & haptics) SteamVR_Actions.default_Haptic.Execute(0f, 2.0f, 65f, 1f, SteamVR_Input_Sources.Any);
 
-            foreach (var obj in GameObject.FindGameObjectsWithTag("BorderObjects")) {
-                Debug.Log("BORDER OBJECT -------------------------------" + obj.name);
-                borderObjects2.Add(obj);
-            }
+            //foreach (var obj in GameObject.FindGameObjectsWithTag("BorderObjects")) {
+            //    Debug.Log("BORDER OBJECT -------------------------------" + obj.name);
+            //    borderObjects2.Add(obj);
+            //}
             
         }
+
+        //find starting location of player (where the trial started)
+        startingLocation = listOfNavStarts.currentObject();
     }
 
     public override bool updateTask()
@@ -393,26 +397,26 @@ public class NavigationTask : ExperimentTask
         //float closestDistance;
         //GameObject closestBorderObject;
 
-        var playerBorderDistances = new Dictionary<string, float>();
-        foreach (GameObject borderObject in borderObjects2)
-        {
-            Vector3 closestBorderPoint = borderObject.GetComponent<Collider>().ClosestPointOnBounds(manager.player.transform.position);
-            float player2borderDist = Vector3Distance2D(closestBorderPoint, manager.player.transform.position);
-            playerBorderDistances.Add(borderObject.name, player2borderDist);
+        //var playerBorderDistances = new Dictionary<string, float>();
+        //foreach (GameObject borderObject in borderObjects2)
+        //{
+        //    Vector3 closestBorderPoint = borderObject.GetComponent<Collider>().ClosestPointOnBounds(manager.player.transform.position);
+        //    float player2borderDist = Vector3Distance2D(closestBorderPoint, manager.player.transform.position);
+        //    playerBorderDistances.Add(borderObject.name, player2borderDist);
 
-            //float distance = Vector3.Distance(avatar.GetComponent<LM_PlayerController>().collisionObject.transform.position, borderObject.transform.position); //calculating distance from player to each border object
+        //    //float distance = Vector3.Distance(avatar.GetComponent<LM_PlayerController>().collisionObject.transform.position, borderObject.transform.position); //calculating distance from player to each border object
 
-            //if (distance < closestDistance) //initially setting the closest object & distance as the first border object's distance & name, then updating and replacing this if smaller distance value is found as script iterates through list of border objects
-            //{
-            //    closestDistance = distance;
-            //    Debug.Log("closestDistance:" + closestDistance);
-            //    closestBorderObject = borderObject;
-            //    Debug.Log("closestBorderObject:" + closestBorderObject);
-            //}
-        }
-        var closestBorder = playerBorderDistances.OrderBy(kvp => kvp.Value).First();
-        Debug.Log(closestBorder.Key + " is the closest border object, located " + closestBorder.Value + "m, orthongonally from the player");
-        playerBorderSumAndMeasurements += new Vector2(closestBorder.Value, 1);
+        //    //if (distance < closestDistance) //initially setting the closest object & distance as the first border object's distance & name, then updating and replacing this if smaller distance value is found as script iterates through list of border objects
+        //    //{
+        //    //    closestDistance = distance;
+        //    //    Debug.Log("closestDistance:" + closestDistance);
+        //    //    closestBorderObject = borderObject;
+        //    //    Debug.Log("closestBorderObject:" + closestBorderObject);
+        //    //}
+        //}
+        //var closestBorder = playerBorderDistances.OrderBy(kvp => kvp.Value).First();
+        //Debug.Log(closestBorder.Key + " is the closest border object, located " + closestBorder.Value + "m, orthongonally from the player");
+        //playerBorderSumAndMeasurements += new Vector2(closestBorder.Value, 1);
 
 
         //if (closestBorderObject != null)
@@ -654,29 +658,56 @@ public class NavigationTask : ExperimentTask
         // 	masterTask.name + "\t" + masterTask.repeatCount + "\t" + parent.repeatCount + "\t" + currentTarget.name + "\t" + optimalDistance + "\t"+ perfDistance + "\t" + excessPath + "\t" + navTime
         //     , 1);
 
-        //calculating average distance to border for trial 
-        //private void CalculateAverageDistance()
-        float totaldistancesToBorder = 0f;
+        ////calculating average distance to border for trial 
+        ////private void CalculateAverageDistance()
+        //float totaldistancesToBorder = 0f;
 
-        foreach (float distanceToBorder in distancesToBorder)
+        //foreach (float distanceToBorder in distancesToBorder)
+        //{
+        //    totaldistancesToBorder += distanceToBorder;
+        //}
+
+        //var avgDist2border = playerBorderSumAndMeasurements[0] / playerBorderSumAndMeasurements[1];
+        //Debug.Log("Sum of all Dist measurements: " + playerBorderSumAndMeasurements[0] + "\t Total Measurements: " + playerBorderSumAndMeasurements[1] + "\t Avg Dist: " + avgDist2border);
+
+        //float averageDistanceToBorder = totaldistancesToBorder / distancesToBorder.Count;
+        //Debug.Log("Average Distance: " + averageDistanceToBorder);
+
+        //find finishing location of player (closest target object & distance to that target object)
+        GameObject[] objs = GameObject.FindGameObjectsWithTag("Target");
+        GameObject closest_obj = null;
+        float closestobjDistance = Mathf.Infinity;
+
+        foreach (GameObject obj in objs)
         {
-            totaldistancesToBorder += distanceToBorder;
+            float dist2obj = Vector3.Distance(endXYZ, obj.transform.position);
+
+            if (dist2obj < closestobjDistance)
+            {
+                closestobjDistance = dist2obj;
+                closest_obj = obj;
+            }
         }
 
-        var avgDist2border = playerBorderSumAndMeasurements[0] / playerBorderSumAndMeasurements[1];
-        Debug.Log("Sum of all Dist measurements: " + playerBorderSumAndMeasurements[0] + "\t Total Measurements: " + playerBorderSumAndMeasurements[1] + "\t Avg Dist: " + avgDist2border);
+        if (closest_obj != null)
+        {
+            Debug.Log("Closest target: " + closest_obj.name);
+            Debug.Log("Distance to closest target: " + closestobjDistance);
+        }
 
-        float averageDistanceToBorder = totaldistancesToBorder / distancesToBorder.Count;
-        Debug.Log("Average Distance: " + averageDistanceToBorder);
+
 
         // More concise LM_TrialLog logging
+        taskLog.AddData(transform.name + "_start", startingLocation.name);
         taskLog.AddData(transform.name + "_target", currentTarget.name);
         taskLog.AddData(transform.name + "_actualPath", perfDistance.ToString());
         taskLog.AddData(transform.name + "_optimalPath", optimalDistance.ToString());
         taskLog.AddData(transform.name + "_excessPath", excessPath.ToString());
         taskLog.AddData(transform.name + "_clockwiseTravel", clockwiseTravel.ToString());
         taskLog.AddData(transform.name + "_duration", navTime.ToString());
-        taskLog.AddData(transform.name + "averageDistToBorder", avgDist2border.ToString());
+        //taskLog.AddData(transform.name + "averageDistToBorder", avgDist2border.ToString());
+        taskLog.AddData(transform.name + "trialEndClosestTarget", closest_obj.name);
+        taskLog.AddData(transform.name + "trialEndClosestTargetDist", closestobjDistance.ToString());
         //taskLog.AddData("testtesttest" + "_correctPosition", interfacePivots.correctPosition.ToString());
 
         if (logStartEnd)
@@ -740,21 +771,22 @@ public class NavigationTask : ExperimentTask
         currentTarget = destinations.currentObject();
     }
 
-    public override bool OnControllerColliderHit(GameObject hit)
-    {
-        if ((hit == currentTarget | hit.transform.parent.gameObject == currentTarget) &
-            hideTargetOnStart != HideTargetOnStart.DisableCompletely & hideTargetOnStart != HideTargetOnStart.SetInactive)
-        {
-            if (showScoring)
-            {
-                score = score + scoreIncrement;
-                hud.setScore(score);
-            }
-            return true;
-        }
+    //fixme COMMENTED THIS CHUNK OUT AS IT WAS INTERFERING WITH TRIAL PROGRESSION
+    //public override bool OnControllerColliderHit(GameObject hit)
+    //{
+    //    if ((hit == currentTarget | hit.transform.parent.gameObject == currentTarget) &
+    //        hideTargetOnStart != HideTargetOnStart.DisableCompletely & hideTargetOnStart != HideTargetOnStart.SetInactive)
+    //    {
+    //        if (showScoring)
+    //        {
+    //            score = score + scoreIncrement;
+    //            hud.setScore(score);
+    //        }
+    //        return true;
+    //    }
 
-        return false;
-    }
+    //    return false;
+    //}
 
     public IEnumerator UnmaskStartObjectFor() // handles the "showing and hiding" the starting target object itself
     {
