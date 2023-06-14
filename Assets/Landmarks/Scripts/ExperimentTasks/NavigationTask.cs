@@ -80,6 +80,9 @@ public class NavigationTask : ExperimentTask
     private Vector3 startXYZ;
     private Vector3 endXYZ;
 
+    //For distance to closest target logging
+    private Vector2 endXZ;
+
     //For distance to border logging
     public string borderObjectTag = "BorderObjects"; // Tag for the border objects
     private List<float> distancesToBorder = new List<float>(); // List to store frame by frame distances to border
@@ -677,10 +680,13 @@ public class NavigationTask : ExperimentTask
         GameObject[] objs = GameObject.FindGameObjectsWithTag("Target");
         GameObject closest_obj = null;
         float closestobjDistance = Mathf.Infinity;
+        endXZ = new Vector2(endXYZ.x, endXYZ.z);
 
         foreach (GameObject obj in objs)
         {
-            float dist2obj = Vector3.Distance(endXYZ, obj.transform.position);
+            Vector3 objPosition = obj.transform.position;
+            Vector2 objPositionXZ = new Vector2(objPosition.x, objPosition.z);
+            float dist2obj = Vector2.Distance(endXZ, objPositionXZ);
 
             if (dist2obj < closestobjDistance)
             {
@@ -706,8 +712,8 @@ public class NavigationTask : ExperimentTask
         taskLog.AddData(transform.name + "_clockwiseTravel", clockwiseTravel.ToString());
         taskLog.AddData(transform.name + "_duration", navTime.ToString());
         //taskLog.AddData(transform.name + "averageDistToBorder", avgDist2border.ToString());
-        taskLog.AddData(transform.name + "trialEndClosestTarget", closest_obj.name);
-        taskLog.AddData(transform.name + "trialEndClosestTargetDist", closestobjDistance.ToString());
+        taskLog.AddData(transform.name + "_trialEndClosestTarget", closest_obj.name);
+        taskLog.AddData(transform.name + "_trialEndClosestTargetDist", closestobjDistance.ToString());
         //taskLog.AddData("testtesttest" + "_correctPosition", interfacePivots.correctPosition.ToString());
 
         if (logStartEnd)
