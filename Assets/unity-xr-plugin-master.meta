@@ -1,5 +1,13 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
 guid: fc3305176d78d4c0691e20f478831be4
+=======
+<<<<<<< HEAD:Assets/AssetStoreOriginals.meta
+guid: 137fd2fee395140bd9bb9142e9469095
+=======
+guid: fc3305176d78d4c0691e20f478831be4
+>>>>>>> upstream/majorUpdate_230519:Assets/unity-xr-plugin-master.meta
+>>>>>>> upstream/majorUpdate_230519
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

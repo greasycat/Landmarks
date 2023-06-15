@@ -1,6 +1,4 @@
-﻿
-You will now see a summary of the 6 target objects that you will be required
-to learn the locations of in the virtual supermarket. You will later be asked to 
-navigate to each target object from various positions in the supermarket. 
+﻿You will now see the list of the 6 target objects that you will be required
+to learn the locations of in the virtual supermarket.  
 
 Press "Continue" to begin.

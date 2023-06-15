@@ -1,6 +1,7 @@
 
-NAVIGATION
+EXPLORATION
 
-You will be required to navigate to targets in the environment. 
-There is no time limit, so you will need to navigate to the current 
-destination before continuing on to the next trial or task.
+You will now enter the virtual supermarket. 
+You have 10 minutes to walk around and learn the locations of the 6 floating target objects.
+Press the trigger button when you feel you have learned the locations of all 6 target objects.
+Press the "Continue" button to begin.

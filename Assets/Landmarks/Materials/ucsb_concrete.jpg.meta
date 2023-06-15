@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< HEAD:Assets/Landmarks/Materials/ucsb_concrete.jpg.meta
 guid: d29586af569214be3b587f9b200ce9ae
+=======
+guid: 6c76f33728de24f569550e4c92d37349
+>>>>>>> upstream/majorUpdate_230519:Assets/Landmarks/Textures/LM_logo_icon.png.meta
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}

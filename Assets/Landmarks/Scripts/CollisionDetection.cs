@@ -22,43 +22,83 @@ public class CollisionDetection : MonoBehaviour {
 	private Experiment manager;
 	private dbLog log;
 
-
-	void OnControllerColliderHit(ControllerColliderHit hit)  {
-		if(hit.gameObject.tag == "Target") {
-			manager.OnControllerColliderHit(hit.gameObject);
-		}
-        else if (hit.gameObject.tag == "LocationColliders")
+    void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if (hit.gameObject.tag == "Target")
         {
-            Debug.Log("CONTROLLER COLLIDER HIT");
+            manager.OnControllerColliderHit(hit.gameObject); // something's that's attached to expt.
         }
     }
-
     private void OnCollisionEnter(Collision collision)
     {
-        if(collision.gameObject.tag == "Target")
+        if (collision.gameObject.tag == "Target")
         {
             manager.OnControllerColliderHit(collision.gameObject);
+            manager.collidingWithTargetNamed = collision.gameObject.name;
         }
     }
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.tag == "Target")
+        {
+            manager.collidingWithTargetNamed = "";
+        }
+    }
+    void OnTriggerEnter(Collider other)
+    {
+        manager.OnControllerColliderHit(other.gameObject);
+        if (other.CompareTag("Target")) manager.triggeredFromTargetNamed = other.name;
+    }
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Target")) manager.triggeredFromTargetNamed = "";
+    }
+    void Start()
+    {
+        //playerXYZPosition = avatarLog.getcomponent
+        GameObject experiment = GameObject.FindWithTag("Experiment");
+        manager = experiment.GetComponent("Experiment") as Experiment;
+    }
+    public void Update()
+    {
+    }
 
-    //private void OnTriggerEnter(Collider other)
-    //{
-    //    if (other.gameObject.tag == "LocationColliders")
-    //    {
-    //        Debug.Log("TRIGGER!!!!!!");
-    //    }
+    //void OnControllerColliderHit(ControllerColliderHit hit)  {
+    //	if(hit.gameObject.tag == "Target") {
+    //		manager.OnControllerColliderHit(hit.gameObject);
+    //	}
+    //       else if (hit.gameObject.tag == "LocationColliders")
+    //       {
+    //           Debug.Log("CONTROLLER COLLIDER HIT");
+    //       }
+    //   }
+
+    //   private void OnCollisionEnter(Collision collision)
+    //   {
+    //       if(collision.gameObject.tag == "Target")
+    //       {
+    //           manager.OnControllerColliderHit(collision.gameObject);
+    //       }
+    //   }
+
+    //   //private void OnTriggerEnter(Collider other)
+    //   //{
+    //   //    if (other.gameObject.tag == "LocationColliders")
+    //   //    {
+    //   //        Debug.Log("TRIGGER!!!!!!");
+    //   //    }
+    //   //}
+
+
+    //   void Start ()
+    //{		
+    //	GameObject experiment = GameObject.FindWithTag ("Experiment");
+    //    manager = experiment.GetComponent("Experiment") as Experiment;
+    //    log = manager.dblog;
     //}
 
 
-    void Start ()
-	{		
-		GameObject experiment = GameObject.FindWithTag ("Experiment");
-	    manager = experiment.GetComponent("Experiment") as Experiment;
-	    log = manager.dblog;
-	}
-	
-	
-	
+
 
 
 }

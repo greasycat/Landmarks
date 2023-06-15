@@ -29,7 +29,8 @@ public class MoveObject : ExperimentTask {
 	private static Vector3 position;
 	private static Quaternion rotation;
 	public ObjectList navTrialDestinations; //list of trial destinations
-	public GameObject currentNavTrialDestination; //current trial destination 
+	public GameObject currentNavTrialDestination; //current trial destination
+	public bool useSnappoint; 
 
 
 	public override void startTask () {
@@ -49,33 +50,38 @@ public class MoveObject : ExperimentTask {
 		}
 		
 		if ( destinations ) {
-			destination = destinations.currentObject();		
+			destination = destinations.currentObject();
+			if (useSnappoint && destination.GetComponentInChildren<LM_SnapPoint>() != null)
+			{
+				Debug.Log("Using Snappoint instead of the destination object itself");
+				destination = destination.GetComponentInChildren<LM_SnapPoint>().gameObject;
+			}
 		}
-		
-		currentNavTrialDestination = navTrialDestinations.currentObject();//listing current trial destination 
 
-		//checking if footprints have spawned near nav trial destination, and if so, to spawn to another location in the list
-		if (destination.name == currentNavTrialDestination.name)
-        {
-			Debug.Log("Footprints location same as trial destination!! Reassigning footprints Location"); 
-			int position = destinations.objects.IndexOf(destination);
-			
-				for (int i=0; i < destinations.objects.Count; i ++)
-			{ 	int newIndex = Random.Range(i, destinations.objects.Count);
+		//currentNavTrialDestination = navTrialDestinations.currentObject();//listing current trial destination 
 
-				if (newIndex == position)
-                {
-					int newIndex2 = Random.Range(i, destinations.objects.Count);
-					destination = destinations.objects[newIndex2];
-                }
+		////checking if footprints have spawned near nav trial destination, and if so, to spawn to another location in the list
+		//if (destination.name == currentNavTrialDestination.name)
+		//      {
+		//	Debug.Log("Footprints location same as trial destination!! Reassigning footprints Location"); 
+		//	int position = destinations.objects.IndexOf(destination);
 
-                else
-                {
-					destination = destinations.objects[newIndex];
-				}
-				
-            }
-        }
+		//		for (int i=0; i < destinations.objects.Count; i ++)
+		//	{ 	int newIndex = Random.Range(i, destinations.objects.Count);
+
+		//		if (newIndex == position)
+		//              {
+		//			int newIndex2 = Random.Range(i, destinations.objects.Count);
+		//			destination = destinations.objects[newIndex2];
+		//              }
+
+		//              else
+		//              {
+		//			destination = destinations.objects[newIndex];
+		//		}
+
+		//          }
+		//      }
 
 		//trialIndex = List.Index(navTrialDestinations, navTrialDestinations.currentObject); //finding index of current object in navTrialDestinations list 
 		//position = start.transform.position;
@@ -90,6 +96,7 @@ public class MoveObject : ExperimentTask {
 
 		} */
 
+		position = start.transform.position;
 		if (useLocalRotation) rotation = start.transform.localRotation;
         else rotation = start.transform.rotation;
 

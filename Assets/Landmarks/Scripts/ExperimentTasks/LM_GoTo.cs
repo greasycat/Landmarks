@@ -145,6 +145,7 @@ public class LM_GoTo : ExperimentTask
         hud.hudPanel.SetActive(true);
         hud.setMessage("");
         hud.SecondsToShow = hud.GeneralDuration;
+        atDestination = false;
     }
 
     private void OnTriggerEnter(Collider collision)

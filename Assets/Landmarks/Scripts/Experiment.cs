@@ -96,6 +96,12 @@ public class Experiment : MonoBehaviour
     protected AvatarController avatarController;
     protected HUD hud;
 
+    public TextMeshProUGUI trialCounter;
+
+    //[HideInInspector]
+    public string collidingWithTargetNamed = "";
+    public string triggeredFromTargetNamed = "";
+
     // -------------------------------------------------------------------------
     // -------------------------- Builtin Methods ------------------------------
     // -------------------------------------------------------------------------
@@ -109,6 +115,7 @@ public class Experiment : MonoBehaviour
         // ------------------------------
 
         // trialLogger = new LM_TrialLog();
+        dblog = new dbLog();
 
         // check if we have any old Landmarks instances from LoadScene.cs and handle them
         GameObject oldInstance = GameObject.Find("OldInstance");
@@ -267,19 +274,20 @@ public class Experiment : MonoBehaviour
 
         if (config.runMode == ConfigRunMode.NEW)
         {
-            dblog = new dbLog(dataPath + logfile, config.appendLogFiles && config.levelNumber > 0); 
+            dblog.logFileName = dataPath + logfile;
+            dblog.appendToLog = true; //config.appendLogFiles && config.levelNumber > 0; 
         }
         else if (config.runMode == ConfigRunMode.RESUME)
         {
-            dblog = new dbPlaybackLog(dataPath + logfile);
+            dblog.logFileName = dataPath + logfile;
+            dblog.appendToLog = true;
         }
-        else if (config.runMode == ConfigRunMode.PLAYBACK)
-        {
-            CharacterController c = avatar.GetComponent<CharacterController>();
-            c.detectCollisions = false;
-            
-            dblog = new dbPlaybackLog(dataPath + logfile);
-        }
+        // else if (config.runMode == ConfigRunMode.PLAYBACK)
+        // {
+        //     CharacterController c = avatar.GetComponent<CharacterController>();
+        //     c.detectCollisions = false;
+        //     dblog = new dbPlaybackLog(dataPath + logfile);
+        // }
 
         // dblog.log("EXPERIMENT:\t" + config.experiment + "\tSUBJECT:\t" + config.subject +
         //           "\tSTART_SCENE\t" + config.levelNames[config.levelNumber] + "\tSTART_CONDITION:\t" + config.conditions[config.levelNumber] + "\tUI:\t" + userInterface.ToString(), 1);
@@ -320,6 +328,8 @@ public class Experiment : MonoBehaviour
         {
             scaledEnvironment = null;
         }
+        
+        if (trialCounter != null) trialCounter.text = string.Format("{0} / {1}", config.levelNumber+1, config.levelNames.Count);
     }
 
     async void Update()
@@ -766,8 +776,8 @@ public class Experiment : MonoBehaviour
             if (usingVR)
             {
                 // Use steam functions to avoid issues w/ framerate drop
-
                 SteamVR_LoadLevel.Begin(config.levelNames[config.levelNumber]);
+                
                 Destroy(transform.parent.gameObject);
                 Debug.Log("Loading new VR scene");
             }

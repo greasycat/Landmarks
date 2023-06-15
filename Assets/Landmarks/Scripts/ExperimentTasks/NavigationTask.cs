@@ -23,7 +23,8 @@ public class NavigationTask : ExperimentTask
     [Header("Task-specific Properties")]
     public ObjectList destinations;
     public GameObject currentTarget;
-
+    public ObjectList listOfNavStarts;
+    public GameObject startingLocation;
     public TextAsset NavigationInstruction;
     public float desiredSphereYPosition = 1.5f;
 
@@ -46,6 +47,7 @@ public class NavigationTask : ExperimentTask
 
     // Handle the rendering of the target objects (default: always show)
     public HideTargetOnStart hideTargetOnStart;
+    public float unmaskStartObjectFor; 
     public GameObject targetMaskPrefab;
     public float showTargetAfterSeconds;
     public bool hideNonTargets;
@@ -78,6 +80,14 @@ public class NavigationTask : ExperimentTask
     private Vector3 startXYZ;
     private Vector3 endXYZ;
 
+    //For distance to closest target logging
+    private Vector2 endXZ;
+
+    //For distance to border logging
+    public string borderObjectTag = "BorderObjects"; // Tag for the border objects
+    private List<float> distancesToBorder = new List<float>(); // List to store frame by frame distances to border
+    private List<GameObject> borderObjects2 = new List<GameObject>();
+    public Vector2 playerBorderSumAndMeasurements;
 
     public float GetStartTime()
     {
@@ -96,6 +106,17 @@ public class NavigationTask : ExperimentTask
         base.startTask();
         //TL Comments: In each "TASK" (InstructionsTask, NavigationTask, etc.), we'll have a base.{method}, such as: base.startTask, base.updateTask, base.endTask, etc. Base refers to the parent class that this script derives from, aka: ExperimentTask.cs. We call the appropriate methods in any script derived from ExperimentTask, by using base(dot).
         //fixmefixmefixme: calc. the shortest distance b/w player controller & tagged target object, and store that name as avariable. Once that variable is indexed, once we do the masking stuff, do this masking stuff for all target obj's EXCEPT this specific target object
+
+        foreach (GameObject obj in listOfNavStarts.objects.Distinct<GameObject>())
+        {
+            if (obj.activeSelf == false) { continue; }
+            obj.SetActive(true);
+            foreach (Transform child in obj.GetComponentsInChildren<Transform>(true))
+            {
+                child.gameObject.SetActive(true);
+            }
+        }
+
 
         if (skip)
         {
@@ -189,6 +210,35 @@ public class NavigationTask : ExperimentTask
                 currentTarget.GetComponentInChildren<MeshRenderer>().enabled = false;
 
             }
+
+            else if (hideTargetOnStart == HideTargetOnStart.Mask)
+
+                foreach (GameObject target in destinations.objects.Distinct<GameObject>())
+                {
+                    // turning off the target object meshrenderers
+                    MeshRenderer[] meshRenderers = target.GetComponentsInChildren<MeshRenderer>();
+                    foreach (MeshRenderer meshRenderer in meshRenderers) meshRenderer.enabled = false;
+                    // Instantiate a new instance of your red sphere
+                    int numSpheres = 0;
+                    if (numSpheres < destinations.objects.Distinct<GameObject>().Count())
+                    // if the # of spheres is less than 9...
+                    {
+                        GameObject newSphere = Instantiate(targetMaskPrefab,
+                        position: new Vector3(target.transform.position.x, desiredSphereYPosition, target.transform.position.z),
+                        rotation: Quaternion.identity,
+                        parent: transform);
+                        newSphere.name = target.name + "_mask";
+                        newSphere.tag = "RedSphereTag"; // after spawning in these spheres, tag them with "RedSphereTag"
+                        numSpheres++;
+                    }
+                }
+            // Handle if we're temporarily showing the start
+            if (unmaskStartObjectFor > 0 && unmaskStartObjectFor < Mathf.Infinity)
+            {
+                StartCoroutine(UnmaskStartObjectFor());
+            }
+
+
             else
             {
                 currentTarget.SetActive(true); // make sure the target is visible unless the bool to hide was checked
@@ -264,36 +314,44 @@ public class NavigationTask : ExperimentTask
 
             if (vrEnabled & haptics) SteamVR_Actions.default_Haptic.Execute(0f, 2.0f, 65f, 1f, SteamVR_Input_Sources.Any);
 
+            //foreach (var obj in GameObject.FindGameObjectsWithTag("BorderObjects")) {
+            //    Debug.Log("BORDER OBJECT -------------------------------" + obj.name);
+            //    borderObjects2.Add(obj);
+            //}
+            
         }
+
+        //find starting location of player (where the trial started)
+
+        if (!listOfNavStarts)
+        {
+            Debug.LogWarning("No trial start locations specified; task will run as" +
+                " free exploration with specified time Alloted or distance alloted" +
+                " (whichever is less)");
+
+            // Make a dummy placeholder for exploration task to avoid throwing errors
+            var tmp_2 = new List<GameObject>();
+            tmp_2.Add(gameObject);
+            gameObject.AddComponent<ObjectList>();
+            gameObject.GetComponent<ObjectList>().objects = tmp_2;
+
+
+            listOfNavStarts = gameObject.GetComponent<ObjectList>();
+
+        }
+        startingLocation = listOfNavStarts.currentObject();
     }
 
     public override bool updateTask()
     {
         base.updateTask();
-        Debug.Log($"Start Timer: {startTime}");
-
+        
         // use experiment.cs to get each target object on which the desired collider SHOULD be attached
         for (int i = 0; i < manager.targetObjects.transform.childCount; i++)
         {
             targetObjectColliders.Add(manager.targetObjects.transform.GetChild(i).gameObject);
         }
-        // Loop through them to check
-        //foreach (GameObject targetObjectPoint in targetObjectColliders) ///fixmefixmefixme 03-06
-        //{
-        //    Collider targetObjectPointColliders = targetObjectPoint.GetComponent<Collider>();
-        //    Bounds targetObjectPointBounds = targetObjectPointColliders.GetComponent<Bounds>();
-        //    Debug.Log("\tAccess to targetObjectPoints collider and bounds");
-        //    if (targetObjectPointBounds.Contains(playerLastPosition))
-        //    {
-        //        isPlayerInside = true;
-        //    }
-        //    if (isPlayerInside == true)
-        //    {
-        //        Debug.Log("helloo world");
-        //    }
-
-        //}
-
+        
         if (skip)
         {
             //log.log("INFO    skip task    " + name,1 );
@@ -336,38 +394,7 @@ public class NavigationTask : ExperimentTask
                     currentTarget.GetComponentInChildren<MeshRenderer>().enabled = true;
                     break;
                 case HideTargetOnStart.Mask:
-                    // everything except for the starting object should be masked
-                    // Loop through all the targets
-                    //Debug.Log("MAAAAAAAAAAAAAAAAAAAASSSSSSSSSSSSSSSSSSSSSSKKKKKKKKKKKKKKKKKKKKKKK");
-                    int numSpheres = 0;
-                    foreach (GameObject target in destinations.objects.Distinct<GameObject>())
-                    {
-                        // Set the target's meshrenderers off
-                        //target.SetActive(false);
-                        MeshRenderer[] meshRenderers = target.GetComponentsInChildren<MeshRenderer>();
-                        foreach (MeshRenderer meshRenderer in meshRenderers) meshRenderer.enabled = false;
-
-                        // Instantiate a new instance of your red sphere
-                        if (numSpheres < destinations.objects.Count)
-                        {
-                            GameObject newSphere = Instantiate(targetMaskPrefab,
-                            position: new Vector3(target.transform.position.x, desiredSphereYPosition, target.transform.position.z),
-                            rotation: Quaternion.identity,
-                            parent: transform);
-                            numSpheres++;
-                        }
-
-                        //fixmefixmefixme spheres keep being instantiated (multiples of 9) as the navigation task proceeds. need to destroy them somehow?
-                        //Debug.Log("\tInstantiated the " + target.name + "mask");
-                    }
-                    GameObject[] spheres = GameObject.FindGameObjectsWithTag("RedSphereTag");
-                    if (spheres.Length > destinations.objects.Count)
-                    {
-                        for (int i = destinations.objects.Count; i < spheres.Length; i++)
-                        {
-                            Destroy(spheres[i]);
-                        }
-                    }
+                    
                     break;
                 default:
                     Debug.Log("No hidden targets identified");
@@ -380,8 +407,43 @@ public class NavigationTask : ExperimentTask
 
         // Keep updating the distance traveled and kill task if they reach max
         playerDistance += Vector3.Distance(avatar.GetComponent<LM_PlayerController>().collisionObject.transform.position, playerLastPosition);
-        clockwiseTravel += Vector3Angle2D(playerLastPosition, avatar.GetComponent<LM_PlayerController>().collisionObject.transform.position);
+        // Subtract the counter-clockwise angle since the last frame to get clockwise movement
+        clockwiseTravel -= Vector3Angle2D(playerLastPosition, avatar.GetComponent<LM_PlayerController>().collisionObject.transform.position);
         playerLastPosition = avatar.GetComponent<LM_PlayerController>().collisionObject.transform.position;
+
+
+        // Keep updating the calculations for borderDistances
+        //logging distance to border at each frame, then finding the average value for the entire trial 
+        //float closestDistance;
+        //GameObject closestBorderObject;
+
+        //var playerBorderDistances = new Dictionary<string, float>();
+        //foreach (GameObject borderObject in borderObjects2)
+        //{
+        //    Vector3 closestBorderPoint = borderObject.GetComponent<Collider>().ClosestPointOnBounds(manager.player.transform.position);
+        //    float player2borderDist = Vector3Distance2D(closestBorderPoint, manager.player.transform.position);
+        //    playerBorderDistances.Add(borderObject.name, player2borderDist);
+
+        //    //float distance = Vector3.Distance(avatar.GetComponent<LM_PlayerController>().collisionObject.transform.position, borderObject.transform.position); //calculating distance from player to each border object
+
+        //    //if (distance < closestDistance) //initially setting the closest object & distance as the first border object's distance & name, then updating and replacing this if smaller distance value is found as script iterates through list of border objects
+        //    //{
+        //    //    closestDistance = distance;
+        //    //    Debug.Log("closestDistance:" + closestDistance);
+        //    //    closestBorderObject = borderObject;
+        //    //    Debug.Log("closestBorderObject:" + closestBorderObject);
+        //    //}
+        //}
+        //var closestBorder = playerBorderDistances.OrderBy(kvp => kvp.Value).First();
+        //Debug.Log(closestBorder.Key + " is the closest border object, located " + closestBorder.Value + "m, orthongonally from the player");
+        //playerBorderSumAndMeasurements += new Vector2(closestBorder.Value, 1);
+
+
+        //if (closestBorderObject != null)
+        //{
+        //    distancesToBorder.Add(closestDistance); //adding value to frame by frame distances to border list 
+
+        //}
 
         if (isScaled)
         {
@@ -424,46 +486,42 @@ public class NavigationTask : ExperimentTask
             return KillCurrent();
         }
 
-        //bool allowContinue;
-        //Debug.Log("Currently hitting target named: " + manager.collidingWithTargetNamed);
-        //if (onlyContinueFromTargets && manager.collidingWithTargetNamed == "")
-        //{
-        //    allowContinue = false;
-        //}
-        //else allowContinue = true;
-
-
-
-        // fixme - Issue with this method of ending the trial breaking HUD (normal collisions ok)
-        if (Time.time - startTime > allowContinueAfter)
+        // In order to allow manual progression, allowContinueAfter must not be zero and enough time must have passed
+        if (allowContinueAfter != Mathf.Infinity && Time.time - startTime > allowContinueAfter)
+        //fixme 06-01: when the obj is masked ->...
         {
-            if (vrEnabled)
+            // They either need to be allowed to continue from anywhere or be at one of the targets to provide input
+            if (!onlyContinueFromTargets || (onlyContinueFromTargets &&
+                                            (manager.triggeredFromTargetNamed != "" || manager.collidingWithTargetNamed != "")
+                                            ))
             {
-                if (vrInput.TriggerButton.GetStateDown(SteamVR_Input_Sources.Any))
+                // Take some response input
+                if (vrEnabled)
+                {
+                    if (vrInput.TriggerButton.GetStateDown(SteamVR_Input_Sources.Any))
+                    {
+                        Debug.Log("Participant ended the trial");
+                        log.log("INPUT_EVENT    Player Arrived at Destination    1", 1);
+                        //hud.hudPanel.SetActive(false);
+                        //hud.setMessage("");
+                        if (haptics) SteamVR_Actions.default_Haptic.Execute(0f, 2.0f, 65f, 1f, SteamVR_Input_Sources.Any);
+                        return true;
+                    }
+                }
+                if (Input.GetKeyDown(KeyCode.Return))
                 {
                     Debug.Log("Participant ended the trial");
                     log.log("INPUT_EVENT    Player Arrived at Destination    1", 1);
-                    hud.hudPanel.SetActive(false);
-                    hud.setMessage("");
-
-                    if (haptics) SteamVR_Actions.default_Haptic.Execute(0f, 2.0f, 65f, 1f, SteamVR_Input_Sources.Any);
-
+                    //hud.hudPanel.SetActive(false);
+                    //hud.setMessage("");
                     return true;
                 }
             }
-            if (Input.GetKeyDown(KeyCode.Return))
-            {
-                Debug.Log("Participant ended the trial");
-                log.log("INPUT_EVENT    Player Arrived at Destination    1", 1);
-                hud.hudPanel.SetActive(false);
-                hud.setMessage("");
-                return true;
-            }
         }
-
-
         return false;
+
     }
+    
 
     public override void endTask()
     {
@@ -487,6 +545,16 @@ public class NavigationTask : ExperimentTask
     public override void TASK_END()
     {
         base.endTask();
+
+        foreach (GameObject obj in listOfNavStarts.objects.Distinct<GameObject>())
+        {
+            if (obj.activeSelf == false) { continue; }
+            obj.SetActive(true);
+            foreach (Transform child in obj.GetComponentsInChildren<Transform>(true))
+            {
+                child.gameObject.SetActive(true);
+            }
+        }
         // Find all instances of InterfacePivot and call stroyAllInterfaces() on each one
         // Find all instances of InterfacePivot 
         //InterfacePivot[] interfacePivots = FindObjectsOfType<InterfacePivot>();
@@ -528,6 +596,15 @@ public class NavigationTask : ExperimentTask
         //    pivot.destroyInterface();
         //}
 
+        GameObject[] spheres = GameObject.FindGameObjectsWithTag("RedSphereTag");
+        if (spheres.Length > 0)
+        {
+            for (int i = 0; i < spheres.Length; i++)
+            {
+                Destroy(spheres[i]);
+            }
+        }
+
         if (printRemainingTimeTo != null) printRemainingTimeTo.text = baseText;
         var navTime = Time.time - startTime;
 
@@ -545,8 +622,18 @@ public class NavigationTask : ExperimentTask
         }
 
         // re-enable everything on the gameobject we just finished finding
-        currentTarget.GetComponentInChildren<MeshRenderer>().enabled = true;
-        currentTarget.GetComponent<Collider>().enabled = true;
+        MeshRenderer[] meshRenderers = currentTarget.GetComponentsInChildren<MeshRenderer>();
+        if (meshRenderers != null)
+        {
+            foreach (MeshRenderer meshRenderer in meshRenderers)
+            {
+                meshRenderer.enabled = true;
+            }
+        }
+
+        // re-enable everything on the gameobject we just finished finding
+        //currentTarget.GetComponentInChildren<MeshRenderer>().enabled = true; June 1st edits, we took this out because it was breaking the task 
+        //currentTarget.GetComponent<Collider>().enabled = true; June 1st edits, we took this out because it was breaking the task 
         var halo = (Behaviour)currentTarget.GetComponent("Halo");
         if (halo != null) halo.enabled = true;
 
@@ -591,13 +678,59 @@ public class NavigationTask : ExperimentTask
         // 	masterTask.name + "\t" + masterTask.repeatCount + "\t" + parent.repeatCount + "\t" + currentTarget.name + "\t" + optimalDistance + "\t"+ perfDistance + "\t" + excessPath + "\t" + navTime
         //     , 1);
 
+        ////calculating average distance to border for trial 
+        ////private void CalculateAverageDistance()
+        //float totaldistancesToBorder = 0f;
+
+        //foreach (float distanceToBorder in distancesToBorder)
+        //{
+        //    totaldistancesToBorder += distanceToBorder;
+        //}
+
+        //var avgDist2border = playerBorderSumAndMeasurements[0] / playerBorderSumAndMeasurements[1];
+        //Debug.Log("Sum of all Dist measurements: " + playerBorderSumAndMeasurements[0] + "\t Total Measurements: " + playerBorderSumAndMeasurements[1] + "\t Avg Dist: " + avgDist2border);
+
+        //float averageDistanceToBorder = totaldistancesToBorder / distancesToBorder.Count;
+        //Debug.Log("Average Distance: " + averageDistanceToBorder);
+
+        //find finishing location of player (closest target object & distance to that target object)
+        GameObject[] objs = GameObject.FindGameObjectsWithTag("Target");
+        GameObject closest_obj = null;
+        float closestobjDistance = Mathf.Infinity;
+        endXZ = new Vector2(endXYZ.x, endXYZ.z);
+
+        foreach (GameObject obj in objs)
+        {
+            Vector3 objPosition = obj.transform.position;
+            Vector2 objPositionXZ = new Vector2(objPosition.x, objPosition.z);
+            float dist2obj = Vector2.Distance(endXZ, objPositionXZ);
+
+            if (dist2obj < closestobjDistance)
+            {
+                closestobjDistance = dist2obj;
+                closest_obj = obj;
+            }
+        }
+
+        if (closest_obj != null)
+        {
+            Debug.Log("Closest target: " + closest_obj.name);
+            Debug.Log("Distance to closest target: " + closestobjDistance);
+        }
+
+
+
         // More concise LM_TrialLog logging
+        taskLog.AddData(transform.name + "_start", startingLocation.name);
         taskLog.AddData(transform.name + "_target", currentTarget.name);
         taskLog.AddData(transform.name + "_actualPath", perfDistance.ToString());
         taskLog.AddData(transform.name + "_optimalPath", optimalDistance.ToString());
         taskLog.AddData(transform.name + "_excessPath", excessPath.ToString());
         taskLog.AddData(transform.name + "_clockwiseTravel", clockwiseTravel.ToString());
         taskLog.AddData(transform.name + "_duration", navTime.ToString());
+        //taskLog.AddData(transform.name + "averageDistToBorder", avgDist2border.ToString());
+        taskLog.AddData(transform.name + "_trialEndClosestTarget", closest_obj.name);
+        taskLog.AddData(transform.name + "_trialEndClosestTargetDist", closestobjDistance.ToString());
         //taskLog.AddData("testtesttest" + "_correctPosition", interfacePivots.correctPosition.ToString());
 
         if (logStartEnd)
@@ -661,21 +794,52 @@ public class NavigationTask : ExperimentTask
         currentTarget = destinations.currentObject();
     }
 
-    public override bool OnControllerColliderHit(GameObject hit)
-    {
-        if ((hit == currentTarget | hit.transform.parent.gameObject == currentTarget) &
-            hideTargetOnStart != HideTargetOnStart.DisableCompletely & hideTargetOnStart != HideTargetOnStart.SetInactive)
-        {
-            if (showScoring)
-            {
-                score = score + scoreIncrement;
-                hud.setScore(score);
-            }
-            return true;
-        }
+    //fixme COMMENTED THIS CHUNK OUT AS IT WAS INTERFERING WITH TRIAL PROGRESSION
+    //public override bool OnControllerColliderHit(GameObject hit)
+    //{
+    //    if ((hit == currentTarget | hit.transform.parent.gameObject == currentTarget) &
+    //        hideTargetOnStart != HideTargetOnStart.DisableCompletely & hideTargetOnStart != HideTargetOnStart.SetInactive)
+    //    {
+    //        if (showScoring)
+    //        {
+    //            score = score + scoreIncrement;
+    //            hud.setScore(score);
+    //        }
+    //        return true;
+    //    }
 
-        return false;
+    //    return false;
+    //}
+
+    public IEnumerator UnmaskStartObjectFor() // handles the "showing and hiding" the starting target object itself
+    {
+        
+        var startFromTarget = manager.targetObjects.transform.Find(listOfNavStarts.currentObject().name).gameObject;
+        startFromTarget.SetActive(true);
+        foreach (var mr in startFromTarget.transform.GetComponentsInChildren<MeshRenderer>())
+        {
+            mr.gameObject.SetActive(true); // Start GO: ON
+            mr.enabled = true; // Start GO meshrenderer: ON
+        }
+        transform.Find(startFromTarget.name + "_mask").gameObject.SetActive(false); // Target Red sphere mask: OFF
+        yield return new WaitForSeconds(unmaskStartObjectFor);
+        foreach (var mr in startFromTarget.transform.GetComponentsInChildren<MeshRenderer>())
+        {
+            mr.gameObject.SetActive(false);  // Start GO: OFF
+            mr.enabled = false; // Start GO meshrenderer: OFF
+            // is this line causing the error??? On subsequent trials, we're UNABLE to get the meshrenderer component, which could be due to 2 reasons:
+            // 1. Starting Target Gameobject was set to false in the previous trial, and never reset
+            // 2. Starting Target Gameoobject's meshrenderer was set to false in the previous trial, and never reset
+        }
+        transform.Find(startFromTarget.name + "_mask").gameObject.SetActive(true); // Target Red sphere mask: ON
+        //END RESULT AFTER FIRST RUN-THRU:
+        //  To reset ->...
+        //  Starting GameObject: ACTIVE(.setActive(true))
+        //  Starting GameObject Meshrenderer: ENABLED (.enabled = true;)
     }
+
+
+
 }
 
 
