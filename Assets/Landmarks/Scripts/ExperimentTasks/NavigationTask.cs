@@ -322,6 +322,23 @@ public class NavigationTask : ExperimentTask
         }
 
         //find starting location of player (where the trial started)
+
+        if (!listOfNavStarts)
+        {
+            Debug.LogWarning("No trial start locations specified; task will run as" +
+                " free exploration with specified time Alloted or distance alloted" +
+                " (whichever is less)");
+
+            // Make a dummy placeholder for exploration task to avoid throwing errors
+            var tmp_2 = new List<GameObject>();
+            tmp_2.Add(gameObject);
+            gameObject.AddComponent<ObjectList>();
+            gameObject.GetComponent<ObjectList>().objects = tmp_2;
+
+
+            listOfNavStarts = gameObject.GetComponent<ObjectList>();
+
+        }
         startingLocation = listOfNavStarts.currentObject();
     }
 
