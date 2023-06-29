@@ -314,10 +314,12 @@ public class NavigationTask : ExperimentTask
 
             if (vrEnabled & haptics) SteamVR_Actions.default_Haptic.Execute(0f, 2.0f, 65f, 1f, SteamVR_Input_Sources.Any);
 
-            //foreach (var obj in GameObject.FindGameObjectsWithTag("BorderObjects")) {
-            //    Debug.Log("BORDER OBJECT -------------------------------" + obj.name);
-            //    borderObjects2.Add(obj);
-            //}
+            //Adding Border Objects to List
+            foreach (var b_obj in GameObject.FindGameObjectsWithTag("BorderObjects"))
+            {
+            Debug.Log("BORDER OBJECT -------------------------------" + b_obj.name);
+            borderObjects2.Add(b_obj);
+            }
             
         }
 
@@ -417,33 +419,34 @@ public class NavigationTask : ExperimentTask
         //float closestDistance;
         //GameObject closestBorderObject;
 
-        //var playerBorderDistances = new Dictionary<string, float>();
-        //foreach (GameObject borderObject in borderObjects2)
-        //{
-        //    Vector3 closestBorderPoint = borderObject.GetComponent<Collider>().ClosestPointOnBounds(manager.player.transform.position);
-        //    float player2borderDist = Vector3Distance2D(closestBorderPoint, manager.player.transform.position);
-        //    playerBorderDistances.Add(borderObject.name, player2borderDist);
+        var playerBorderDistances = new Dictionary<string, float>();
+        foreach (GameObject borderObject in borderObjects2)
+        {
+            Vector3 closestBorderPoint = borderObject.GetComponent<Collider>().ClosestPointOnBounds(manager.player.transform.position);
+            float player2borderDist = Vector3Distance2D(closestBorderPoint, manager.player.transform.position);
+            playerBorderDistances.Add(borderObject.name, player2borderDist);
 
-        //    //float distance = Vector3.Distance(avatar.GetComponent<LM_PlayerController>().collisionObject.transform.position, borderObject.transform.position); //calculating distance from player to each border object
+            //float distance = Vector3.Distance(avatar.GetComponent<LM_PlayerController>().collisionObject.transform.position, borderObject.transform.position); //calculating distance from player to each border object
 
-        //    //if (distance < closestDistance) //initially setting the closest object & distance as the first border object's distance & name, then updating and replacing this if smaller distance value is found as script iterates through list of border objects
-        //    //{
-        //    //    closestDistance = distance;
-        //    //    Debug.Log("closestDistance:" + closestDistance);
-        //    //    closestBorderObject = borderObject;
-        //    //    Debug.Log("closestBorderObject:" + closestBorderObject);
-        //    //}
-        //}
-        //var closestBorder = playerBorderDistances.OrderBy(kvp => kvp.Value).First();
-        //Debug.Log(closestBorder.Key + " is the closest border object, located " + closestBorder.Value + "m, orthongonally from the player");
-        //playerBorderSumAndMeasurements += new Vector2(closestBorder.Value, 1);
+            //if (distance < closestDistance) //initially setting the closest object & distance as the first border object's distance & name, then updating and replacing this if smaller distance value is found as script iterates through list of border objects
+            //{
+            //closestDistance = distance;
+            //Debug.Log("closestDistance:" + closestDistance);
+            //closestBorderObject = borderObject;
+            //Debug.Log("closestBorderObject:" + closestBorderObject);
+            //}
+        }
+
+        var closestBorder = playerBorderDistances.OrderBy(kvp => kvp.Value).First();
+        Debug.Log(closestBorder.Key + " is the closest border object, located " + closestBorder.Value + "m, orthongonally from the player");
+        playerBorderSumAndMeasurements += new Vector2(closestBorder.Value, 1);
 
 
-        //if (closestBorderObject != null)
-        //{
-        //    distancesToBorder.Add(closestDistance); //adding value to frame by frame distances to border list 
+       //if (closestBorderObject != null)
+       //{
+       //     distancesToBorder.Add(closestDistance); //adding value to frame by frame distances to border list 
 
-        //}
+       //}
 
         if (isScaled)
         {
@@ -520,6 +523,7 @@ public class NavigationTask : ExperimentTask
         }
         return false;
 
+        
     }
     
 
@@ -678,8 +682,8 @@ public class NavigationTask : ExperimentTask
         // 	masterTask.name + "\t" + masterTask.repeatCount + "\t" + parent.repeatCount + "\t" + currentTarget.name + "\t" + optimalDistance + "\t"+ perfDistance + "\t" + excessPath + "\t" + navTime
         //     , 1);
 
-        ////calculating average distance to border for trial 
-        ////private void CalculateAverageDistance()
+        //calculating average distance to border for trial 
+        //private void CalculateAverageDistance()
         //float totaldistancesToBorder = 0f;
 
         //foreach (float distanceToBorder in distancesToBorder)
@@ -687,8 +691,8 @@ public class NavigationTask : ExperimentTask
         //    totaldistancesToBorder += distanceToBorder;
         //}
 
-        //var avgDist2border = playerBorderSumAndMeasurements[0] / playerBorderSumAndMeasurements[1];
-        //Debug.Log("Sum of all Dist measurements: " + playerBorderSumAndMeasurements[0] + "\t Total Measurements: " + playerBorderSumAndMeasurements[1] + "\t Avg Dist: " + avgDist2border);
+        var avgDist2border = playerBorderSumAndMeasurements[0] / playerBorderSumAndMeasurements[1];
+        Debug.Log("Sum of all Dist measurements: " + playerBorderSumAndMeasurements[0] + "\t Total Measurements: " + playerBorderSumAndMeasurements[1] + "\t Avg Dist: " + avgDist2border);
 
         //float averageDistanceToBorder = totaldistancesToBorder / distancesToBorder.Count;
         //Debug.Log("Average Distance: " + averageDistanceToBorder);
@@ -721,14 +725,14 @@ public class NavigationTask : ExperimentTask
 
 
         // More concise LM_TrialLog logging
-        taskLog.AddData(transform.name + "_start", startingLocation.name);
+        //taskLog.AddData(transform.name + "_start", startingLocation.name);
         taskLog.AddData(transform.name + "_target", currentTarget.name);
         taskLog.AddData(transform.name + "_actualPath", perfDistance.ToString());
         taskLog.AddData(transform.name + "_optimalPath", optimalDistance.ToString());
         taskLog.AddData(transform.name + "_excessPath", excessPath.ToString());
         taskLog.AddData(transform.name + "_clockwiseTravel", clockwiseTravel.ToString());
         taskLog.AddData(transform.name + "_duration", navTime.ToString());
-        //taskLog.AddData(transform.name + "averageDistToBorder", avgDist2border.ToString());
+        taskLog.AddData(transform.name + "averageDistToBorder", avgDist2border.ToString());
         taskLog.AddData(transform.name + "_trialEndClosestTarget", closest_obj.name);
         taskLog.AddData(transform.name + "_trialEndClosestTargetDist", closestobjDistance.ToString());
         //taskLog.AddData("testtesttest" + "_correctPosition", interfacePivots.correctPosition.ToString());
