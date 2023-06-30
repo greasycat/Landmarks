@@ -440,13 +440,14 @@ public class NavigationTask : ExperimentTask
         var closestBorder = playerBorderDistances.OrderBy(kvp => kvp.Value).First();
         Debug.Log(closestBorder.Key + " is the closest border object, located " + closestBorder.Value + "m, orthongonally from the player");
         playerBorderSumAndMeasurements += new Vector2(closestBorder.Value, 1);
+        playerBorderDistances.Clear();//fixmefixmefixme 
+        Debug.Log("Dictionary Reset");
+        
+        //if (closestBorderObject != null)
+        //{
+        //     distancesToBorder.Add(closestDistance); //adding value to frame by frame distances to border list 
 
-
-       //if (closestBorderObject != null)
-       //{
-       //     distancesToBorder.Add(closestDistance); //adding value to frame by frame distances to border list 
-
-       //}
+        //}
 
         if (isScaled)
         {
@@ -693,6 +694,7 @@ public class NavigationTask : ExperimentTask
 
         var avgDist2border = playerBorderSumAndMeasurements[0] / playerBorderSumAndMeasurements[1];
         Debug.Log("Sum of all Dist measurements: " + playerBorderSumAndMeasurements[0] + "\t Total Measurements: " + playerBorderSumAndMeasurements[1] + "\t Avg Dist: " + avgDist2border);
+       
 
         //float averageDistanceToBorder = totaldistancesToBorder / distancesToBorder.Count;
         //Debug.Log("Average Distance: " + averageDistanceToBorder);
