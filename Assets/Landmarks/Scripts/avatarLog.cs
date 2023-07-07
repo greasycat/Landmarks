@@ -52,8 +52,8 @@ public class avatarLog : MonoBehaviour
 	void FixedUpdate()
 	{
 
-		// Checking if player pressed button 
-		if (Input.GetKey(KeyCode.Space))
+		// Checking if player pressed button to indicate that they've fully learned locations of all target objects 
+		if (Input.GetKey(KeyCode.Space) || Input.GetButtonDown("RightTrigger") || Input.GetButtonDown("LeftTrigger"))
 		{
 			KeyPress = "True";
 		}
@@ -62,6 +62,7 @@ public class avatarLog : MonoBehaviour
 			KeyPress = "False";
 		}
 
+		
 		foreach (GameObject targetObject in targetObjects)
         {
 			IsVisibleFromCamera(targetObject, controller.cam);

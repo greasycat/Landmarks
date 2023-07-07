@@ -3,7 +3,6 @@ Welcome!
 
 Thank you for participating in this experiment. You will shortly be placed inside 
 a virtual supermarket, and your task is to walk around and learn the locations of the 
-6 floating target objects. The list of the target objects will
-be shown in the next slide. If you have any questions, please inform the experimenter before beginning. 
+6 floating target objects. If you have any questions, please inform the experimenter before beginning. 
 
-Press "Continue" to begin.
+Press "Continue" using the trigger button, to begin.

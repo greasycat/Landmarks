@@ -424,8 +424,16 @@ public class NavigationTask : ExperimentTask
         {
             Vector3 closestBorderPoint = borderObject.GetComponent<Collider>().ClosestPointOnBounds(manager.player.transform.position);
             float player2borderDist = Vector3Distance2D(closestBorderPoint, manager.player.transform.position);
-            playerBorderDistances.Add(borderObject.name, player2borderDist);
 
+            if (playerBorderDistances.ContainsKey(borderObject.name))// adding this if statement to prevent task from crashing on route retracing trial 
+            {
+                playerBorderDistances[borderObject.name] += player2borderDist;
+            }
+
+            else
+            {
+                playerBorderDistances.Add(borderObject.name, player2borderDist);
+            }
             //float distance = Vector3.Distance(avatar.GetComponent<LM_PlayerController>().collisionObject.transform.position, borderObject.transform.position); //calculating distance from player to each border object
 
             //if (distance < closestDistance) //initially setting the closest object & distance as the first border object's distance & name, then updating and replacing this if smaller distance value is found as script iterates through list of border objects
@@ -440,15 +448,8 @@ public class NavigationTask : ExperimentTask
         var closestBorder = playerBorderDistances.OrderBy(kvp => kvp.Value).First();
         Debug.Log(closestBorder.Key + " is the closest border object, located " + closestBorder.Value + "m, orthongonally from the player");
         playerBorderSumAndMeasurements += new Vector2(closestBorder.Value, 1);
-        playerBorderDistances.Clear();//fixmefixmefixme 
-        Debug.Log("Dictionary Reset");
+                
         
-        //if (closestBorderObject != null)
-        //{
-        //     distancesToBorder.Add(closestDistance); //adding value to frame by frame distances to border list 
-
-        //}
-
         if (isScaled)
         {
             scaledPlayerDistance += Vector3.Distance(scaledAvatar.transform.position, scaledPlayerLastPosition);
