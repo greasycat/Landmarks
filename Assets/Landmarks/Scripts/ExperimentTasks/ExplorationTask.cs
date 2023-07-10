@@ -497,10 +497,10 @@ public class ExplorationTask : ExperimentTask
         if (allowContinueAfter != Mathf.Infinity && Time.time - startTime > allowContinueAfter)
         //fixme 06-01: when the obj is masked ->...
         {
-            // They either need to be allowed to continue from anywhere or be at one of the targets to provide input
-            if (!onlyContinueFromTargets || (onlyContinueFromTargets &&
-                                            (manager.triggeredFromTargetNamed != "" || manager.collidingWithTargetNamed != "")
-                                            ))
+            //// They either need to be allowed to continue from anywhere or be at one of the targets to provide input
+            //if (!onlyContinueFromTargets || (onlyContinueFromTargets &&
+            //                                //(manager.triggeredFromTargetNamed != "" || manager.collidingWithTargetNamed != "")
+            //                                ))
             {
                 // Take some response input
                 if (vrEnabled)

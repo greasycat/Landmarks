@@ -89,6 +89,10 @@ public class NavigationTask : ExperimentTask
     private List<GameObject> borderObjects2 = new List<GameObject>();
     public Vector2 playerBorderSumAndMeasurements;
 
+    // record which object they end at, and whether they went to the right object
+    private GameObject participantEndTarget;
+    private GameObject dummyLogging;
+
     public float GetStartTime()
     {
         return startTime;
@@ -106,6 +110,9 @@ public class NavigationTask : ExperimentTask
         base.startTask();
         //TL Comments: In each "TASK" (InstructionsTask, NavigationTask, etc.), we'll have a base.{method}, such as: base.startTask, base.updateTask, base.endTask, etc. Base refers to the parent class that this script derives from, aka: ExperimentTask.cs. We call the appropriate methods in any script derived from ExperimentTask, by using base(dot).
         //fixmefixmefixme: calc. the shortest distance b/w player controller & tagged target object, and store that name as avariable. Once that variable is indexed, once we do the masking stuff, do this masking stuff for all target obj's EXCEPT this specific target object
+
+        dummyLogging = Instantiate(gameObject, new Vector3(0, 0, 0), Quaternion.identity);
+        dummyLogging.name = "NA";
 
         foreach (GameObject obj in listOfNavStarts.objects.Distinct<GameObject>())
         {
@@ -497,7 +504,8 @@ public class NavigationTask : ExperimentTask
         {
             // They either need to be allowed to continue from anywhere or be at one of the targets to provide input
             if (!onlyContinueFromTargets || (onlyContinueFromTargets &&
-                                            (manager.triggeredFromTargetNamed != "" || manager.collidingWithTargetNamed != "")
+                                            (manager.currentlyAtTarget != null)
+                                            //(manager.triggeredFromTargetNamed != "" || manager.collidingWithTargetNamed != "")
                                             ))
             {
                 // Take some response input
@@ -505,6 +513,7 @@ public class NavigationTask : ExperimentTask
                 {
                     if (vrInput.TriggerButton.GetStateDown(SteamVR_Input_Sources.Any))
                     {
+                        participantEndTarget = manager.currentlyAtTarget;
                         Debug.Log("Participant ended the trial");
                         log.log("INPUT_EVENT    Player Arrived at Destination    1", 1);
                         //hud.hudPanel.SetActive(false);
@@ -515,12 +524,22 @@ public class NavigationTask : ExperimentTask
                 }
                 if (Input.GetKeyDown(KeyCode.Return))
                 {
+                    participantEndTarget = manager.currentlyAtTarget;
                     Debug.Log("Participant ended the trial");
                     log.log("INPUT_EVENT    Player Arrived at Destination    1", 1);
                     //hud.hudPanel.SetActive(false);
                     //hud.setMessage("");
                     return true;
                 }
+            }
+
+            else
+            {
+                participantEndTarget = dummyLogging;
+                Debug.Log($"Name of Participant end target (DNF) {participantEndTarget.name}");
+                Debug.Log($"Name of dummyLogging (DNF) {dummyLogging.name}");
+                Debug.Log("Participant ran out of time");
+                log.log("INPUT_EVENT   Player ran out of time   1", 1);
             }
         }
         return false;
@@ -728,8 +747,10 @@ public class NavigationTask : ExperimentTask
 
 
         // More concise LM_TrialLog logging
-        //taskLog.AddData(transform.name + "_start", startingLocation.name);
+        taskLog.AddData(transform.name + "_start", startingLocation.name);
         taskLog.AddData(transform.name + "_target", currentTarget.name);
+        taskLog.AddData(transform.name + "_endedAtTarget", participantEndTarget.name); //
+        taskLog.AddData(transform.name + "_endedAtCorrectTarget", (participantEndTarget == destinations.currentObject()).ToString()); //
         taskLog.AddData(transform.name + "_actualPath", perfDistance.ToString());
         taskLog.AddData(transform.name + "_optimalPath", optimalDistance.ToString());
         taskLog.AddData(transform.name + "_excessPath", excessPath.ToString());
@@ -802,21 +823,21 @@ public class NavigationTask : ExperimentTask
     }
 
     //fixme COMMENTED THIS CHUNK OUT AS IT WAS INTERFERING WITH TRIAL PROGRESSION
-    //public override bool OnControllerColliderHit(GameObject hit)
-    //{
-    //    if ((hit == currentTarget | hit.transform.parent.gameObject == currentTarget) &
-    //        hideTargetOnStart != HideTargetOnStart.DisableCompletely & hideTargetOnStart != HideTargetOnStart.SetInactive)
-    //    {
-    //        if (showScoring)
-    //        {
-    //            score = score + scoreIncrement;
-    //            hud.setScore(score);
-    //        }
-    //        return true;
-    //    }
+    public override bool OnControllerColliderHit(GameObject hit)
+    {
+        //if ((hit == currentTarget | hit.transform.parent.gameObject == currentTarget) &
+        //    hideTargetOnStart != HideTargetOnStart.DisableCompletely & hideTargetOnStart != HideTargetOnStart.SetInactive)
+        //{
+        //    if (showScoring)
+        //    {
+        //        score = score + scoreIncrement;
+        //        hud.setScore(score);
+        //    }
+        //    return true;
+        //}
 
-    //    return false;
-    //}
+        return false;
+    }
 
     public IEnumerator UnmaskStartObjectFor() // handles the "showing and hiding" the starting target object itself
     {

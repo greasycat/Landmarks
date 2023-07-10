@@ -99,8 +99,9 @@ public class Experiment : MonoBehaviour
     public TextMeshProUGUI trialCounter;
 
     //[HideInInspector]
-    public string collidingWithTargetNamed = "";
-    public string triggeredFromTargetNamed = "";
+    //public string collidingWithTargetNamed = "";
+    //public string triggeredFromTargetNamed = "";
+    public GameObject currentlyAtTarget;
 
     // -------------------------------------------------------------------------
     // -------------------------- Builtin Methods ------------------------------
