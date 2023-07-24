@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Valve.VR;
+using Valve.VR.InteractionSystem;
 
 public class avatarLog : MonoBehaviour
 {
@@ -13,11 +15,14 @@ public class avatarLog : MonoBehaviour
 	private Experiment manager;
 	private LM_PlayerController controller;
 
-	private string location = "Nowhere";
-	private string previousLocation = "Nowhere";
+	private string location = "CURRENTLY NOWHERE";
+	private string previousLocation = "PREVIOUSLY Nowhere";
 	private string KeyPress;
 	private string TargetObjectVisibility;
-	private GameObject[] targetObjects; 
+	private GameObject[] targetObjects;
+	//private Experiment vrInput;
+	private ExperimentTask vrEnabled;
+	private SteamVR_Input_ActionSet_landmarks vrInput;
 
 	void Start()
 	{
@@ -29,6 +34,8 @@ public class avatarLog : MonoBehaviour
 		body = controller.collisionObject.transform;
 		head = controller.cam.transform;
 		targetObjects = GameObject.FindGameObjectsWithTag("Target");
+		// set up vrInput if we're using VR
+		if (vrEnabled) vrInput = SteamVR_Input.GetActionSet<SteamVR_Input_ActionSet_landmarks>(default);
 
 	}
 
@@ -37,7 +44,7 @@ public class avatarLog : MonoBehaviour
 		if (Input.GetKeyDown(KeyCode.Alpha0))
 		{
 			Debug.Log("Someone is trying to erase us from space-time!");
-			location = "Nowhere";
+			location = "PARADOX Nowhere";
 		}
 
 		if (previousLocation != location)
@@ -45,30 +52,42 @@ public class avatarLog : MonoBehaviour
 			Debug.Log("We have left " + previousLocation + ". Now entering " + location);
 		}
 
-
-
-	}
-	// Update is called once per frame
-	void FixedUpdate()
-	{
-
 		// Checking if player pressed button to indicate that they've fully learned locations of all target objects 
-		if (Input.GetKey(KeyCode.Space) || Input.GetButtonDown("RightTrigger") || Input.GetButtonDown("LeftTrigger"))
+		if (Input.GetKey(KeyCode.Space))
 		{
 			KeyPress = "True";
+			Debug.Log("Participant thinks they've learned entire layout");
 		}
 		else
 		{
 			KeyPress = "False";
 		}
 
-		
+		if (vrEnabled)
+		{
+			if (vrInput.TriggerButton.GetStateDown(SteamVR_Input_Sources.Any))
+			{
+				KeyPress = "True";
+				Debug.Log("Participant thinks they've learned entire layout");
+			}
+
+			else
+			{
+				KeyPress = "False";
+			}
+		}
+
+	}
+	// Update is called once per frame
+	void FixedUpdate()
+	{
+	
 		foreach (GameObject targetObject in targetObjects)
         {
 			IsVisibleFromCamera(targetObject, controller.cam);
 			
 		}
-
+			
 
 		// fixmefixmefixme Checking if target objects are visible as player moves around; 
 
@@ -93,6 +112,7 @@ public class avatarLog : MonoBehaviour
 		// Log the name of the tracked object, it's body position, body rotation, and camera (head) rotation
 		if (navLog)
 		{
+			Debug.Log("---------------------------- " + location + " -------------------------------");
 			//print("AVATAR_POS	" + "\t" +  avatar.position.ToString("f3") + "\t" + "AVATAR_Body " + "\t" +  cameraCon.localEulerAngles.ToString("f3") +"\t"+ "AVATAR_Head " + cameraRig.localEulerAngles.ToString("f3"));
 			log.log("Avatar: \t" + controller.name + "\t" +
 					"Body Position (xyz): \t" + body.position.x + "\t" + body.position.y + "\t" + body.position.z + "\t" +
@@ -107,12 +127,45 @@ public class avatarLog : MonoBehaviour
 		}
 	}
 
-	void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision collision)
+    {
+		if (collision.gameObject.tag == "LocationColliders")
+		{
+			location = collision.gameObject.name;
+			Debug.Log("COLLIDER IS TRIGGERING!!!! At " + location);
+		}
+	}
+
+    private void OnCollisionStay(Collision collision)
+    {
+		if (collision.gameObject.tag == "LocationColliders")
+		{
+			if (location == "ERRONEOUS Nowhere")
+			{
+				location = collision.gameObject.name;
+				Debug.LogWarning("Fixing an error in current location assignment; everything is okay!");
+			}
+			Debug.Log("STILL at " + collision.gameObject.name);
+		}
+	}
+
+    private void OnCollisionExit(Collision collision)
+    {
+		if (collision.gameObject.tag == "LocationColliders")
+		{
+
+			location = "EXITED TO Nowhere";
+			previousLocation = collision.gameObject.name;
+			Debug.Log("COLLIDER IS TRIGGERING!!!!");
+		}
+	}
+
+    void OnTriggerEnter(Collider other)
 	{
 		if (other.gameObject.tag == "LocationColliders")
 		{
 			location = other.gameObject.name;
-			Debug.Log("COLLIDER IS TRIGGERING!!!!");
+			Debug.Log("COLLIDER IS TRIGGERING!!!! At " + location);
 		}
 	}
 
@@ -120,7 +173,7 @@ public class avatarLog : MonoBehaviour
 	{
 		if (other.gameObject.tag == "LocationColliders")
 		{
-			if (location == "Nowhere")
+			if (location == "ERRONEOUS Nowhere")
 			{
 				location = other.gameObject.name;
 				Debug.LogWarning("Fixing an error in current location assignment; everything is okay!");
@@ -134,7 +187,7 @@ public class avatarLog : MonoBehaviour
 		if (other.gameObject.tag == "LocationColliders")
 		{
 
-			location = "Nowhere";
+			location = "EXITED TO Nowhere";
 			previousLocation = other.gameObject.name;
 			Debug.Log("COLLIDER IS TRIGGERING!!!!");
 		}

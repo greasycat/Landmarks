@@ -5,4 +5,4 @@ Thank you for participating in this experiment. You will shortly be placed insid
 a virtual supermarket, and your task is to walk around and learn the locations of the 
 6 floating target objects. If you have any questions, please inform the experimenter before beginning. 
 
-Press "Continue" using the trigger button, to begin.
+Press "Continue" using the trackpad, to begin.
