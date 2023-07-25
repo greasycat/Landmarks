@@ -51,6 +51,7 @@ public class MoveObject : ExperimentTask {
 		
 		if ( destinations ) {
 			destination = destinations.currentObject();
+			Debug.Log("Printing Destinations ------" + destination);
 			if (useSnappoint && destination.GetComponentInChildren<LM_SnapPoint>() != null)
 			{
 				Debug.Log("Using Snappoint instead of the destination object itself");

@@ -123,7 +123,7 @@ public class LM_CompassPointing : ExperimentTask
         if (avatar.GetComponent<FirstPersonController>() != null)
         {
             avatar.GetComponent<FirstPersonController>().enabled = false; // disable the controller
-            avatar.transform.position = location.transform.position; // move player to the pointing location
+            //avatar.transform.position = location.transform.position; // move player to the pointing location
 
             // Point the player at the orientation for JRD or a random orientation for SOP start
             avatar.transform.LookAt(orientation.transform); 
