@@ -48,6 +48,7 @@ public class Experiment : MonoBehaviour
 
     public GameObject availableControllers;
     public UserInterface userInterface = UserInterface.KeyboardMouse;
+    public float fadeDistance = 1.0f;
     public GameObject targetObjects;
     // public bool debugging = false;
     

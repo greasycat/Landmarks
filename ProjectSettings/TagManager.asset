@@ -17,6 +17,7 @@ TagManager:
   - Error
   - Target
   - Task
+  - Painting
   layers:
   - Default
   - TransparentFX
