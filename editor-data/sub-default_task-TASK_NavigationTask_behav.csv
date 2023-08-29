@@ -1,0 +1,2 @@
+id,condition,sceneName,sceneNumber,task,block,trial,Navigate_target,Navigate_actualPath,Navigate_optimalPath,Navigate_excessPath,Navigate_clockwiseTravel,Navigate_duration,
+default,default,main,1,TASK_NavigationTask,1,1,Table,72.78572,3.567142,69.21858,-122.5644,35.55136,

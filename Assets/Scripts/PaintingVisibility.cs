@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.ProBuilder;
 using UnityEngine.Serialization;
@@ -9,6 +10,8 @@ public class PaintingVisibility : MonoBehaviour
 
     [SerializeField] private Experiment experiment;
     [SerializeField] private GameObject player;
+    [SerializeField] private TaskList taskList;
+    [SerializeField] private List<string> exceptTasks;
     private Transform _playerControllerTransform;
 
     private Renderer _objectRenderer;
@@ -37,6 +40,11 @@ public class PaintingVisibility : MonoBehaviour
         {
             Debug.LogWarning("TransparencyController is missing a Renderer or playerEntity.");
         }
+
+        if (taskList == null || exceptTasks == null)
+        {
+            Debug.LogWarning("Must specify a task list");
+        }
     }
 
     private float decay(float x)
@@ -49,9 +57,14 @@ public class PaintingVisibility : MonoBehaviour
         return Mathf.Exp(-2.0f * (x-1.5f));
     }
 
+    private bool checkIfLearning()
+    {
+        return exceptTasks.Any(exp => exp == taskList.currentTask.name);
+    }
+
     private void Update()
     {
-        if (!_isSetupComplete)
+        if (!_isSetupComplete || checkIfLearning())
         {
             return;
         }
@@ -62,8 +75,8 @@ public class PaintingVisibility : MonoBehaviour
         // Calculate a factor between 0 and 1 based on how close the object is to becoming fully transparent
         var fadeFactor = decay(distance);
         
-        Debug.Log($"Distance: {distance}");
-        Debug.Log($"Factor: {fadeFactor}");
+        // Debug.Log($"Distance: {distance}");
+        // Debug.Log($"Factor: {fadeFactor}");
 
         // Adjust transparency accordingly
         var newColor = new Color(

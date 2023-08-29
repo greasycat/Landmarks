@@ -48,6 +48,8 @@ public class LM_PermutedList : ExperimentTask
 
         // Generate permutations
         permutedList = Permute(listToPermute.objects, subset).ToList();
+        // Debug.LogWarning($"Subset: {subset}");
+        // Debug.LogWarning($"PermutedList: {permutedList}");
 
         // Shuffle if necessary
         if (shuffle)

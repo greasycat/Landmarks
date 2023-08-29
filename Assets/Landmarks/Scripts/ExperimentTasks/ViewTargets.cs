@@ -158,6 +158,12 @@ public class ViewTargets : ExperimentTask {
 		}
 		return false;
 	}
+
+	public void rescale(float factor = 2.0f)
+	{
+		current.transform.localScale *= 2;
+	}
+	
 	public void initCurrent() {
 		// store original properties of the target
 		position = current.transform.position;
@@ -168,8 +174,10 @@ public class ViewTargets : ExperimentTask {
 		// move the target to the viewing location temporarily
 		current.transform.parent = destination.transform;
 		current.transform.localPosition = objectPositionOffset;
+		var currentAngles = current.transform.localEulerAngles;
+		objectRotationOffset.x = currentAngles.x;
         current.transform.localEulerAngles = objectRotationOffset;
-        current.transform.localScale = Vector3.Scale(current.transform.localScale, destination.transform.localScale);
+        current.transform.localScale = Vector3.Scale(current.transform.localScale, destination.transform.localScale) * 10f;
 
 		// return the target to its original parent (we'll revert other values later)
 		// this way it won't track with the "head" of the avatar
