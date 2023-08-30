@@ -41,13 +41,9 @@ public class PaintingVisibility : MonoBehaviour
             Debug.LogWarning("TransparencyController is missing a Renderer or playerEntity.");
         }
 
-        if (taskList == null || exceptTasks == null)
-        {
-            Debug.LogWarning("Must specify a task list");
-        }
     }
 
-    private float decay(float x)
+    private static float Decay(float x)
     {
         if (x <= 1.5)
         {
@@ -57,14 +53,24 @@ public class PaintingVisibility : MonoBehaviour
         return Mathf.Exp(-2.0f * (x-1.5f));
     }
 
-    private bool checkIfLearning()
+    private bool CheckIfLearning()
     {
+        if (taskList == null || exceptTasks == null || taskList.currentTask == null)
+        {
+            return false;
+        }
+
         return exceptTasks.Any(exp => exp == taskList.currentTask.name);
     }
 
     private void Update()
     {
-        if (!_isSetupComplete || checkIfLearning())
+        if (!_isSetupComplete)
+        {
+            return;
+        }
+
+        if (CheckIfLearning())
         {
             return;
         }
@@ -73,7 +79,7 @@ public class PaintingVisibility : MonoBehaviour
         var distance = Vector3.Distance(_playerControllerTransform.position, transform.position);
 
         // Calculate a factor between 0 and 1 based on how close the object is to becoming fully transparent
-        var fadeFactor = decay(distance);
+        var fadeFactor = Decay(distance);
         
         // Debug.Log($"Distance: {distance}");
         // Debug.Log($"Factor: {fadeFactor}");
