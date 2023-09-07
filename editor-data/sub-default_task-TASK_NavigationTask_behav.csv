@@ -1,0 +1,2 @@
+id,condition,sceneName,sceneNumber,task,block,trial,Navigate_target,Navigate_actualPath,Navigate_optimalPath,Navigate_excessPath,Navigate_clockwiseTravel,Navigate_duration,
+default,default,main,1,TASK_NavigationTask,1,1,Skateboard,65.95089,2.890243,63.06065,63.98912,30.28569,
