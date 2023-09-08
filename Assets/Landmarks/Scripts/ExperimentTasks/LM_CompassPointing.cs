@@ -34,13 +34,15 @@ public class LM_CompassPointing : ExperimentTask
     public TextAsset jrdText;
     public TextAsset rvdText;
     public LM_PermutedList listOfTriads;
+    public ObjectList listOfLocations;
+    public ObjectList listofTargets;
     public bool randomStartRotation;
     public Vector3 compassPosOffset = new Vector3(0f, 0f, -2f);
     public Vector3 compassRotOffset = new Vector3(15f, 0f, 0f);
     [Min(0f)]
     public float secondsBeforeResponse = 5.0f; // how long before they can submit answer
 
-    private List<GameObject> questionItems; 
+    public List<GameObject> questionItems; 
     private GameObject location; // standing at the...
     private GameObject orientation; // facing the...
     private GameObject target; // point to the...
@@ -79,10 +81,25 @@ public class LM_CompassPointing : ExperimentTask
         // Configure the Task-independent variables ----------------------------
         // ---------------------------------------------------------------------
 
-        questionItems = listOfTriads.GetCurrentSubset(); // Get the objects for this question
+        if (listOfTriads != null && (listOfLocations == null && listofTargets == null))
+        {
+            questionItems = listOfTriads.GetCurrentSubset(); // Get the objects for this question
+        }
+        else if (listOfTriads == null && (listOfLocations != null && listofTargets != null))
+        {
+            questionItems = new List<GameObject>();
+            questionItems.Add(listOfLocations.currentObject());
+            questionItems.Add(listofTargets.currentObject());
+        }
+        else
+        {
+            Debug.LogError("You need to figure out where you're getting your objects from (listOfTriads or listOfPairs");
+        }
+
+        
         location = questionItems[0]; // where to the player is positioned (anchor 1)
-        orientation = questionItems[1]; // where the player is facing (anchor 2)
-        target = questionItems[2]; // where the player is estimating 
+        //orientation = questionItems[1]; // where the player is facing (anchor 2)
+        target = questionItems[1]; // where the player is estimating 
 
 
         // ---------------------------------------------------------------------
@@ -126,7 +143,7 @@ public class LM_CompassPointing : ExperimentTask
             //avatar.transform.position = location.transform.position; // move player to the pointing location
 
             // Point the player at the orientation for JRD or a random orientation for SOP start
-            avatar.transform.LookAt(orientation.transform); 
+            //avatar.transform.LookAt(orientation.transform); 
 
             // Reset the camera to be zeroed on the controller position (i.e. looking straight forward)
             avatar.GetComponentInChildren<Camera>().transform.localEulerAngles = Vector3.zero; // reset the camera
@@ -246,7 +263,7 @@ public class LM_CompassPointing : ExperimentTask
         // --------------------------
         taskLog.AddData(transform.name + "_task", format.ToString());
         taskLog.AddData(transform.name + "_location", location.name);
-        taskLog.AddData(transform.name + "_orientation", orientation.name);
+        //taskLog.AddData(transform.name + "_orientation", orientation.name);
         taskLog.AddData(transform.name + "_target", target.name);
         taskLog.AddData(transform.name + "_compassStartAngle", startAngle.ToString()); // record where we started the compass at
         taskLog.AddData(transform.name + "_responseCW", response.ToString());
@@ -255,7 +272,7 @@ public class LM_CompassPointing : ExperimentTask
         taskLog.AddData(transform.name + "_absError", absError.ToString());
         taskLog.AddData(transform.name + "_SOPorientingTime", orientTime.ToString());
         taskLog.AddData(transform.name + "_responseTime", responseTime.ToString());
-        
+
     }
 
 
@@ -263,7 +280,16 @@ public class LM_CompassPointing : ExperimentTask
     {
         base.endTask();
 
-        listOfTriads.IncrementCurrentSubset(); // next set of targets
+        if (listOfTriads != null && (listOfLocations == null && listofTargets == null))
+        {
+            listOfTriads.IncrementCurrentSubset(); // next set of targets
+        }
+        else if (listOfTriads == null && (listOfLocations != null && listofTargets != null))
+        {
+            listofTargets.incrementCurrent();
+        }
+
+        
         oriented = false; // reset for next SOP trial (if any)
         compass.interactable = false; // shut off the compass object's function
         compass.gameObject.SetActive(false); // hide the compass

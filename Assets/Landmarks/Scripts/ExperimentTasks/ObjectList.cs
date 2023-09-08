@@ -30,17 +30,26 @@ public class ObjectList : ExperimentTask {
 	public List<GameObject> objects;
 	public EndListMode EndListBehavior; 
 	public bool shuffle;
+	public bool resetList;
+
     // public GameObject order; // DEPRICATED
 
-    
-	public override void startTask () {
+    public override void startTask () {
         //ViewObject.startObjects.current = 0;
         //current = 0;
 
 		GameObject[] objs;
 
-        if (objects.Count == 0)
+        if (objects.Count == 0 || resetList)
         {
+			Debug.LogError("The if statement is running");
+			if (resetList)
+			{
+				Debug.LogError("RESETTING LIST");
+				objects.Clear();
+				current = 0;
+			}
+
             if (parentObject == null & parentName == "") Debug.LogError("No objects found for objectlist.");
 
             // If parentObject is left blank and parentName is not, use parentName to get parentObject

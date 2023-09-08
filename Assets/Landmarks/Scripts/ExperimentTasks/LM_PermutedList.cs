@@ -32,8 +32,6 @@ public class LM_PermutedList : ExperimentTask
 
     //[HideInInspector]
     public List<List<GameObject>> permutedList = new List<List<GameObject>>();
-    
-
 
     public override void startTask()
     {
