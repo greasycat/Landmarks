@@ -42,7 +42,7 @@ public class ObjectList : ExperimentTask {
 
         if (objects.Count == 0 || resetList)
         {
-			Debug.LogError("The if statement is running");
+			//Debug.LogError("The if statement is running");
 			if (resetList)
 			{
 				Debug.LogError("RESETTING LIST");

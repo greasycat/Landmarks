@@ -21,6 +21,10 @@ TagManager:
   - TargetObjectColliders
   - RedSphereTag
   - BorderObjects
+  - FxTemporaire
+  - projectile
+  - StartingLocations
+  - NavigationLocations
   layers:
   - Default
   - TransparentFX

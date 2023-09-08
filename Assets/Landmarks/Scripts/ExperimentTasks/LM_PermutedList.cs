@@ -89,17 +89,47 @@ public class LM_PermutedList : ExperimentTask
         for (int i = 0; i < subset; i++)
         {
             var ol = new GameObject();
-            
-            ol.AddComponent<ObjectList>();
+            // Add an ObjectList component to the new game object and set its endListBehavior
+            var olComponent = ol.AddComponent<ObjectList>();
+            olComponent.EndListBehavior = EndListMode.End;
             var thing = Instantiate(ol, transform);
             thing.name = this.name + "_subset" + i;
-
+            if (i == 0 && thing.name.Contains("_subset0"))
+            {
+                thing.tag = "StartingLocations";
+            }
+            else if (i == 1 && thing.name.Contains("_subset1"))
+            {
+                thing.tag = "NavigationLocations";
+            }
             foreach (var entry in permutedList)
             {
                 thing.GetComponent<ObjectList>().objects.Add(entry[i]);
             }
             Destroy(ol);
+            //ol.AddComponent<ObjectList>();
+            //var thing = Instantiate(ol, transform);
+            //thing.name = this.name + “_subset” + i;
+            //foreach (var entry in permutedList)
+            //{
+            //    thing.GetComponent<ObjectList>().objects.Add(entry[i]);
+            //}
+            //Destroy(ol);
         }
+        //for (int i = 0; i < subset; i++)
+        //{
+        //    var ol = new GameObject();
+
+        //    ol.AddComponent<ObjectList>();
+        //    var thing = Instantiate(ol, transform);
+        //    thing.name = this.name + "_subset" + i;
+
+        //    foreach (var entry in permutedList)
+        //    {
+        //        thing.GetComponent<ObjectList>().objects.Add(entry[i]);
+        //    }
+        //    Destroy(ol);
+        //}
     }
 
 
