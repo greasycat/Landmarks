@@ -18,6 +18,7 @@ TagManager:
   - Target
   - Task
   - Painting
+  - RegionTrigger
   layers:
   - Default
   - TransparentFX
