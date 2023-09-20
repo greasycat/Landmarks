@@ -1,0 +1,2 @@
+id,condition,sceneName,sceneNumber,task,block,trial,Navigate_target,Navigate_actualPath,Navigate_optimalPath,Navigate_excessPath,Navigate_clockwiseTravel,Navigate_duration,Navigate_startX,Navigate_startZ,Navigate_endX,Navigate_endZ,
+default,default,main,1,TASK_NavigationTask,1,1,Guitar,16.77059,2.333534,14.43705,310.0313,9.250767,0,-2.741813E-08,1.407062,-1.248237,
