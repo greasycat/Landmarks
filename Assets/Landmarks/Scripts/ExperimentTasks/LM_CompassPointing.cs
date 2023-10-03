@@ -58,6 +58,13 @@ public class LM_CompassPointing : ExperimentTask
     private float orientTime; // save the time to orient (SOP only)
     private float responseTime; // save the time to answer
 
+    // Handle the rendering of the target objects (default: always show)
+    public HideTargetOnStart hideTargetOnStart;
+    public float unmaskStartObjectFor;
+    public GameObject targetMaskPrefab;
+    public float showTargetAfterSeconds;
+    public bool hideNonTargets;
+
     public override void startTask()
     {
         TASK_START();
@@ -181,7 +188,19 @@ public class LM_CompassPointing : ExperimentTask
             compass.interactable = true;
             oriented = true;
         }
-        
+
+        // Handle if we're hiding all the non-targets
+        if (hideNonTargets)
+        {
+            foreach (GameObject item in listOfLocations.objects)
+            {
+                if (item.name != listOfLocations.currentObject().name)
+                {
+                    item.SetActive(false);
+                }
+                else item.SetActive(true);
+            }
+        }
     }
 
 
@@ -295,7 +314,7 @@ public class LM_CompassPointing : ExperimentTask
         compass.gameObject.SetActive(false); // hide the compass
         // Free Movement
         if (avatar.GetComponent<FirstPersonController>() != null) avatar.GetComponent<FirstPersonController>().enabled = true; // if using 1stPerson controller
-        manager.player.GetComponent<CharacterController>().enabled = false;
+        manager.player.GetComponent<CharacterController>().enabled = true;
     }
 
 }

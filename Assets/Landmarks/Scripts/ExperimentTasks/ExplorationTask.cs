@@ -34,6 +34,7 @@ public class ExplorationTask : ExperimentTask
     public float distanceAllotted = Mathf.Infinity;
     [Tooltip("in seconds")]
     public float timeAllotted = Mathf.Infinity;
+    public float timeRemaining;
     [Tooltip("Do we want time or distance remaining to be broadcast somewhere?")]
     public TextMeshProUGUI printRemainingTimeTo;
     private string baseText;
@@ -264,6 +265,7 @@ public class ExplorationTask : ExperimentTask
 
             // startTime = Current time in seconds
             startTime = Time.time;
+            Debug.Log("The time is" + startTime);
 
             // Get the avatar start location (distance = 0)
             playerDistance = 0.0f;
@@ -474,7 +476,7 @@ public class ExplorationTask : ExperimentTask
 
 
         float distanceRemaining = distanceAllotted - playerDistance;
-        float timeRemaining = timeAllotted - (Time.time - startTime);
+        timeRemaining = timeAllotted - (Time.time - startTime);
         // If we have a place to output ongoing trial info (time/dist remaining), use it
         if (printRemainingTimeTo != null)
         {
@@ -485,7 +487,16 @@ public class ExplorationTask : ExperimentTask
         if (!isScaled & playerDistance >= distanceAllotted) return true;
         else if (isScaled & scaledPlayerDistance >= distanceAllotted) return true;
         // End the trial if they reach the max time allotted
-        if (Time.time - startTime >= timeAllotted) return true;
+        if (Time.time - startTime >= timeAllotted)
+        {
+            Debug.Log("Time has run out!");
+            Debug.Log("Time Alloted is:" + timeAllotted);
+            Debug.Log("Diff. b/w start time and current time" + (Time.time - startTime));
+            Debug.Log("The current time is" + (Time.time));
+            Debug.Log("The start time is" + startTime);
+            return true;
+        }
+        return true;
 
 
         if (killCurrent == true)
@@ -820,6 +831,8 @@ public class ExplorationTask : ExperimentTask
             destinations.incrementCurrent();
         }
         currentTarget = destinations.currentObject();
+
+        timeRemaining = 0f;
     }
 
     //fixme COMMENTED THIS CHUNK OUT AS IT WAS INTERFERING WITH TRIAL PROGRESSION

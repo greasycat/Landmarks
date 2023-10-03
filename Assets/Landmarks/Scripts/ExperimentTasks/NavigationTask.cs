@@ -93,6 +93,9 @@ public class NavigationTask : ExperimentTask
     private GameObject participantEndTarget;
     private GameObject dummyLogging;
 
+    //hiding the exploration phase countdown timer when the navigation task begins
+    public TL_ExplorationCountdownTimer ExplorationCountdownTimer;
+
     public float GetStartTime()
     {
         return startTime;
@@ -108,6 +111,15 @@ public class NavigationTask : ExperimentTask
     {
         if (!manager) Start();
         base.startTask();
+
+        //hiding the exploration phase countdown timer when the navigation task begins
+        if (ExplorationCountdownTimer != null)
+        {
+            Debug.Log("Turning off exploration phase timer");
+            ExplorationCountdownTimer.enabled = false;
+            ExplorationCountdownTimer.DisableTimer();
+        }
+
         //TL Comments: In each "TASK" (InstructionsTask, NavigationTask, etc.), we'll have a base.{method}, such as: base.startTask, base.updateTask, base.endTask, etc. Base refers to the parent class that this script derives from, aka: ExperimentTask.cs. We call the appropriate methods in any script derived from ExperimentTask, by using base(dot).
         //fixmefixmefixme: calc. the shortest distance b/w player controller & tagged target object, and store that name as avariable. Once that variable is indexed, once we do the masking stuff, do this masking stuff for all target obj's EXCEPT this specific target object
 
@@ -490,8 +502,15 @@ public class NavigationTask : ExperimentTask
         if (!isScaled & playerDistance >= distanceAllotted) return true;
         else if (isScaled & scaledPlayerDistance >= distanceAllotted) return true;
         // End the trial if they reach the max time allotted
-        if (Time.time - startTime >= timeAllotted) return true;
-
+        if (Time.time - startTime >= timeAllotted)
+        {
+            participantEndTarget = dummyLogging;
+            Debug.Log($"Name of Participant end target (DNF) {participantEndTarget.name}");
+            Debug.Log($"Name of dummyLogging (DNF) {dummyLogging.name}");
+            Debug.Log("Participant ran out of time");
+            log.log("INPUT_EVENT   Player ran out of time   1", 1);
+            return true;
+        }
 
         if (killCurrent == true)
         {
@@ -533,14 +552,6 @@ public class NavigationTask : ExperimentTask
                 }
             }
 
-            else
-            {
-                participantEndTarget = dummyLogging;
-                Debug.Log($"Name of Participant end target (DNF) {participantEndTarget.name}");
-                Debug.Log($"Name of dummyLogging (DNF) {dummyLogging.name}");
-                Debug.Log("Participant ran out of time");
-                log.log("INPUT_EVENT   Player ran out of time   1", 1);
-            }
         }
         return false;
 
