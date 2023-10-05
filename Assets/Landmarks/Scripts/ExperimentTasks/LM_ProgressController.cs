@@ -18,6 +18,8 @@ public class LM_ProgressController : MonoBehaviour
     [FormerlySerializedAs("configPath")] [NotEditable] public string savePath;
     
     [SerializeField] private bool deleteCurrentSaveFileOnEditorQuit = false;
+    private FileStream currentSaveFileStream;
+    private StreamWriter currentSaveWriter;
 
     private void Awake()
     {
@@ -40,6 +42,13 @@ public class LM_ProgressController : MonoBehaviour
         lastSaveStack = File.ReadAllText(lastSaveFile).Split('\n').ToList();
         isLastSaveCompleted = CheckIfLastSaveIsCompleted();
         currentSaveFile = CreateSaveFile(savePath);
+        currentSaveFileStream = new FileStream(currentSaveFile, FileMode.Append, FileAccess.Write, FileShare.Read);
+        if (currentSaveFileStream == null)
+        {
+            Debug.LogError("Save file not created: " + currentSaveFile);
+            throw new Exception("Save file not created: " + currentSaveFile);
+        }
+        currentSaveWriter = new StreamWriter(currentSaveFileStream);
 
         Debug.Log("Last save file: " + string.Join(",", lastSaveStack));
     }
@@ -48,14 +57,9 @@ public class LM_ProgressController : MonoBehaviour
 
     private IEnumerator WriteToCurrentSaveFile(string text)
     {
-        yield return new WaitForSeconds(0.1f);
-        if (currentSaveFile == null) yield break;
-        // File.AppendAllText(currentSaveFile, text + "\n");
-        using (TextWriter tw = new StreamWriter(currentSaveFile, true))
-        {
-            tw.WriteLine(text);
-            tw.Close();
-        }
+        if (currentSaveFile == null || currentSaveFileStream == null) yield break;
+        currentSaveWriter.WriteLine(text);
+        currentSaveWriter.Flush();
     }
 
     public void RecordTaskStart(string taskName)
@@ -167,7 +171,7 @@ public class LM_ProgressController : MonoBehaviour
     {
         var timestamp = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
         var saveFile = Path.Combine(folderPath, "save_" + timestamp + ".txt");
-        File.Create(saveFile);
+        File.Create(saveFile).Dispose();
         if (!File.Exists(saveFile))
         {
             Debug.LogError("Save file not created: " + saveFile);
