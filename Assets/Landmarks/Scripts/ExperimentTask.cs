@@ -14,6 +14,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+using System;
 using UnityEngine;
 using System.Collections;
 using System.Reflection;
@@ -29,6 +30,7 @@ public class ExperimentTask : MonoBehaviour{
 	protected dbLog log;
 	protected Experiment manager;
 	protected avatarLog avatarLog;
+	protected LM_ProgressController progressController;
 	
     protected GameObject scaledAvatar; // MJS 2019 - track scaled avatar in scaled nav task
     protected avatarLog scaledAvatarLog; // MJS 2019 - track scaled avatar in scaled nav task
@@ -41,6 +43,7 @@ public class ExperimentTask : MonoBehaviour{
     protected ArrayList trialData;
 	
 	public bool skip = false;
+	public bool skipIfResume = false;
 	public bool canIncrementLists = true;
 
 	public int interval = 0;
@@ -93,6 +96,7 @@ public class ExperimentTask : MonoBehaviour{
 		overheadCamera = manager.overheadCamera;
         log = manager.dblog;
         vrEnabled = manager.usingVR;
+        progressController = FindObjectOfType<LM_ProgressController>();
 
         // set up vrInput if we're using VR
         if (vrEnabled) vrInput = SteamVR_Input.GetActionSet<SteamVR_Input_ActionSet_landmarks>(default);
@@ -130,6 +134,8 @@ public class ExperimentTask : MonoBehaviour{
             eegManager.EEGTrigger(startLabel);
             log.log("EEG_TRIGGER\tName\t" + startLabel + "\tValue\t" + eegManager.triggers[startLabel].ToString(), 1);
         }
+        
+        StartCoroutine(progressController.Instance.WriteToCurrentSaveFile("(" + name));
     }
 	
 	public virtual void TASK_START () {
@@ -196,7 +202,24 @@ public class ExperimentTask : MonoBehaviour{
 		currentInterrupt = 0;    //put here because of interrupts
 		log.log("TASK_END\t" + name + "\t" + this.GetType().Name + "\t" + duration,1 );
         hud.showNothing();
+        
+        StartCoroutine(progressController.Instance.WriteToCurrentSaveFile(name+")"));
 	}
+	
+	
+	public delegate bool TaskFilteringDelegate(ExperimentTask target);
+    public void Traverse(Action<ExperimentTask> action, TaskFilteringDelegate filteredDelegate)
+    {
+		action(this);
+        foreach (Transform task in transform)
+        {
+            var child = task.GetComponent<ExperimentTask>();
+            if (child != null && !filteredDelegate(this))
+            {
+                child.Traverse(action, filteredDelegate);
+            }
+        }
+    }
 
 
 	public virtual void TASK_END ()
