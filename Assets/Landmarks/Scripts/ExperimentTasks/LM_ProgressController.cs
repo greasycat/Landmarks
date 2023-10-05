@@ -1,15 +1,23 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class LM_ProgressController : MonoBehaviour
 {
-    public LM_ProgressController Instance { get; private set; }
-    [SerializeField] private readonly string _rootTaskName = "LM_Timeline";
-    [SerializeField] private string applicationName = "Landmarks";
-    [SerializeField] private string currentSaveFile;
-    private string configPath;
+    public static LM_ProgressController Instance { get; private set; }
+    [SerializeField] public string rootTaskName = "LM_Timeline";
+    [SerializeField] public string applicationName = "Landmarks";
+    [NotEditable] public string currentSaveFile;
+    [NotEditable] public string lastSaveFile;
+    [NotEditable] public List<string> lastSaveStack;
+    [NotEditable] public bool isLastSaveCompleted;
+    [FormerlySerializedAs("configPath")] [NotEditable] public string savePath;
+    
+    [SerializeField] private bool deleteCurrentSaveFileOnEditorQuit = false;
 
     private void Awake()
     {
@@ -27,10 +35,117 @@ public class LM_ProgressController : MonoBehaviour
 
     private void Start()
     {
-        configPath = GetSystemConfigFolder();
-        CreateSaveFile();
+        savePath = GetSystemConfigFolder();
+        lastSaveFile = GetLastSaveFile(savePath);
+        lastSaveStack = File.ReadAllText(lastSaveFile).Split('\n').ToList();
+        isLastSaveCompleted = CheckIfLastSaveIsCompleted();
+        currentSaveFile = CreateSaveFile(savePath);
+
+        Debug.Log("Last save file: " + string.Join(",", lastSaveStack));
     }
 
+
+
+    private IEnumerator WriteToCurrentSaveFile(string text)
+    {
+        yield return new WaitForSeconds(0.1f);
+        if (currentSaveFile == null) yield break;
+        // File.AppendAllText(currentSaveFile, text + "\n");
+        using (TextWriter tw = new StreamWriter(currentSaveFile, true))
+        {
+            tw.WriteLine(text);
+            tw.Close();
+        }
+    }
+
+    public void RecordTaskStart(string taskName)
+    {
+        StartCoroutine(WriteToCurrentSaveFile("(" + taskName));
+    }
+
+    public void RecordTaskEnd(string taskName)
+    {
+        StartCoroutine(WriteToCurrentSaveFile(taskName + ")"));
+    }
+
+    public void GetFirstTaskInLastSave()
+    {
+        // Get the first line of the last save stack
+        if (lastSaveStack.Count == 0) return;
+        var lastTask = lastSaveStack[0];
+        // match "(taskName"
+        if (!lastTask.StartsWith("(")) return;
+        var taskName = lastTask.Substring(1);
+        Debug.Log("Last task: " + taskName);
+    }
+
+    public void MarkTaskComplete(string taskName)
+    {
+        // Get the first line of the last save stack
+        if (lastSaveStack.Count == 0) return;
+        var firstTask = lastSaveStack[0];
+        // match "(taskName"
+        if (!firstTask.StartsWith("(" + taskName)) return;
+        // remove the first line
+        lastSaveStack.RemoveAt(0);
+    }
+
+    private bool CheckIfLastSaveIsCompleted()
+    {
+        // Get the first line of the last save stack
+        return lastSaveStack.Count >= 1
+               && lastSaveStack[0].StartsWith("(" + rootTaskName)
+               && lastSaveStack[lastSaveStack.Count - 1].StartsWith(rootTaskName + ")");
+    }
+
+    private bool SkipTheWholeTask(string taskName)
+    {
+        // Get the first line of the last save stack
+        if (lastSaveStack.Count == 0) return false;
+        var firstTask = lastSaveStack[0];
+        // match "(taskName"
+        if (!firstTask.StartsWith("(" + taskName)) return false;
+        // try to find the end of the task
+        var endTask = lastSaveStack.FindIndex((line) => line.StartsWith(taskName + ")"));
+        if (endTask == -1) return false;
+        // remove the whole task
+        lastSaveStack.RemoveRange(0, endTask + 1);
+        return true;
+    }
+
+    public void DeleteSaveFile(string saveFile)
+    {
+        var path = Path.Combine(savePath, saveFile);
+        File.Delete(path);
+        Debug.Log("Save file deleted: " + path);
+    }
+
+    public void DeleteAllSaveFiles()
+    {
+        var files = Directory.GetFiles(savePath);
+        foreach (var file in files)
+        {
+            File.Delete(file);
+            Debug.Log("Save file deleted: " + file);
+        }
+    }
+
+    public static string GetLastSaveFile(string filepath)
+    {
+        var files = Directory.GetFiles(filepath);
+        var latest = DateTime.MinValue;
+        var latestFile = "";
+        foreach (var file in files)
+        {
+            var timestamp = File.GetCreationTime(file);
+            if (timestamp <= latest) continue;
+
+            latest = timestamp;
+            latestFile = file;
+        }
+
+        return latestFile;
+    }
     public string GetSystemConfigFolder()
     {
         var configFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
@@ -48,67 +163,26 @@ public class LM_ProgressController : MonoBehaviour
     }
 
     //function to create a save file with current timestamp
-    public void CreateSaveFile()
+    public static string CreateSaveFile(string folderPath)
     {
         var timestamp = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
-        var saveFile = Path.Combine(configPath, "save_" + timestamp + ".txt");
+        var saveFile = Path.Combine(folderPath, "save_" + timestamp + ".txt");
         File.Create(saveFile);
         if (!File.Exists(saveFile))
         {
             Debug.LogError("Save file not created: " + saveFile);
-            return;
+            throw new Exception("Save file not created: " + saveFile);
         }
+
         Debug.Log("Save file created: " + saveFile);
-        currentSaveFile = saveFile;
-    }
-    
-    public string GetLastSaveFile()
-    {
-        var files = Directory.GetFiles(configPath);
-        var latest = DateTime.MinValue;
-        var latestFile = "";
-        foreach (var file in files)
-        {
-            var timestamp = File.GetCreationTime(file);
-            if (timestamp <= latest) continue;
-            
-            latest = timestamp;
-            latestFile = file;
-        }
-
-        return latestFile;
+        return saveFile;
     }
 
-    public void DeleteSaveFile(string saveFile)
-    {
-        var path = Path.Combine(configPath, saveFile);
-        File.Delete(path);
-        Debug.Log("Save file deleted: " + path);
-    }
-
-    public void DeleteAllSaveFiles()
-    {
-        var files = Directory.GetFiles(configPath);
-        foreach (var file in files)
-        {
-            File.Delete(file);
-            Debug.Log("Save file deleted: " + file);
-        }
-    }
-    
-    
-    public IEnumerator WriteToCurrentSaveFile(string text)
-    {
-        yield return new WaitForSeconds(0.1f);
-        if (currentSaveFile == null) yield break;
-        File.AppendAllText(currentSaveFile, text+"\n");
-    }
-    
     public static void PrintAllTaskInOrder()
     {
         var root = GameObject.Find("LM_Timeline");
         var rootTask = root.GetComponent<TaskList>();
-        rootTask.Traverse((obj) => Debug.Log(obj.name), (_)=>false);
+        rootTask.Traverse((obj) => Debug.Log(obj.name), (_) => false);
     }
 
     public static void PrintAllNonTrialTask()
@@ -117,13 +191,23 @@ public class LM_ProgressController : MonoBehaviour
         var rootTask = root.GetComponent<TaskList>();
         rootTask.Traverse((obj) =>
         {
-            Debug.Log(obj.name);
+            // Debug.Log(obj.name);
         }, (task) =>
-            {
-                if (task.GetType() != typeof(TaskList)) return false;
-                var taskList = task as TaskList;
-                if (taskList == null) return false;
-                return taskList.taskListType == Role.trial;
-            });
+        {
+            if (task.GetType() != typeof(TaskList)) return false;
+            var taskList = task as TaskList;
+            if (taskList == null) return false;
+            return taskList.taskListType == Role.trial;
+        });
+    }
+
+    private void OnApplicationQuit()
+    {
+        #if UNITY_EDITOR
+        if (deleteCurrentSaveFileOnEditorQuit)
+        {
+            DeleteSaveFile(currentSaveFile);
+        }
+        #endif
     }
 }

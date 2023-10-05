@@ -1,40 +1,40 @@
-63832051602947	EXPERIMENT:		SUBJECT:	default	START_SCENE	demo_SimpleSample_50x50	START_CONDITION:	default	UI:	KeyboardMouse
-63832051603021	TASK_START	LM_Timeline	TaskList
-63832051603022	TASK_START	InitializeExperiment	TaskList
-63832051603023	TASK_START	UpdateTargetObjects	LM_UpdateTargetObjects
-63832051603038	TASK_END	UpdateTargetObjects	LM_UpdateTargetObjects	16
-63832051603040	TASK_START	AssignTargetColors	LM_TargetColorAssignments
-63832051603093	TASK_END	AssignTargetColors	LM_TargetColorAssignments	53
-63832051603094	TASK_START	PlaceTargets	TaskList
-63832051603096	TASK_START	ListTargetLocations	ObjectList
-63832051603096	TASK_ADD	ListTargetLocations	ObjectList	Target01	null
-63832051603097	TASK_ADD	ListTargetLocations	ObjectList	Target02	null
-63832051603097	TASK_ADD	ListTargetLocations	ObjectList	Target03	null
-63832051603098	TASK_ADD	ListTargetLocations	ObjectList	Target04	null
-63832051603616	TASK_END	ListTargetLocations	ObjectList	520
-63832051603617	TASK_START	ListTargets	ObjectList
-63832051603617	TASK_ADD	ListTargets	ObjectList	Orange Cube	null
-63832051603618	TASK_ADD	ListTargets	ObjectList	Green Cylinder	null
-63832051603618	TASK_ADD	ListTargets	ObjectList	Red Sphere	null
-63832051603619	TASK_ADD	ListTargets	ObjectList	Blue Capsule	null
-63832051603657	TASK_END	ListTargets	ObjectList	40
-63832051603659	TASK_START	PopulateTargets	MoveObjects
-63832051603661	Target01: 	Orange Cube	Position: 	-20.6	1	-17.20001	Rotation: 	0	0	0
-63832051603662	Target02: 	Green Cylinder	Position: 	19	1	-17.84705	Rotation: 	0	0	0
-63832051603662	Target03: 	Red Sphere	Position: 	17.64706	1	18.70001	Rotation: 	0	0	0
-63832051603663	Target04: 	Blue Capsule	Position: 	-18.6	1	18.70001	Rotation: 	90	0	0
-63832051603670	TASK_END	PopulateTargets	MoveObjects	11
-63832051603671	LM_Output	TaskList
+63832092556164	EXPERIMENT:		SUBJECT:	default	START_SCENE	demo_SimpleSample_50x50	START_CONDITION:	default	UI:	KeyboardMouse
+63832092556239	TASK_START	LM_Timeline	TaskList
+63832092556240	TASK_START	InitializeExperiment	TaskList
+63832092556241	TASK_START	UpdateTargetObjects	LM_UpdateTargetObjects
+63832092556257	TASK_END	UpdateTargetObjects	LM_UpdateTargetObjects	16
+63832092556259	TASK_START	AssignTargetColors	LM_TargetColorAssignments
+63832092556311	TASK_END	AssignTargetColors	LM_TargetColorAssignments	52
+63832092556311	TASK_START	PlaceTargets	TaskList
+63832092556313	TASK_START	ListTargetLocations	ObjectList
+63832092556313	TASK_ADD	ListTargetLocations	ObjectList	Target01	null
+63832092556314	TASK_ADD	ListTargetLocations	ObjectList	Target02	null
+63832092556314	TASK_ADD	ListTargetLocations	ObjectList	Target03	null
+63832092556315	TASK_ADD	ListTargetLocations	ObjectList	Target04	null
+63832092556922	TASK_END	ListTargetLocations	ObjectList	610
+63832092556923	TASK_START	ListTargets	ObjectList
+63832092556923	TASK_ADD	ListTargets	ObjectList	Green Cylinder	null
+63832092556924	TASK_ADD	ListTargets	ObjectList	Red Sphere	null
+63832092556924	TASK_ADD	ListTargets	ObjectList	Orange Cube	null
+63832092556925	TASK_ADD	ListTargets	ObjectList	Blue Capsule	null
+63832092556973	TASK_END	ListTargets	ObjectList	49
+63832092556974	TASK_START	PopulateTargets	MoveObjects
+63832092556976	Target01: 	Green Cylinder	Position: 	-20.6	1	-17.20001	Rotation: 	0	0	0
+63832092556976	Target02: 	Red Sphere	Position: 	19	1	-17.84705	Rotation: 	0	0	0
+63832092556977	Target03: 	Orange Cube	Position: 	17.64706	1	18.70001	Rotation: 	0	0	0
+63832092556977	Target04: 	Blue Capsule	Position: 	-18.6	1	18.70001	Rotation: 	90	0	0
+63832092556984	TASK_END	PopulateTargets	MoveObjects	10
+63832092556985	LM_Output	TaskList
 TaskListName	RepetitionNumber	CatchFlag
 PlaceTargets1False
-63832051603671	TASK_END	PlaceTargets	TaskList	577
-63832051603672	TASK_START	ListNavigationStarts	ObjectList
-63832051603673	TASK_ADD	ListNavigationStarts	ObjectList	StartLocation02	null
-63832051603673	TASK_ADD	ListNavigationStarts	ObjectList	StartLocation01	null
-63832051603673	TASK_ADD	ListNavigationStarts	ObjectList	StartLocation03	null
-63832051603680	TASK_END	ListNavigationStarts	ObjectList	7
-63832051603680	LM_Output	TaskList
+63832092556986	TASK_END	PlaceTargets	TaskList	674
+63832092556987	TASK_START	ListNavigationStarts	ObjectList
+63832092556987	TASK_ADD	ListNavigationStarts	ObjectList	StartLocation03	null
+63832092556988	TASK_ADD	ListNavigationStarts	ObjectList	StartLocation02	null
+63832092556988	TASK_ADD	ListNavigationStarts	ObjectList	StartLocation01	null
+63832092556995	TASK_END	ListNavigationStarts	ObjectList	8
+63832092556995	LM_Output	TaskList
 TaskListName	RepetitionNumber	CatchFlag
 InitializeExperiment1False
-63832051603680	TASK_END	InitializeExperiment	TaskList	659
-63832051603682	TASK_START	BeginMessage	InstructionsTask
+63832092556995	TASK_END	InitializeExperiment	TaskList	755
+63832092556997	TASK_START	BeginMessage	InstructionsTask

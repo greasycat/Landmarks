@@ -32,34 +32,34 @@ public class ProgressControllerTest : LM_UnitTest
 
     private static void TestProgressFileCreation()
     {
-        FindSingleton(out LM_ProgressController controller);
-        controller.Instance.CreateSaveFile();
+        var controller = LM_ProgressController.Instance;
+        LM_ProgressController.CreateSaveFile(controller.savePath);
     }
 
     private static void TestProgressFileDeletions()
     {
-        FindSingleton(out LM_ProgressController controller);
-        controller.Instance.DeleteAllSaveFiles();
+        var controller = LM_ProgressController.Instance;
+        controller.DeleteAllSaveFiles();
     }
     
     private static void TestGetLastSaveFile()
     {
-        FindSingleton(out LM_ProgressController controller);
-        var file = controller.Instance.GetLastSaveFile();
+        var controller = LM_ProgressController.Instance;
+        var file = LM_ProgressController.GetLastSaveFile(controller.savePath);
         Debug.Log(file);
     }
 
     private void OpenCurrentSaveFile()
     {
-        FindSingleton(out LM_ProgressController controller);
-        var file = controller.Instance.GetLastSaveFile();
+        var controller = LM_ProgressController.Instance;
+        var file = LM_ProgressController.GetLastSaveFile(controller.savePath);
         OpenFolder(file);
     }
     
     private static void OpenProgressSavingLocation()
     {
-        FindSingleton(out LM_ProgressController controller);
-        var dir = controller.Instance.GetSystemConfigFolder();
+        var controller = LM_ProgressController.Instance;
+        var dir = controller.GetSystemConfigFolder();
         OpenFolder(dir);
     }
 

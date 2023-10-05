@@ -96,7 +96,7 @@ public class ExperimentTask : MonoBehaviour{
 		overheadCamera = manager.overheadCamera;
         log = manager.dblog;
         vrEnabled = manager.usingVR;
-        progressController = FindObjectOfType<LM_ProgressController>();
+        progressController = LM_ProgressController.Instance;
 
         // set up vrInput if we're using VR
         if (vrEnabled) vrInput = SteamVR_Input.GetActionSet<SteamVR_Input_ActionSet_landmarks>(default);
@@ -135,7 +135,7 @@ public class ExperimentTask : MonoBehaviour{
             log.log("EEG_TRIGGER\tName\t" + startLabel + "\tValue\t" + eegManager.triggers[startLabel].ToString(), 1);
         }
         
-        StartCoroutine(progressController.Instance.WriteToCurrentSaveFile("(" + name));
+        progressController.RecordTaskStart(name);
     }
 	
 	public virtual void TASK_START () {
@@ -203,7 +203,7 @@ public class ExperimentTask : MonoBehaviour{
 		log.log("TASK_END\t" + name + "\t" + this.GetType().Name + "\t" + duration,1 );
         hud.showNothing();
         
-        StartCoroutine(progressController.Instance.WriteToCurrentSaveFile(name+")"));
+        progressController.RecordTaskEnd(name);
 	}
 	
 	
@@ -224,7 +224,6 @@ public class ExperimentTask : MonoBehaviour{
 
 	public virtual void TASK_END ()
     {
-
 	}
 
 

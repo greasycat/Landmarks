@@ -139,8 +139,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf683e28320a490f92ed16c96cb753f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rootTaskName: LM_Timeline
   applicationName: Landmarks
   currentSaveFile: 
+  lastSaveFile: 
+  lastSaveStack:
+  - 
+  isLastSaveCompleted: 0
+  savePath: 
+  deleteCurrentSaveFileOnEditorQuit: 1
 --- !u!1 &95417910
 GameObject:
   m_ObjectHideFlags: 0
@@ -1158,6 +1165,11 @@ PrefabInstance:
         type: 3}
       propertyPath: masterText
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5308465572058041532, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
+        type: 3}
+      propertyPath: skipIfResume
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5308465572059306240, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
         type: 3}
@@ -2493,6 +2505,11 @@ PrefabInstance:
         type: 3}
       propertyPath: skip
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 170528091735560577, guid: 41e6964e688bb468db8869f849e9dfe9,
+        type: 3}
+      propertyPath: skipIfResume
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 170528091735560591, guid: 41e6964e688bb468db8869f849e9dfe9,
         type: 3}
