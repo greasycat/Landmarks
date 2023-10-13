@@ -146,7 +146,7 @@ public class LM_CompassPointing : ExperimentTask
         // If using 1st person controller (e.g., keyboard mouse controller
         if (avatar.GetComponent<FirstPersonController>() != null)
         {
-            avatar.GetComponent<FirstPersonController>().enabled = false; // disable the controller
+            //avatar.GetComponent<FirstPersonController>().enabled = false; // disable the controller
             //avatar.transform.position = location.transform.position; // move player to the pointing location
 
             // Point the player at the orientation for JRD or a random orientation for SOP start
@@ -214,7 +214,7 @@ public class LM_CompassPointing : ExperimentTask
                 {
                     if (format == Format.SOP)
                     {
-                        avatar.GetComponent<FirstPersonController>().enabled = false; // disable the controller to work
+                        //avatar.GetComponent<FirstPersonController>().enabled = false; // disable the controller to work
                         avatar.GetComponentInChildren<Camera>().transform.localEulerAngles = Vector3.zero; // reset the camera
                         avatar.GetComponent<FirstPersonController>().ResetMouselook(); // reset the zero position to be our current cam orientation
 

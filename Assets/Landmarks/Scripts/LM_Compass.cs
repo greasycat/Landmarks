@@ -7,6 +7,8 @@ public class LM_Compass : MonoBehaviour
     public GameObject pointer;
     public float rotationSpeedMultiplier;
     public bool interactable;
+    public Transform playerCamera; // Assign your desktop player camera to this variable
+    public Transform vRPlayerCamera; // Assign your VR player camera to this variable
 
     // Start is called before the first frame update
     void Start()
@@ -29,6 +31,37 @@ public class LM_Compass : MonoBehaviour
                 pointer.transform.Rotate(new Vector3(0f, rotationSpeedMultiplier * Time.deltaTime, 0f), Space.Self);
                 
             }
+        }
+
+        // Making pointer point in the direction where the player is facing 
+        if (playerCamera != null)
+        {
+            // Get the rotation of the player camera
+            Quaternion cameraRotation = playerCamera.rotation;
+
+            // Keep the x and z-axis coordinates fixed at zero, only grab rotation values for y axis;
+            Vector3 newRotation = new Vector3(0, cameraRotation.eulerAngles.y, 0);
+
+            // Set the rotation of the pointer to match the camera's rotation (only in y axis)
+            //Note: we are multiplying y axis rotation value by 180 to ensure that red end of compass faces player camera direction instead of opposite direction
+            pointer.transform.rotation = Quaternion.Euler(newRotation) * Quaternion.Euler(0,180,0);
+        }
+        else if (vRPlayerCamera != null)
+        {
+            // Get the rotation of the VR player camera
+            Quaternion cameraRotation = vRPlayerCamera.rotation;
+
+            // Keep the x and z-axis coordinates fixed at zero, only grab rotation values for y axis;
+            Vector3 newRotation = new Vector3(0, cameraRotation.eulerAngles.y, 0);
+
+            // Set the rotation of the pointer to match the camera's rotation (only in y axis)
+            //Note: we are multiplying y axis rotation value by 180 to ensure that red end of compass faces player camera direction instead of opposite direction
+            pointer.transform.rotation = Quaternion.Euler(newRotation) * Quaternion.Euler(0, 180, 0);
+        }
+
+        else
+        {
+            Debug.LogError("either desktop or VR player camera is not assigned to the PointerController script!");
         }
     }
 
