@@ -8,15 +8,15 @@ using UnityStandardAssets.Vehicles.Ball;
 using static UnityEngine.GraphicsBuffer;
 using System.Linq;
 
-//public enum HideTargetOnStart
-//{
-//    Off,
-//    SetInactive,
-//    SetInvisible,
-//    DisableCompletely,
-//    Mask,
-//    SetProbeTrial
-//}
+public enum HideTargetOnStart_Exploration
+{
+    Off,
+    SetInactive,
+    SetInvisible,
+    DisableCompletely,
+    Mask,
+    SetProbeTrial
+}
 
 public class ExplorationTask : ExperimentTask
 {
@@ -52,6 +52,7 @@ public class ExplorationTask : ExperimentTask
     public GameObject targetMaskPrefab;
     public float showTargetAfterSeconds;
     public bool hideNonTargets;
+    public bool insideRedSphereCollider = false;
 
     // for compass assist
     public LM_Compass assistCompass;
@@ -115,15 +116,15 @@ public class ExplorationTask : ExperimentTask
         //TL Comments: In each "TASK" (InstructionsTask, NavigationTask, etc.), we'll have a base.{method}, such as: base.startTask, base.updateTask, base.endTask, etc. Base refers to the parent class that this script derives from, aka: ExperimentTask.cs. We call the appropriate methods in any script derived from ExperimentTask, by using base(dot).
         //fixmefixmefixme: calc. the shortest distance b/w player controller & tagged target object, and store that name as avariable. Once that variable is indexed, once we do the masking stuff, do this masking stuff for all target obj's EXCEPT this specific target object
 
-        foreach (GameObject obj in listOfNavStarts.objects.Distinct<GameObject>())
-        {
-            if (obj.activeSelf == false) { continue; }
-            obj.SetActive(true);
-            foreach (Transform child in obj.GetComponentsInChildren<Transform>(true))
-            {
-                child.gameObject.SetActive(true);
-            }
-        }
+        // foreach (GameObject obj in listOfNavStarts.objects.Distinct<GameObject>())
+        // {
+        //     if (obj.activeSelf == false) { continue; }
+        //     obj.SetActive(true);
+        //     foreach (Transform child in obj.GetComponentsInChildren<Transform>(true))
+        //     {
+        //         child.gameObject.SetActive(true);
+        //     }
+        // }
 
 
         if (skip)
@@ -354,7 +355,7 @@ public class ExplorationTask : ExperimentTask
     public override bool updateTask()
     {
         base.updateTask();
-
+        Debug.Log ($"Start Timer: { startTime}");
         // use experiment.cs to get each target object on which the desired collider SHOULD be attached
         for (int i = 0; i < manager.targetObjects.transform.childCount; i++)
         {
@@ -496,9 +497,7 @@ public class ExplorationTask : ExperimentTask
             Debug.Log("The start time is" + startTime);
             return true;
         }
-        return true;
-
-
+       
         if (killCurrent == true)
         {
             return KillCurrent();
@@ -512,55 +511,36 @@ public class ExplorationTask : ExperimentTask
             //if (!onlyContinueFromTargets || (onlyContinueFromTargets &&
             //                                //(manager.triggeredFromTargetNamed != "" || manager.collidingWithTargetNamed != "")
             //                                ))
-            {
+            
                 // Take some response input
-                if (vrEnabled)
+                if (insideRedSphereCollider)
                 {
-                    if (vrInput.TriggerButton.GetStateDown(SteamVR_Input_Sources.Any))
+                    if (vrEnabled)
+                    {
+                        if (vrInput.TriggerButton.GetStateDown(SteamVR_Input_Sources.Any))
+                        {
+                            Debug.Log("Participant ended the trial");
+                            log.log("INPUT_EVENT    Player Arrived at Destination    1", 1);
+                            //hud.hudPanel.SetActive(false);
+                            //hud.setMessage("");
+                            if (haptics) SteamVR_Actions.default_Haptic.Execute(0f, 2.0f, 65f, 1f, SteamVR_Input_Sources.Any);
+                            return true;
+                        }
+                    }
+                    if (Input.GetKeyDown(KeyCode.Return))
                     {
                         Debug.Log("Participant ended the trial");
                         log.log("INPUT_EVENT    Player Arrived at Destination    1", 1);
                         //hud.hudPanel.SetActive(false);
                         //hud.setMessage("");
-                        if (haptics) SteamVR_Actions.default_Haptic.Execute(0f, 2.0f, 65f, 1f, SteamVR_Input_Sources.Any);
                         return true;
                     }
                 }
-                if (Input.GetKeyDown(KeyCode.Return))
-                {
-                    Debug.Log("Participant ended the trial");
-                    log.log("INPUT_EVENT    Player Arrived at Destination    1", 1);
-                    //hud.hudPanel.SetActive(false);
-                    //hud.setMessage("");
-                    return true;
-                }
-            }
         }
-        return false;
-
-        ////Animate target objects with bobbing animation
-        //if (targetObjectBobbingAnimation == true)
-        //{
-        //    Debug.Log("Animating Target Objects!!");
-        //    GameObject[] objs_animation = GameObject.FindGameObjectsWithTag("Target");
-
-        //    foreach (GameObject go in objs_animation)
-        //    {
-        //        originalPosition = go.transform.position;
-        //        bobbingTimer += Time.deltaTime;
-
-        //        // Calculate the new Y position based on a sine wave
-        //        float newY = originalPosition.y + Mathf.Sin(bobbingTimer * bobbingSpeed) * bobbingHeight;
-
-        //        // Update the object's position
-        //        go.transform.position = new Vector3(go.transform.position.x, newY, go.transform.position.z);
-
-        //    }
-
-        //}
-
+            return false;
+            
+        
     }
-
 
     public override void endTask()
     {
@@ -585,15 +565,15 @@ public class ExplorationTask : ExperimentTask
     {
         base.endTask();
 
-        foreach (GameObject obj in listOfNavStarts.objects.Distinct<GameObject>())
-        {
-            if (obj.activeSelf == false) { continue; }
-            obj.SetActive(true);
-            foreach (Transform child in obj.GetComponentsInChildren<Transform>(true))
-            {
-                child.gameObject.SetActive(true);
-            }
-        }
+        // foreach (GameObject obj in listOfNavStarts.objects.Distinct<GameObject>())
+        // {
+        //     if (obj.activeSelf == false) { continue; }
+        //     obj.SetActive(true);
+        //     foreach (Transform child in obj.GetComponentsInChildren<Transform>(true))
+        //     {
+        //         child.gameObject.SetActive(true);
+        //     }
+        // }
         // Find all instances of InterfacePivot and call stroyAllInterfaces() on each one
         // Find all instances of InterfacePivot 
         //InterfacePivot[] interfacePivots = FindObjectsOfType<InterfacePivot>();
@@ -836,8 +816,8 @@ public class ExplorationTask : ExperimentTask
     }
 
     //fixme COMMENTED THIS CHUNK OUT AS IT WAS INTERFERING WITH TRIAL PROGRESSION
-    //public override bool OnControllerColliderHit(GameObject hit)
-    //{
+    public override bool OnControllerColliderHit(GameObject hit)
+    {
     //    if ((hit == currentTarget | hit.transform.parent.gameObject == currentTarget) &
     //        hideTargetOnStart != HideTargetOnStart.DisableCompletely & hideTargetOnStart != HideTargetOnStart.SetInactive)
     //    {
@@ -849,8 +829,8 @@ public class ExplorationTask : ExperimentTask
     //        return true;
     //    }
 
-    //    return false;
-    //}
+        return false;
+    }
 
     public IEnumerator UnmaskStartObjectFor() // handles the "showing and hiding" the starting target object itself
     {

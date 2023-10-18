@@ -1,0 +1,2 @@
+id,condition,sceneName,sceneNumber,task,block,trial,Explore_target,Explore_actualPath,Explore_optimalPath,Explore_excessPath,Explore_clockwiseTravel,Explore_duration,
+default,default,Supermarket #3B,1,TASK_Exploration_Testing,1,1,Explore,0.3799999,0,0.3799999,0,10.03956,

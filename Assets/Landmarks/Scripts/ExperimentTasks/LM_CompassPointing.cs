@@ -17,6 +17,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityStandardAssets.Characters.FirstPerson;
+using Valve.VR;
+using Valve.VR.InteractionSystem;
 
 public enum Format
 {
@@ -179,7 +181,7 @@ public class LM_CompassPointing : ExperimentTask
         // Put up the HUD
         if (format == Format.SOP)
         {
-            hud.setMessage("Orient yourself to the best of your ability.\nPress Enter when you are ready.");
+            hud.setMessage("Please face the floating target object in front of you.\nPress the trigger button when you are ready.");
         }
         else if (format == Format.JRD)
         {
@@ -264,6 +266,66 @@ public class LM_CompassPointing : ExperimentTask
                     return true; // end trial
                 }
 
+            }
+
+            if (vrEnabled)
+            {
+                if (vrInput.TriggerButton.GetStateDown(SteamVR_Input_Sources.Any))
+                {
+                    if (!oriented)
+                    {
+                        if (format == Format.SOP)
+                        {
+                            //avatar.GetComponent<FirstPersonController>().enabled = false; // disable the controller to work
+                            avatar.GetComponentInChildren<Camera>().transform.localEulerAngles = Vector3.zero; // reset the camera
+                            avatar.GetComponent<FirstPersonController>().ResetMouselook(); // reset the zero position to be our current cam orientation
+
+                            var compassparent = compass.transform.parent;
+                            compass.transform.parent = avatar.GetComponentInChildren<LM_SnapPoint>().transform; // make it the child of the snappoint
+                            compass.transform.localPosition = compassPosOffset; // adjust position
+                            compass.transform.localEulerAngles = compassRotOffset; // adjust rotation
+                            compass.transform.parent = compassparent; // send it back to its old parent to avoid funky movement effects
+
+                            // Calculate the correct answer (using the new oriented facing direction)
+                            var newOrientation = avatar.GetComponentInChildren<LM_SnapPoint>().gameObject;
+                            answer = Vector3.SignedAngle(newOrientation.transform.position - location.transform.position,
+                                                        target.transform.position - location.transform.position, Vector3.up);
+                            if (answer < 0) answer += 360;
+                            Debug.Log("Answer is " + answer);
+                        }
+
+
+
+                        oriented = true; // mark them oriented
+                        hud.setMessage(formattedQuestion);
+                        compass.gameObject.SetActive(true);
+                        compass.interactable = true;
+                        orientTime = Time.time - startTime; // save the orientation time
+                        startTime = Time.time; // reset the start clock for the answer portion
+
+                        return false; // don't end the trial
+                    }
+                    else
+                    {
+                        // record response time
+                        responseTime = Time.time - startTime;
+
+                        // Record the response as an angle between -180 and 180
+                        response = compass.pointer.transform.localEulerAngles.y;
+
+                        Debug.Log("RESPONSE: " + response.ToString());
+
+                        // Calculate the (signed) error - should be between -180 and 180
+                        signedError = response - answer;
+                        if (signedError > 180) signedError -= 360;
+                        else if (signedError < -180) signedError += 360;
+                        Debug.Log("Signed Error: " + signedError);
+                        absError = Mathf.Abs(signedError);
+                        Debug.Log("Absolute Error: " + absError);
+
+                        return true; // end trial
+                    }
+                }
             }
         }
 

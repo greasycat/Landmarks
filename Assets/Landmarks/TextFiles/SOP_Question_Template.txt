@@ -1,1 +1,1 @@
-"Point to the {0}."
+"Face towards the {0}. Press the trigger button when done."
