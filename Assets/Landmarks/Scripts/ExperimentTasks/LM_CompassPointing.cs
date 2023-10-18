@@ -278,7 +278,7 @@ public class LM_CompassPointing : ExperimentTask
                         {
                             //avatar.GetComponent<FirstPersonController>().enabled = false; // disable the controller to work
                             avatar.GetComponentInChildren<Camera>().transform.localEulerAngles = Vector3.zero; // reset the camera
-                            avatar.GetComponent<FirstPersonController>().ResetMouselook(); // reset the zero position to be our current cam orientation
+                            //avatar.GetComponent<FirstPersonController>().ResetMouselook(); // reset the zero position to be our current cam orientation
 
                             var compassparent = compass.transform.parent;
                             compass.transform.parent = avatar.GetComponentInChildren<LM_SnapPoint>().transform; // make it the child of the snappoint
