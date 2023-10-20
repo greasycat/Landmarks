@@ -43,8 +43,7 @@ public class LM_Compass : MonoBehaviour
             Vector3 newRotation = new Vector3(0, cameraRotation.eulerAngles.y, 0);
 
             // Set the rotation of the pointer to match the camera's rotation (only in y axis)
-            //Note: we are multiplying y axis rotation value by 180 to ensure that red end of compass faces player camera direction instead of opposite direction
-            pointer.transform.rotation = Quaternion.Euler(newRotation) * Quaternion.Euler(0,180,0);
+            pointer.transform.rotation = Quaternion.Euler(newRotation); 
         }
         else if (vRPlayerCamera != null)
         {
@@ -56,7 +55,8 @@ public class LM_Compass : MonoBehaviour
 
             // Set the rotation of the pointer to match the camera's rotation (only in y axis)
             //Note: we are multiplying y axis rotation value by 180 to ensure that red end of compass faces player camera direction instead of opposite direction
-            pointer.transform.rotation = Quaternion.Euler(newRotation) * Quaternion.Euler(0, 180, 0);
+            pointer.transform.rotation = Quaternion.Euler(newRotation); 
+                //Quaternion.Euler(0, 0, 0);
         }
 
         else

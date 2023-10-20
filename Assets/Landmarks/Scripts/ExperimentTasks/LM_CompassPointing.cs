@@ -42,7 +42,7 @@ public class LM_CompassPointing : ExperimentTask
     public Vector3 compassPosOffset = new Vector3(0f, 0f, -2f);
     public Vector3 compassRotOffset = new Vector3(15f, 0f, 0f);
     [Min(0f)]
-    public float secondsBeforeResponse = 5.0f; // how long before they can submit answer
+    public float secondsBeforeResponse = 0.0f; // how long before they can submit answer
 
     public List<GameObject> questionItems; 
     private GameObject location; // standing at the...
@@ -203,11 +203,16 @@ public class LM_CompassPointing : ExperimentTask
                 else item.SetActive(true);
             }
         }
+
+        avatar.GetComponentInChildren<Camera>().transform.localEulerAngles = Vector3.zero; // reset the camera
+
     }
 
 
     public override bool updateTask()
     {
+        hud.hudPanelOFF = 0f;
+
         if (Time.time - startTime > secondsBeforeResponse) // don't let them submit until the wait time has passed
         {
 
@@ -218,11 +223,11 @@ public class LM_CompassPointing : ExperimentTask
                     if (format == Format.SOP)
                     {
                         //avatar.GetComponent<FirstPersonController>().enabled = false; // disable the controller to work
-                        avatar.GetComponentInChildren<Camera>().transform.localEulerAngles = Vector3.zero; // reset the camera
-                        avatar.GetComponent<FirstPersonController>().ResetMouselook(); // reset the zero position to be our current cam orientation
+                        //avatar.GetComponentInChildren<Camera>().transform.localEulerAngles = Vector3.zero; // reset the camera
+                        //avatar.GetComponent<FirstPersonController>().ResetMouselook(); // reset the zero position to be our current cam orientation
 
                         var compassparent = compass.transform.parent;
-                        compass.transform.parent = avatar.GetComponentInChildren<LM_SnapPoint>().transform; // make it the child of the snappoint
+                        compass.transform.parent = avatar.GetComponentInChildren<LM_SnapPoint>().transform; // make it the child of the snappoint 
                         compass.transform.localPosition = compassPosOffset; // adjust position
                         compass.transform.localEulerAngles = compassRotOffset; // adjust rotation
                         compass.transform.parent = compassparent; // send it back to its old parent to avoid funky movement effects
@@ -251,8 +256,11 @@ public class LM_CompassPointing : ExperimentTask
                         // record response time
                         responseTime = Time.time - startTime;
 
-                        // Record the response as an angle between -180 and 180
-                        response = compass.pointer.transform.localEulerAngles.y;
+                    // Record the response as an angle between -180 and 180
+                        response = avatar.GetComponentInChildren<Camera>().transform.localEulerAngles.y;
+                        //response = compass.pointer.transform.localEulerAngles.y;
+
+                        // Record angle from 
 
                         Debug.Log("RESPONSE: " + response.ToString());
 
@@ -277,8 +285,8 @@ public class LM_CompassPointing : ExperimentTask
                     if (format == Format.SOP)
                     {
                         //avatar.GetComponent<FirstPersonController>().enabled = false; // disable the controller to work
-                        avatar.GetComponentInChildren<Camera>().transform.localEulerAngles = Vector3.zero; // reset the camera
-                        avatar.GetComponent<FirstPersonController>().ResetMouselook(); // reset the zero position to be our current cam orientation
+                        //avatar.GetComponentInChildren<Camera>().transform.localEulerAngles = Vector3.zero; // reset the camera
+                        //avatar.GetComponent<FirstPersonController>().ResetMouselook(); // reset the zero position to be our current cam orientation
 
                         var compassparent = compass.transform.parent;
                         compass.transform.parent = avatar.GetComponentInChildren<LM_SnapPoint>().transform; // make it the child of the snappoint
