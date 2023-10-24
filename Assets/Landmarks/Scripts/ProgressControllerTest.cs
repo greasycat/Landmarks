@@ -32,43 +32,43 @@ public class ProgressControllerTest : LM_UnitTest
 
     private static void TestProgressFileCreation()
     {
-        var controller = LM_ProgressController.Instance;
-        LM_ProgressController.CreateSaveFile(controller.savePath);
+        var controller = LM_Progress.Instance;
+        LM_Progress.CreateSaveFile(controller.savePath);
     }
 
     private static void TestProgressFileDeletions()
     {
-        var controller = LM_ProgressController.Instance;
+        var controller = LM_Progress.Instance;
         controller.DeleteAllSaveFiles();
     }
     
     private static void TestGetLastSaveFile()
     {
-        var controller = LM_ProgressController.Instance;
-        var file = LM_ProgressController.GetLastSaveFile(controller.savePath);
+        var controller = LM_Progress.Instance;
+        var file = LM_Progress.GetLastSaveFile(controller.savePath);
         Debug.Log(file);
     }
 
     private void OpenCurrentSaveFile()
     {
-        var controller = LM_ProgressController.Instance;
-        var file = LM_ProgressController.GetLastSaveFile(controller.savePath);
+        var controller = LM_Progress.Instance;
+        var file = LM_Progress.GetLastSaveFile(controller.savePath);
         OpenFolder(file);
     }
     
     private static void OpenProgressSavingLocation()
     {
-        var controller = LM_ProgressController.Instance;
+        var controller = LM_Progress.Instance;
         var dir = controller.GetSystemConfigFolder();
         OpenFolder(dir);
     }
 
     private static void PrintAllTasks()
     {
-        LM_ProgressController.PrintAllTaskInOrder();
+        LM_Progress.PrintAllTaskInOrder();
     }
     private static void PrintAllNonTrialTasks()
     {
-        LM_ProgressController.PrintAllNonTrialTask();
+        LM_Progress.PrintAllNonTrialTask();
     }
 }

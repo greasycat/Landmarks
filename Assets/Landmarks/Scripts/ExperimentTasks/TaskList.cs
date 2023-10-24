@@ -18,6 +18,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using Landmarks.Scripts;
 using UnityEngine.UI;
 using TMPro;
 
@@ -116,6 +117,11 @@ public class TaskList : ExperimentTask
             }
         }
 
+        if (progress.Skippable(this))
+        {
+            skip = true;
+        }
+
         if (overideRepeat)
         {
             repeat = overideRepeat.objects.Count;
@@ -190,8 +196,6 @@ public class TaskList : ExperimentTask
 
     public void startNextTask()
     {
-        Debug.Log("Starting " + tasks[currentTaskIndex].name);
-
         // update the trial count on the overlay
         if (overlayRepeatCount != null) overlayRepeatCount.text = string.Format("{0}: {1} / {2}", name, repeatCount, repeat);
         if (overlayListItem != null & overideRepeat != null) overlayListItem.text = string.Format("{0}", overideRepeat.currentObject().name);

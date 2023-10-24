@@ -30,7 +30,7 @@ public class ExperimentTask : MonoBehaviour{
 	protected dbLog log;
 	protected Experiment manager;
 	protected avatarLog avatarLog;
-	protected LM_ProgressController progressController;
+	protected LM_Progress progress;
 	
     protected GameObject scaledAvatar; // MJS 2019 - track scaled avatar in scaled nav task
     protected avatarLog scaledAvatarLog; // MJS 2019 - track scaled avatar in scaled nav task
@@ -89,21 +89,21 @@ public class ExperimentTask : MonoBehaviour{
 	public virtual void startTask() {
 		avatar = GameObject.FindWithTag ("Player");
 		avatarLog = avatar.GetComponentInChildren<avatarLog>() as avatarLog; //jdstokes 2015
-		hud = avatar.GetComponent("HUD") as HUD;
+		hud = avatar.GetComponent<HUD>();
 		experiment = GameObject.FindWithTag ("Experiment");
-		manager = experiment.GetComponent("Experiment") as Experiment;
+		manager = experiment.GetComponent<Experiment>();
 		firstPersonCamera = manager.playerCamera;
 		overheadCamera = manager.overheadCamera;
         log = manager.dblog;
         vrEnabled = manager.usingVR;
-        progressController = LM_ProgressController.Instance;
+        progress = LM_Progress.Instance;
 
         // set up vrInput if we're using VR
         if (vrEnabled) vrInput = SteamVR_Input.GetActionSet<SteamVR_Input_ActionSet_landmarks>(default);
 
         // Grab the scaled nav task/player and log it - MJS 2019
         scaledAvatar = manager.scaledPlayer;
-        scaledAvatarLog = scaledAvatar.GetComponent("avatarLog") as avatarLog;
+        scaledAvatarLog = scaledAvatar.GetComponent<avatarLog>();
 
         //debugButton = hud.debugButton.GetComponent<Button>();
         actionButton = hud.actionButton.GetComponent<Button>();
@@ -135,7 +135,7 @@ public class ExperimentTask : MonoBehaviour{
             log.log("EEG_TRIGGER\tName\t" + startLabel + "\tValue\t" + eegManager.triggers[startLabel].ToString(), 1);
         }
         
-        progressController.RecordTaskStart(name);
+        progress.RecordTaskStart(this);
     }
 	
 	public virtual void TASK_START () {
@@ -144,11 +144,7 @@ public class ExperimentTask : MonoBehaviour{
 	
 	public virtual bool updateTask () {
 
-		bool attemptInterupt = false;
-		
-		if ( interruptInterval > 0 && Experiment.Now() - task_start >= interruptInterval)  {
-	        attemptInterupt = true;
-	    }
+		bool attemptInterupt = interruptInterval > 0 && Experiment.Now() - task_start >= interruptInterval;
 	    
 		if( Input.GetButtonDown ("Compass") ) {
 			attemptInterupt = true;	
@@ -162,7 +158,7 @@ public class ExperimentTask : MonoBehaviour{
 			else 
 			{
 				Debug.Log(currentInterrupt);
-	    		Debug.Log(repeatInterrupts);
+				Debug.Log(repeatInterrupts);
 	    
 				log.log("INPUT_EVENT	interrupt	" + name,1 );
 				//interruptTasks.pausedTasks = this;
@@ -203,7 +199,7 @@ public class ExperimentTask : MonoBehaviour{
 		log.log("TASK_END\t" + name + "\t" + this.GetType().Name + "\t" + duration,1 );
         hud.showNothing();
         
-        progressController.RecordTaskEnd(name);
+        progress.RecordTaskEnd(this);
 	}
 	
 	

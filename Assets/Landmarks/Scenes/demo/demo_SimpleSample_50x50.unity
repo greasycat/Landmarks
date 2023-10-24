@@ -121,33 +121,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &25117487 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5308465570326146505, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
-    type: 3}
-  m_PrefabInstance: {fileID: 868073007}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &25117489
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 25117487}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cf683e28320a490f92ed16c96cb753f0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rootTaskName: LM_Timeline
-  applicationName: Landmarks
-  currentSaveFile: 
-  lastSaveFile: 
-  lastSaveStack:
-  - 
-  isLastSaveCompleted: 0
-  savePath: 
-  deleteCurrentSaveFileOnEditorQuit: 1
 --- !u!1 &95417910
 GameObject:
   m_ObjectHideFlags: 0

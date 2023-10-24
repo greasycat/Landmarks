@@ -6,32 +6,41 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public class LM_ProgressController : MonoBehaviour
+public class LM_Progress : MonoBehaviour
 {
-    public static LM_ProgressController Instance { get; private set; }
+    public static LM_Progress Instance { get; private set; }
+
     [SerializeField] public string rootTaskName = "LM_Timeline";
     [SerializeField] public string applicationName = "Landmarks";
+    [SerializeField] public bool resumeLastSave = true;
+
     [NotEditable] public string currentSaveFile;
     [NotEditable] public string lastSaveFile;
     [NotEditable] public List<string> lastSaveStack;
     [NotEditable] public bool isLastSaveCompleted;
-    [FormerlySerializedAs("configPath")] [NotEditable] public string savePath;
-    
+    [NotEditable] public string savePath;
+
+    [NotEditable] public string currentTaskName = "";
+    [NotEditable] public int currentTaskIndex = -1;
+
     [SerializeField] private bool deleteCurrentSaveFileOnEditorQuit = false;
-    private FileStream currentSaveFileStream;
-    private StreamWriter currentSaveWriter;
+    [SerializeField] private List<string> partiallyCompletedTrials;
+
+
+    //**************************************************************
+    // Initialize singleton instance
+    //**************************************************************
 
     private void Awake()
     {
-        if (Instance == null)
+        if (Instance != null && Instance != this)
         {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-            Debug.Log("Singleton ProgressController created");
+            Destroy(gameObject);
         }
         else
         {
-            Destroy(gameObject);
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
         }
     }
 
@@ -40,84 +49,104 @@ public class LM_ProgressController : MonoBehaviour
         savePath = GetSystemConfigFolder();
         lastSaveFile = GetLastSaveFile(savePath);
         lastSaveStack = File.ReadAllText(lastSaveFile).Split('\n').ToList();
-        isLastSaveCompleted = CheckIfLastSaveIsCompleted();
         currentSaveFile = CreateSaveFile(savePath);
-        currentSaveFileStream = new FileStream(currentSaveFile, FileMode.Append, FileAccess.Write, FileShare.Read);
-        if (currentSaveFileStream == null)
+    }
+
+
+    //**************************************************************
+    // Task-related functions
+    //**************************************************************
+    public void RecordTaskStart(ExperimentTask task)
+    {
+        var startMarker = "(" + task.name;
+        WriteToCurrentSaveFileSync(startMarker);
+
+        if (task is TaskList taskList)
         {
-            Debug.LogError("Save file not created: " + currentSaveFile);
-            throw new Exception("Save file not created: " + currentSaveFile);
+            if (taskList.taskListType == Role.trial)
+            {
+                partiallyCompletedTrials = GetAllChildrenTask(currentTaskIndex, task.name);
+            }
         }
-        currentSaveWriter = new StreamWriter(currentSaveFileStream);
 
-        Debug.Log("Last save file: " + string.Join(",", lastSaveStack));
+        ShiftCurrentIndex(1, task.name);
     }
 
 
-
-    private IEnumerator WriteToCurrentSaveFile(string text)
+    public void RecordTaskEnd(ExperimentTask task)
     {
-        if (currentSaveFile == null || currentSaveFileStream == null) yield break;
-        currentSaveWriter.WriteLine(text);
-        currentSaveWriter.Flush();
+        var endMarker = task.name + ")";
+        WriteToCurrentSaveFileSync(endMarker);
+        ShiftCurrentIndex(1, task.name);
     }
 
-    public void RecordTaskStart(string taskName)
+    public bool Skippable(ExperimentTask task)
     {
-        StartCoroutine(WriteToCurrentSaveFile("(" + taskName));
-    }
-
-    public void RecordTaskEnd(string taskName)
-    {
-        StartCoroutine(WriteToCurrentSaveFile(taskName + ")"));
-    }
-
-    public void GetFirstTaskInLastSave()
-    {
-        // Get the first line of the last save stack
-        if (lastSaveStack.Count == 0) return;
-        var lastTask = lastSaveStack[0];
-        // match "(taskName"
-        if (!lastTask.StartsWith("(")) return;
-        var taskName = lastTask.Substring(1);
-        Debug.Log("Last task: " + taskName);
-    }
-
-    public void MarkTaskComplete(string taskName)
-    {
-        // Get the first line of the last save stack
-        if (lastSaveStack.Count == 0) return;
-        var firstTask = lastSaveStack[0];
-        // match "(taskName"
-        if (!firstTask.StartsWith("(" + taskName)) return;
-        // remove the first line
-        lastSaveStack.RemoveAt(0);
-    }
-
-    private bool CheckIfLastSaveIsCompleted()
-    {
-        // Get the first line of the last save stack
-        return lastSaveStack.Count >= 1
-               && lastSaveStack[0].StartsWith("(" + rootTaskName)
-               && lastSaveStack[lastSaveStack.Count - 1].StartsWith(rootTaskName + ")");
-    }
-
-    private bool SkipTheWholeTask(string taskName)
-    {
-        // Get the first line of the last save stack
+        if (!resumeLastSave) return false;
         if (lastSaveStack.Count == 0) return false;
-        var firstTask = lastSaveStack[0];
-        // match "(taskName"
-        if (!firstTask.StartsWith("(" + taskName)) return false;
-        // try to find the end of the task
-        var endTask = lastSaveStack.FindIndex((line) => line.StartsWith(taskName + ")"));
-        if (endTask == -1) return false;
-        // remove the whole task
-        lastSaveStack.RemoveRange(0, endTask + 1);
-        return true;
+        if (currentTaskIndex == -1) return false;
+        if (currentTaskIndex >= lastSaveStack.Count) return false;
+
+        if (task is TaskList taskList)
+        {
+            if (taskList.taskListType == Role.trial)
+            {
+                // join the list of partially completed trials
+                var partiallyCompletedTrialsString = string.Join("\n", partiallyCompletedTrials);
+                Debug.Log(partiallyCompletedTrialsString);
+                
+            }
+        }
+
+
+        return false;
     }
 
-    public void DeleteSaveFile(string saveFile)
+    //**************************************************************
+    // Save-related functions
+    //**************************************************************
+    private void ShiftCurrentIndex(int shift, string taskName)
+    {
+        currentTaskIndex += shift;
+        currentTaskName = taskName;
+    }
+
+    private List<string> GetAllChildrenTask(int startIndex, string taskName)
+    {
+        //find the end of the current task in stack
+        //return the list of task between
+        var i = startIndex;
+        for (; i < lastSaveStack.Count; i++)
+        {
+            var task = lastSaveStack[i];
+            if (task.StartsWith($"{taskName})"))
+            {
+                break;
+            }
+        }
+        return lastSaveStack.GetRange(startIndex, i - startIndex);
+    }
+
+    //**************************************************************
+    // IO functions
+    //**************************************************************
+    private void WriteToCurrentSaveFileSync(string text)
+    {
+        if (string.IsNullOrEmpty(currentSaveFile))
+        {
+            Debug.LogError("Save file has not been created: " + currentSaveFile + " writing:" + text);
+        }
+
+        using (var writer = new StreamWriter(currentSaveFile, true))
+        {
+            Debug.Log("Writing to save file: " + currentSaveFile + " writing:" + text);
+            writer.WriteLine(text);
+            writer.Close();
+        }
+    }
+
+
+    private void DeleteSaveFile(string saveFile)
     {
         var path = Path.Combine(savePath, saveFile);
         File.Delete(path);
@@ -150,6 +179,7 @@ public class LM_ProgressController : MonoBehaviour
 
         return latestFile;
     }
+
     public string GetSystemConfigFolder()
     {
         var configFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
@@ -182,6 +212,10 @@ public class LM_ProgressController : MonoBehaviour
         return saveFile;
     }
 
+    //**************************************************************
+    // Debug functions
+    //**************************************************************
+
     public static void PrintAllTaskInOrder()
     {
         var root = GameObject.Find("LM_Timeline");
@@ -207,11 +241,11 @@ public class LM_ProgressController : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         if (deleteCurrentSaveFileOnEditorQuit)
         {
             DeleteSaveFile(currentSaveFile);
         }
-        #endif
+#endif
     }
 }
