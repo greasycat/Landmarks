@@ -18,6 +18,8 @@ using System;
 using UnityEngine;
 using System.Collections;
 using System.Reflection;
+using Landmarks.Scripts;
+using Landmarks.Scripts.Progress;
 using UnityEngine.UI;
 using Valve.VR;
 using UnityEditor;
@@ -44,6 +46,7 @@ public class ExperimentTask : MonoBehaviour{
 	
 	public bool skip = false;
 	public bool skipIfResume = false;
+	public bool stopResumeIfNotCompleted = true;
 	public bool canIncrementLists = true;
 
 	public int interval = 0;
@@ -139,11 +142,12 @@ public class ExperimentTask : MonoBehaviour{
     }
 	
 	public virtual void TASK_START () {
-
 	}	
 	
-	public virtual bool updateTask () {
-
+	public virtual bool updateTask ()
+	{
+		if (skip) return true;
+		
 		bool attemptInterupt = interruptInterval > 0 && Experiment.Now() - task_start >= interruptInterval;
 	    
 		if( Input.GetButtonDown ("Compass") ) {

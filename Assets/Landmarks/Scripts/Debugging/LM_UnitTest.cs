@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Landmarks.Scripts
+namespace Landmarks.Scripts.Debugging
 {
     public class LM_UnitTest: EditorWindow
     {

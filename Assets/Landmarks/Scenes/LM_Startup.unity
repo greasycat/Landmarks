@@ -242,12 +242,10 @@ MonoBehaviour:
   currentSaveFile: 
   lastSaveFile: 
   lastSaveStack: []
-  isLastSaveCompleted: 0
-  savePath: 
+  savingFolderPath: 
   currentTaskName: 
-  currentTaskIndex: 0
+  currentIndex: 0
   deleteCurrentSaveFileOnEditorQuit: 1
-  partiallyCompletedTrials: []
 --- !u!4 &34686137
 Transform:
   m_ObjectHideFlags: 0
@@ -1116,6 +1114,51 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 229560148}
   m_CullTransparentMesh: 0
+--- !u!1 &296286607
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 296286609}
+  - component: {fileID: 296286608}
+  m_Layer: 0
+  m_Name: LM_Debug
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &296286608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 296286607}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3aebd006ce0468e80001832c5007648, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minimalPriorityLevel: 1
+  _printing: 1
+--- !u!4 &296286609
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 296286607}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 889.4833, y: 461.65128, z: -113.444916}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &455043219
 GameObject:
   m_ObjectHideFlags: 0
@@ -2799,6 +2842,7 @@ MonoBehaviour:
   practiceTrialCount: 0
   levelNames:
   - demo_SimpleSample_50x50
+  - demo_SimplerSampler_3x3
   randomSceneOrder: 0
   levelNumber: 0
   appendLogFiles: 0

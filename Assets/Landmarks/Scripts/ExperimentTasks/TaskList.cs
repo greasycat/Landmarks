@@ -117,11 +117,6 @@ public class TaskList : ExperimentTask
             }
         }
 
-        if (progress.Skippable(this))
-        {
-            skip = true;
-        }
-
         if (overideRepeat)
         {
             repeat = overideRepeat.objects.Count;

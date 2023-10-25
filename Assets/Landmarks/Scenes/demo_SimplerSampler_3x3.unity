@@ -402,6 +402,16 @@ PrefabInstance:
       propertyPath: userInterface
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5308465571750927104, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
+        type: 3}
+      propertyPath: skipIfResume
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5308465571750927104, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
+        type: 3}
+      propertyPath: stopResumeIfNotCompleted
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5308465572180033509, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
         type: 3}
       propertyPath: m_LocalPosition.z
