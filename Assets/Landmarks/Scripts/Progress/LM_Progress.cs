@@ -30,6 +30,7 @@ namespace Landmarks.Scripts.Progress
         
         // Debug variables
         [SerializeField] private bool deleteCurrentSaveFileOnEditorQuit = false;
+        [SerializeField] private int depth = 0;
 
 
         //**************************************************************
@@ -74,8 +75,7 @@ namespace Landmarks.Scripts.Progress
         /// <param name="task"> The task that needs to be recorded </param>
         public void RecordTaskStart(ExperimentTask task)
         {
-            var startMarker = "(" + task.name + ":";
-            WriteToCurrentSaveFileSync(startMarker);
+            WriteToCurrentSaveFileSync(new XmlTag(task.name).ToString());
             LM_Debug.Instance.Log($"Recording start: {task.name}", 1);
 
             // Next Index here can be either the current index or the next index of child
@@ -92,8 +92,9 @@ namespace Landmarks.Scripts.Progress
         public void RecordTaskEnd(ExperimentTask task)
         {
             LM_Debug.Instance.Log($"Recording stop: {task.name}", 1);
-            var endMarker = task.name + ")";
-            WriteToCurrentSaveFileSync(endMarker);
+            
+            depth--;
+            WriteToCurrentSaveFileSync(XmlTag.BuildClosingString(task.name));
             ShiftCurrentIndex(currentIndex + 1);
         }
 
@@ -243,6 +244,7 @@ namespace Landmarks.Scripts.Progress
             }
             return new Tuple<int, int>(startIndex, -1);
         }
+        
 
         /// <summary>
         /// The methods will return a list of child tasks that can be skipped
@@ -284,6 +286,9 @@ namespace Landmarks.Scripts.Progress
 
             LM_Debug.Instance.Log("tasks to skip" +string.Join(", ", tasksToSkip), 2);
         }
+
+
+
 
         //**************************************************************
         // IO methods
