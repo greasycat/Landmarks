@@ -75,9 +75,9 @@ namespace Landmarks.Scripts.Progress
         /// <param name="task"> The task that needs to be recorded </param>
         public void RecordTaskStart(ExperimentTask task)
         {
-            WriteToCurrentSaveFileSync(new XmlTag(task.name).ToString());
+            WriteToCurrentSaveFileSync(XmlTag.BuildOpeningString(task.name, depth));
             LM_Debug.Instance.Log($"Recording start: {task.name}", 1);
-
+            depth++;
             // Next Index here can be either the current index or the next index of child
             var nextIndex = TrySkip(task);
             ShiftCurrentIndex(nextIndex);
@@ -94,7 +94,7 @@ namespace Landmarks.Scripts.Progress
             LM_Debug.Instance.Log($"Recording stop: {task.name}", 1);
             
             depth--;
-            WriteToCurrentSaveFileSync(XmlTag.BuildClosingString(task.name));
+            WriteToCurrentSaveFileSync(XmlTag.BuildClosingString(task.name, depth));
             ShiftCurrentIndex(currentIndex + 1);
         }
 

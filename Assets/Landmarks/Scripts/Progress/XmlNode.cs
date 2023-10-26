@@ -1,28 +1,29 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace Landmarks.Scripts.Progress
 {
-    public class SaveNode
+    public class XmlNode
     {
         public string TaskName { get; set; }
 
         public bool Interrupted { get; set; }
         public string FieldString { get; set; }
         
-        public List<SaveNode> children;
+        public List<XmlNode> children;
         
-        public void AddChildTask(SaveNode child)
+        public void AddChildTask(XmlNode child)
         {
             children.Add(child);
         }
 
-        public static SaveNode ParseFromLines(List<string> lines)
+        public static XmlNode ParseFromLines(List<string> lines)
         {
             if (lines.Count == 0) return null;
             
-            var root = new SaveNode();
+            var root = new XmlNode();
             var parent = root;
 
             for (var i = 0; i < lines.Count; ++i)
@@ -43,7 +44,7 @@ namespace Landmarks.Scripts.Progress
             return root;
         }
 
-        public static SaveNode ParseFromStartToken(string token)
+        public static XmlNode ParseFromStartToken(string token)
         {
                     var split = token.Substring(1).Split(':');
                     var fieldString = "{}";
@@ -53,12 +54,18 @@ namespace Landmarks.Scripts.Progress
                         fieldString = split[1];
                     }
                     
-                    return new SaveNode
+                    return new XmlNode
                     {
                         TaskName = name,
                         FieldString = fieldString,
                         Interrupted = true
                     };
         }
+
+        public static string Trim(string text)
+        {
+            return Regex.Replace(text, @"\s+", "");
+        }
+        
     }
 }
