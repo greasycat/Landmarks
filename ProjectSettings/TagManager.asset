@@ -25,6 +25,7 @@ TagManager:
   - projectile
   - StartingLocations
   - NavigationLocations
+  - Walls
   layers:
   - Default
   - TransparentFX

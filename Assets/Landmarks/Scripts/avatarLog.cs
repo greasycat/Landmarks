@@ -77,7 +77,23 @@ public class avatarLog : MonoBehaviour
 			}
 		}
 
-	}
+		if (navLog)
+        {
+			Debug.Log("---------------------------- " + location + " -------------------------------");
+			//print("AVATAR_POS	" + "\t" +  avatar.position.ToString("f3") + "\t" + "AVATAR_Body " + "\t" +  cameraCon.localEulerAngles.ToString("f3") +"\t"+ "AVATAR_Head " + cameraRig.localEulerAngles.ToString("f3"));
+			log.log("Avatar: \t" + controller.name + "\t" +
+					"Body Position (xyz): \t" + body.position.x + "\t" + body.position.y + "\t" + body.position.z + "\t" +
+					"Body Rotation (xyz): \t" + body.eulerAngles.x + "\t" + body.eulerAngles.y + "\t" + body.eulerAngles.z + "\t" +
+					"Camera Position (xyz): \t" + head.position.x + "\t" + head.position.y + "\t" + head.position.z + "\t" +
+					"Camera Rotation   (xyz): \t" + head.eulerAngles.x + "\t" + head.eulerAngles.y + "\t" + head.eulerAngles.z + "\t" +
+					"Location (Object/Hallway): \t" + location + "\t" +
+					"Keypress(True/False): \t" + KeyPress + "\t" +
+					"TargetObjectVisibility: \t" + TargetObjectVisibility + "\t"
+					, 1);
+
+		}
+
+    }
 	// Update is called once per frame
 	void FixedUpdate()
 	{
@@ -110,33 +126,19 @@ public class avatarLog : MonoBehaviour
 
 
 		// Log the name of the tracked object, it's body position, body rotation, and camera (head) rotation
-		if (navLog)
-		{
-			Debug.Log("---------------------------- " + location + " -------------------------------");
-			//print("AVATAR_POS	" + "\t" +  avatar.position.ToString("f3") + "\t" + "AVATAR_Body " + "\t" +  cameraCon.localEulerAngles.ToString("f3") +"\t"+ "AVATAR_Head " + cameraRig.localEulerAngles.ToString("f3"));
-			log.log("Avatar: \t" + controller.name + "\t" +
-					"Body Position (xyz): \t" + body.position.x + "\t" + body.position.y + "\t" + body.position.z + "\t" +
-					"Body Rotation (xyz): \t" + body.eulerAngles.x + "\t" + body.eulerAngles.y + "\t" + body.eulerAngles.z + "\t" +
-					"Camera Position (xyz): \t" + head.position.x + "\t" + head.position.y + "\t" + head.position.z + "\t" +
-					"Camera Rotation   (xyz): \t" + head.eulerAngles.x + "\t" + head.eulerAngles.y + "\t" + head.eulerAngles.z + "\t" +
-					"Location (Object/Hallway): \t" + location + "\t" +
-					"Keypress(True/False): \t" + KeyPress + "\t" +
-					"TargetObjectVisibility: \t" + TargetObjectVisibility + "\t"
-					, 1);
 
-		}
 	}
 
-    private void OnCollisionEnter(Collision collision)
+/*    private void OnCollisionEnter(Collision collision)
     {
 		if (collision.gameObject.tag == "LocationColliders")
 		{
 			location = collision.gameObject.name;
 			Debug.Log("COLLIDER IS TRIGGERING!!!! At " + location);
 		}
-	}
+	}*/
 
-    private void OnCollisionStay(Collision collision)
+/*    private void OnCollisionStay(Collision collision)
     {
 		if (collision.gameObject.tag == "LocationColliders")
 		{
@@ -147,9 +149,9 @@ public class avatarLog : MonoBehaviour
 			}
 			Debug.Log("STILL at " + collision.gameObject.name);
 		}
-	}
+	}*/
 
-    private void OnCollisionExit(Collision collision)
+/*    private void OnCollisionExit(Collision collision)
     {
 		if (collision.gameObject.tag == "LocationColliders")
 		{
@@ -158,9 +160,9 @@ public class avatarLog : MonoBehaviour
 			previousLocation = collision.gameObject.name;
 			Debug.Log("COLLIDER IS TRIGGERING!!!!");
 		}
-	}
+	}*/
 
-    void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider other)
 	{
 		if (other.gameObject.tag == "LocationColliders")
 		{
@@ -169,7 +171,7 @@ public class avatarLog : MonoBehaviour
 		}
 	}
 
-	private void OnTriggerStay(Collider other)
+/*	private void OnTriggerStay(Collider other)
 	{
 		if (other.gameObject.tag == "LocationColliders")
 		{
@@ -180,7 +182,7 @@ public class avatarLog : MonoBehaviour
 			}
 			Debug.Log("STILL at " + other.name);
 		}
-	}
+	}*/
 
 	private void OnTriggerExit(Collider other)
 	{
@@ -189,7 +191,7 @@ public class avatarLog : MonoBehaviour
 
 			location = "EXITED TO Nowhere";
 			previousLocation = other.gameObject.name;
-			Debug.Log("COLLIDER IS TRIGGERING!!!!");
+			Debug.Log("COLLIDER IS Exiting!!!! "+location);
 		}
 	}
 

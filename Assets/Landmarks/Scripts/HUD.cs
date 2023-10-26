@@ -75,7 +75,7 @@ public class HUD : MonoBehaviour
 
 	DateTime LastShown = DateTime.Now;
 	public int SecondsToShow = 0;
-	public int GeneralDuration = 10;
+	public int GeneralDuration = 3;
 	public int InstructionDuration = 99999; // MJS - allow different duration for instructions tasks
 
 	[HideInInspector] public long playback_time = 0;

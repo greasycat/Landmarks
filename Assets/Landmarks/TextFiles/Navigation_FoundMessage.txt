@@ -1,4 +1,4 @@
 
 The next target is the {0}.
 Repeat the same route that you took in the previous trial. 
-Press the trigger button when you think you're at the target. 
+Press the trigger button to select the red sphere that you think is the target. 
