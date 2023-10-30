@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Landmarks.Scripts.Debugging;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Landmarks.Scripts.Progress
 {
@@ -23,14 +24,16 @@ namespace Landmarks.Scripts.Progress
         [NotEditable] public string savingFolderPath;
 
         // Task-related variables
-        [NotEditable] public string currentTaskName = "";
-        [NotEditable] public int currentIndex = -1;
+        private XmlNode _currentSaveNode;
+        private Queue<KeyValuePair<string, string>> _attributeStack;
 
-        [NotEditable] private List<string> tasksToSkip;
-        
+        public Queue<KeyValuePair<string, string>> AttributeStack => _attributeStack;
+
+
         // Debug variables
         [SerializeField] private bool deleteCurrentSaveFileOnEditorQuit = false;
-        [SerializeField] private int depth = 0;
+        private int _depth = 0;
+        private int _line = 1;
 
 
         //**************************************************************
@@ -52,8 +55,7 @@ namespace Landmarks.Scripts.Progress
 
         private void Start()
         {
-            tasksToSkip = new List<string>();
-            
+            _attributeStack = new Queue<KeyValuePair<string, string>>();
             savingFolderPath = GetSystemConfigFolder();
             LoadLastSave();
             PrepareNewSave();
@@ -63,7 +65,7 @@ namespace Landmarks.Scripts.Progress
         //**************************************************************
         // Task-related methods
         //**************************************************************
-    
+
         /// <summary>
         /// Record the start of a task
         /// This method will be inside the ExperimentTask.startTask() method
@@ -75,12 +77,30 @@ namespace Landmarks.Scripts.Progress
         /// <param name="task"> The task that needs to be recorded </param>
         public void RecordTaskStart(ExperimentTask task)
         {
-            WriteToCurrentSaveFileSync(XmlTag.BuildOpeningString(task.name, depth));
+            var attributes = new Dictionary<string, string>
+            {
+                { "name", task.name },
+                { "line", _line.ToString() }
+            };
+            
+            // RecordAttributesByType(task, attributes);
+
+            WriteToCurrentSaveFileSync(XmlNode.BuildOpeningString("Task", attributes,  _depth));
+            _line++;
+            
             LM_Debug.Instance.Log($"Recording start: {task.name}", 1);
-            depth++;
-            // Next Index here can be either the current index or the next index of child
-            var nextIndex = TrySkip(task);
-            ShiftCurrentIndex(nextIndex);
+            _depth++;
+
+            // LM_Debug.Instance.Log("Start-Before:" + _currentSaveNode.Name, 1);
+            TrySkip(task);
+            // LM_Debug.Instance.Log("Start-After:" + _currentSaveNode.Name, 1);
+
+            if (!task.skip)
+            {
+                LM_Debug.Instance.Log($"Trigger MoveToNextNode for {task.name}", 1);
+                XmlNode.MoveToNextNode(ref _currentSaveNode);
+            }
+            
         }
 
 
@@ -88,101 +108,79 @@ namespace Landmarks.Scripts.Progress
         /// Record the end of a task
         /// This method will be inside the ExperimentTask.endTask() method
         /// </summary>
-        /// <param name="task"></param>
+        /// <param name="task">The task you want to record</param>
         public void RecordTaskEnd(ExperimentTask task)
         {
             LM_Debug.Instance.Log($"Recording stop: {task.name}", 1);
-            
-            depth--;
-            WriteToCurrentSaveFileSync(XmlTag.BuildClosingString(task.name, depth));
-            ShiftCurrentIndex(currentIndex + 1);
+            _depth--;
+            WriteToCurrentSaveFileSync(XmlNode.BuildClosingString("Task", _depth));
+            _line++;
         }
 
-        private int TrySkip(ExperimentTask task)
+        private void RecordAttributesByType(ExperimentTask task, IDictionary<string, string> attributes)
         {
-            var nextIndex = currentIndex + 1;
-
-            // Check if the task is set to skippable when resuming
-            if (!task.skipIfResume) return nextIndex;
-
-            // Check if we are doing a resume
-            if (!resumeLastSave) return nextIndex;
-
-            if (currentIndex == -1) return nextIndex;
-
-            // Check if the task stack is empty 
-            if (lastSaveStack.Count == 0) return nextIndex;
-
-            // Check if index is going out of bound
-            if (currentIndex >= lastSaveStack.Count) return nextIndex;
-        
-            // check if the task is a an task list, if not just move to next task
-            if (!(task is TaskList taskList)) return nextIndex;
-        
-        
-            // TaskList means we have to deal with child tasks skipping
-
-            // Get the last taskName
-            var lastTask = lastSaveStack[currentIndex];
-            // if the the last task is not the current task, then we don't need to skip, we just move to next task
-            if (!lastTask.StartsWith($"({task.name}:")) return nextIndex;
-        
-            // Handle non-trial type TaskList 
-            // - Here we want to skip all the children tasks of the current task
-            // - Meaning skip straight to end of the current task, denoted by "taskName)"
-            if (taskList.taskListType != Role.trial)
+            while (_attributeStack.Count > 0)
             {
-                var taskRange = GetTaskIndexRange(currentIndex, task.name);
-
-                LM_Debug.Instance.Log($"Task: {task.name}, current task {lastSaveStack[currentIndex]}", 1);
-                LM_Debug.Instance.Log($"Child range: {taskRange.Item1}, {taskRange.Item2}", 1);
-            
-            
-                // Just redo the current task if we cannot find the end of the task
-                if (taskRange.Item2 == -1)
-                {
-
-                    LM_Debug.Instance.Log($"Found the interrupted task: {task.name}", 2);
-                    
-                    if (task.stopResumeIfNotCompleted)
-                    {
-                        LM_Debug.Instance.Log($"Stop resuming", 2);
-                        resumeLastSave = false;
-                        return nextIndex;
-                    }
-                    
-                    return nextIndex;
-                }
-            
-                nextIndex = taskRange.Item2;
-            
-                task.skip = true;
-            
+                attributes.Add(_attributeStack.Dequeue());
+                Debug.Log("Dequeuing");
             }
-            // Now deal with trial type TaskList
-            // We need to get all the completed trials and skip them
-            else
+            
+        }
+        
+        
+        private void TrySkip(ExperimentTask task)
+        {
+            if (task.skip && lastSaveStack.Count != 0)
             {
-                var taskRange = GetTaskIndexRange(currentIndex, task.name);
-                if (taskRange.Item2 == -1)
-                {
-                    UpdateSkippableTrial(taskRange);
-                }
+                LM_Debug.Instance.Log($"Manual Skipping task {task.name} at index {_currentSaveNode.GetAttribute("line")}", 1);
+                XmlNode.SkipToNextNode(ref _currentSaveNode);
+                return;
+            }
+            
+            if (!resumeLastSave || lastSaveStack.Count == 0 || !task.skipIfResume)
+            {
+                LM_Debug.Instance.Log($"Skip not enabled for {task.name}", 1);
+                return;
             }
 
-            // If the task is not a trial
-            return nextIndex;
+            if (task.name != _currentSaveNode.Name)
+            {
+                LM_Debug.Instance.Log($"Task name not match: {task.name} {_currentSaveNode.Name}", 1);
+                return;
+            }
+
+
+            if (!_currentSaveNode.HasAttributeEqualTo("completed", "true"))
+            {
+                if (task is TaskList taskList && taskList.taskListType == Role.trial)
+                {
+                    var trialSubTaskNames = task.gameObject.transform.Cast<Transform>().Select(tr => tr.name);
+                    var numSubTasks = trialSubTaskNames.Count();
+                    
+                    // Get the number of completed subtasks
+                    var child = _currentSaveNode.GetAllChildren();
+                    var completedSubTasks = child.Where(node => node.HasAttributeEqualTo("completed", "true"));
+                    var numCompletedSubTasks = completedSubTasks.Count();
+                    
+                    // floor division completed subtasks number by number of subtask in each trial
+                    // to get the number of completed trials
+                    var numCompletedTrials = numCompletedSubTasks / numSubTasks;
+                    taskList.repeatCount += numCompletedTrials;
+                    
+                    resumeLastSave = false; // Stop resuming
+                    return;
+                }
+                LM_Debug.Instance.Log("Task not completed", 1);
+                return;
+            }
+            
+            
+            LM_Debug.Instance.Log($"Skipping task {task.name} at index {_currentSaveNode.GetAttribute("line")}", 1);
+            task.skip = true;
+            XmlNode.SkipToNextNode(ref _currentSaveNode);
+
         }
-
-        public bool CheckIfCurrentTrialIsCompleted()
-        {
-            var tempIndex = currentIndex;
-            var tempName = currentTaskName;
-
-
-            return true;
-        }
-
+        
         //**************************************************************
         // Save-related methods
         //**************************************************************
@@ -203,92 +201,18 @@ namespace Landmarks.Scripts.Progress
 
             lastSaveStack = File.ReadAllText(lastSaveFile).Split('\n').ToList();
             RemoveEmptyLines(lastSaveStack);
+
+            _currentSaveNode = XmlNode.ParseFromLines(lastSaveStack);
+            XmlNode.MoveToNextNode(ref _currentSaveNode);
+
+            LM_Debug.Instance.Log(_currentSaveNode.HierarchyToString(0), 2);
         }
+
 
         private void PrepareNewSave()
         {
             currentSaveFile = CreateSaveFile(savingFolderPath);
         }
-
-        private void ShiftCurrentIndex(int shift)
-        {
-            if (shift >= lastSaveStack.Count) return;
-
-            currentIndex = shift;
-            currentTaskName = lastSaveStack[shift];
-        }
-        
-        private Tuple<int, int> GetTaskIndexRange(int startIndex, string taskName)
-        {
-            //find the end of the current task in stack
-            //return the list of task between
-            var i = startIndex + 1;
-            var duplicateCount = 0;
-            for (; i < lastSaveStack.Count; i++)
-            {
-                var task = lastSaveStack[i];
-
-                if (task.StartsWith($"({taskName}:"))
-                {
-                    duplicateCount++;
-                }
-                else if (task.StartsWith($"{taskName})"))
-                {
-                    duplicateCount--;
-                }
-
-                if (duplicateCount == -1)
-                {
-                    return new Tuple<int, int>(startIndex, i);
-                }
-            }
-            return new Tuple<int, int>(startIndex, -1);
-        }
-        
-
-        /// <summary>
-        /// The methods will return a list of child tasks that can be skipped
-        /// One should only call this method when trying to skip the parental task
-        /// </summary>
-        /// <param name="range">The range should try to include the start and end index for the parent task</param>
-        private void UpdateSkippableTrial(Tuple<int, int> range)
-        {
-            if (range.Item1 == -1 || range.Item2 == -1) return;
-            // define a stack to store the tokens
-            var tokens = new Stack<string>();
-            
-            for (var i = range.Item1 + 1; i < range.Item2; i++)
-            {
-                var taskToken = lastSaveStack[i].TrimEnd();
-                LM_Debug.Instance.Log("token: " + taskToken, 2);
-                // push token
-                if (taskToken.StartsWith("("))
-                {
-                    var taskName = taskToken.Substring(1, taskToken.IndexOf(":", StringComparison.Ordinal) - 1);
-                    LM_Debug.Instance.Log("pushing: " + taskName, 2);
-                    tokens.Push(taskName);
-                }
-                // check and pop
-                else if (taskToken.EndsWith(")"))
-                {
-
-                    var taskName = taskToken.Substring(0, taskToken.Length - 1);
-                    var top = tokens.Peek();
-                    
-                    LM_Debug.Instance.Log($"matching: {top} with {taskName}", 2);
-                    if (top == taskName)
-                    {
-                        tokens.Pop();
-                        tasksToSkip.Add(taskName);
-                    }
-                }
-            }
-
-            LM_Debug.Instance.Log("tasks to skip" +string.Join(", ", tasksToSkip), 2);
-        }
-
-
-
 
         //**************************************************************
         // IO methods
@@ -334,14 +258,14 @@ namespace Landmarks.Scripts.Progress
                 LM_Debug.Instance.LogWarning("No save file found");
                 return "";
             }
-        
+
 
             var latest = DateTime.MinValue;
             var latestFile = "";
             foreach (var file in files)
             {
-                if (!file.EndsWith(".txt")) continue;
-            
+                if (!file.EndsWith(".xml")) continue;
+
                 var timestamp = File.GetCreationTime(file);
                 if (timestamp <= latest) continue;
 
@@ -372,7 +296,7 @@ namespace Landmarks.Scripts.Progress
         public static string CreateSaveFile(string folderPath)
         {
             var timestamp = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
-            var saveFile = Path.Combine(folderPath, "save_" + timestamp + ".txt");
+            var saveFile = Path.Combine(folderPath, "save_" + timestamp + ".xml");
             File.Create(saveFile).Dispose();
             if (!File.Exists(saveFile))
             {
@@ -394,29 +318,6 @@ namespace Landmarks.Scripts.Progress
         //**************************************************************
         // Debug methods
         //**************************************************************
-
-        public static void PrintAllTaskInOrder()
-        {
-            var root = GameObject.Find("LM_Timeline");
-            var rootTask = root.GetComponent<TaskList>();
-            rootTask.Traverse((obj) => LM_Debug.Instance.Log(obj.name), (_) => false);
-        }
-
-        public static void PrintAllNonTrialTask()
-        {
-            var root = GameObject.Find("LM_Timeline");
-            var rootTask = root.GetComponent<TaskList>();
-            rootTask.Traverse((obj) =>
-            {
-                // LM_Debug.Instance.Log(obj.name);
-            }, (task) =>
-            {
-                if (task.GetType() != typeof(TaskList)) return false;
-                var taskList = task as TaskList;
-                if (taskList == null) return false;
-                return taskList.taskListType == Role.trial;
-            });
-        }
 
         private void OnApplicationQuit()
         {

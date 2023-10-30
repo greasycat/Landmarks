@@ -22,8 +22,6 @@ namespace Landmarks.Scripts.Progress
             root.Add(new Button(TestGetLastSaveFile) { text = "Get Last Save" });
             root.Add(new Button(OpenCurrentSaveFile) { text = "Open current save" });
             root.Add(new Button(OpenProgressSavingLocation) { text = "Open save folder in explorer" });
-            root.Add(new Button(PrintAllTasks) { text = "Print All TaskLists" });
-            root.Add(new Button(PrintAllNonTrialTasks) { text = "Print All Non-Trial Tasks" });
         }
 
         private static void OpenFolder(string path)
@@ -64,13 +62,5 @@ namespace Landmarks.Scripts.Progress
             OpenFolder(dir);
         }
 
-        private static void PrintAllTasks()
-        {
-            LM_Progress.PrintAllTaskInOrder();
-        }
-        private static void PrintAllNonTrialTasks()
-        {
-            LM_Progress.PrintAllNonTrialTask();
-        }
     }
 }

@@ -686,7 +686,6 @@ public class Experiment : MonoBehaviour
                 foreach (Match nameMatch in nameMatches)
                 {
                     GroupCollection nameGroups = nameMatch.Groups;
-                    Debug.Log(nameGroups[1].Value);
                     filename = nameGroups[1].Value;
                 }
                 //filename = "task_" + taskCount;
@@ -738,7 +737,7 @@ public class Experiment : MonoBehaviour
         // Shut down any LM_TaskLogs
         foreach (var log in FindObjectsOfType<LM_TaskLog>())
         {
-            log.output.Close();
+            log.output?.Close();
         }
 
 
@@ -779,6 +778,7 @@ public class Experiment : MonoBehaviour
             }
             else
             {
+                Debug.Log("Loading new scene " + config.levelNames[config.levelNumber]);
                 SceneManager.LoadSceneAsync(config.levelNames[config.levelNumber]); 
                 Destroy(transform.parent.gameObject);
                 // otherwise, just load the level like usual

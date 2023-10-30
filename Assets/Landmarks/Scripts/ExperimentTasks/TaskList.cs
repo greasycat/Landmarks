@@ -15,11 +15,7 @@
 */
 
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
-using System;
-using Landmarks.Scripts;
-using UnityEngine.UI;
 using TMPro;
 
 public enum Role
@@ -45,7 +41,7 @@ public class TaskList : ExperimentTask
     [HideInInspector]
     public ExperimentTask currentTask;
 
-    private int currentTaskIndex = 0;
+    public int currentTaskIndex = 0;
 
     // CATCH TRIAL VARIABLES
     public int catchTrialCount = 0;
@@ -61,6 +57,8 @@ public class TaskList : ExperimentTask
     // Display progress in eperimenter gui
     public TextMeshProUGUI overlayRepeatCount; // ignored if empty
     public TextMeshProUGUI overlayListItem; // ignored if empty
+    
+    public int numberOfChildTaskToSkip = 0;
 
     private new void Awake() {
         base.Awake();
@@ -73,7 +71,18 @@ public class TaskList : ExperimentTask
         TASK_START();
 
 
-        if (!skip) startNextTask();
+        if (!skip)
+        {
+            // if (numberOfChildTaskToSkip > 0)
+            // {
+                // currentTaskIndex = numberOfChildTaskToSkip;
+                // startNextTask();
+            // }
+            // else
+            // {
+                startNextTask();
+            // }
+        }
     }
 
     public override void TASK_START()
@@ -205,7 +214,12 @@ public class TaskList : ExperimentTask
 
     public override bool updateTask()
     {
-        if (skip) return true;
+        if (skip)
+        {
+            Debug.Log("Skipping "+ name);
+            skip = false;
+            return true;
+        }
 
         if (currentTask.updateTask())
         {
@@ -262,7 +276,7 @@ public class TaskList : ExperimentTask
             // If we've reached the last task but have cycles (repeats) left -- reset task index, increment repeatcount and run startNextTask()
             if (currentTaskIndex >= tasks.Length)
             {
-                if (taskLog != null & taskLog.trialData.Values.Count > 0)
+                if (taskLog != null && taskLog.trialData.Values.Count > 0)
                 {
                     log.Write(taskLog.FormatCurrent()); // output the formatted data to the log file
                     taskLog.LogTrial();
@@ -336,6 +350,7 @@ public class TaskList : ExperimentTask
 
     public override void endTask()
     {
+        Debug.Log("endTask() called:" + name);
         base.endTask();
 
         if (overideRepeat)

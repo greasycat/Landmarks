@@ -207,21 +207,6 @@ public class ExperimentTask : MonoBehaviour{
 	}
 	
 	
-	public delegate bool TaskFilteringDelegate(ExperimentTask target);
-    public void Traverse(Action<ExperimentTask> action, TaskFilteringDelegate filteredDelegate)
-    {
-		action(this);
-        foreach (Transform task in transform)
-        {
-            var child = task.GetComponent<ExperimentTask>();
-            if (child != null && !filteredDelegate(this))
-            {
-                child.Traverse(action, filteredDelegate);
-            }
-        }
-    }
-
-
 	public virtual void TASK_END ()
     {
 	}
