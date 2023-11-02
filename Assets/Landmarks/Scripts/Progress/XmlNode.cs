@@ -168,7 +168,7 @@ namespace Landmarks.Scripts.Progress
 
         public static XmlNode ParseFromLines(List<string> lines)
         {
-            if (lines.Count == 0) return null;
+            if (lines.Count == 0) return new XmlNode("NA");
 
             var root = new XmlNode("Root");
             root.SetAttribute("name", "Root");

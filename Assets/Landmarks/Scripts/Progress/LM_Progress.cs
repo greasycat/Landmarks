@@ -83,7 +83,7 @@ namespace Landmarks.Scripts.Progress
                 { "line", _line.ToString() }
             };
             
-            // RecordAttributesByType(task, attributes);
+            RecordAttributesByType(task, attributes);
 
             WriteToCurrentSaveFileSync(XmlNode.BuildOpeningString("Task", attributes,  _depth));
             _line++;
