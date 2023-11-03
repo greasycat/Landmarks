@@ -1,2 +1,0 @@
-id,condition,sceneName,sceneNumber,task,block,trial,Navigate_target,Navigate_actualPath,Navigate_optimalPath,Navigate_excessPath,Navigate_clockwiseTravel,Navigate_duration,
-1,default,demo_SimpleSample_50x50,1,TASK_NavigationTask,1,1,Blue Capsule,23.88,26.88444,-3.004433,-88.39437,3.513275,

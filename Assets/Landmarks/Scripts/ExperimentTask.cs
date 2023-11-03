@@ -138,7 +138,8 @@ public class ExperimentTask : MonoBehaviour{
             log.log("EEG_TRIGGER\tName\t" + startLabel + "\tValue\t" + eegManager.triggers[startLabel].ToString(), 1);
         }
         
-        progress.RecordTaskStart(this);
+        if (progress != null)
+			progress.RecordTaskStart(this);
     }
 	
 	public virtual void TASK_START () {
@@ -203,7 +204,8 @@ public class ExperimentTask : MonoBehaviour{
 		log.log("TASK_END\t" + name + "\t" + this.GetType().Name + "\t" + duration,1 );
         hud.showNothing();
         
-        progress.RecordTaskEnd(this);
+        if (progress != null)
+			progress.RecordTaskEnd(this);
 	}
 	
 	

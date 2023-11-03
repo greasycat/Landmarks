@@ -27,9 +27,7 @@ public enum Role
 
 public class TaskList : ExperimentTask
 {
-    [Header("Task-specific Properties")]
-
-    public Role taskListType = Role.standard;
+    [Header("Task-specific Properties")] public Role taskListType = Role.standard;
     public string[] skipConditions;
     public GameObject[] tasks; // no longer need to preset, shown for debugging and visualization - MJS
     public GameObject[] objectsList;
@@ -38,8 +36,7 @@ public class TaskList : ExperimentTask
     public int repeatCount = 1;
     public bool hideTargetsDuringTask;
 
-    [HideInInspector]
-    public ExperimentTask currentTask;
+    [HideInInspector] public ExperimentTask currentTask;
 
     public int currentTaskIndex = 0;
 
@@ -49,18 +46,17 @@ public class TaskList : ExperimentTask
     public List<GameObject> onlyOnCatch; // which task-components are we adding on catch trials
     public bool noCatchOnFirstTrial = true;
 
-    [HideInInspector]
-    public List<int> catchTrials; // list of catch trials
-    [HideInInspector]
-    public bool catchFlag = false;
+    [HideInInspector] public List<int> catchTrials; // list of catch trials
+    [HideInInspector] public bool catchFlag = false;
 
     // Display progress in eperimenter gui
     public TextMeshProUGUI overlayRepeatCount; // ignored if empty
     public TextMeshProUGUI overlayListItem; // ignored if empty
-    
+
     public int numberOfChildTaskToSkip = 0;
 
-    private new void Awake() {
+    private new void Awake()
+    {
         base.Awake();
     }
 
@@ -71,18 +67,7 @@ public class TaskList : ExperimentTask
         TASK_START();
 
 
-        if (!skip)
-        {
-            // if (numberOfChildTaskToSkip > 0)
-            // {
-                // currentTaskIndex = numberOfChildTaskToSkip;
-                // startNextTask();
-            // }
-            // else
-            // {
-                startNextTask();
-            // }
-        }
+        if (!skip) startNextTask();
     }
 
     public override void TASK_START()
@@ -107,6 +92,7 @@ public class TaskList : ExperimentTask
                         }
                     }
                 }
+
                 break;
             case Role.trial:
                 break;
@@ -144,7 +130,6 @@ public class TaskList : ExperimentTask
             {
                 tasks[iTask] = transform.GetChild(iTask).gameObject;
             }
-
         }
 
         //----------------------------------------------------------------------
@@ -153,7 +138,6 @@ public class TaskList : ExperimentTask
 
         if (catchTrialCount > 0)
         {
-
             // Create a list of our trial numbers
             int[] catchCandidates;
 
@@ -162,7 +146,8 @@ public class TaskList : ExperimentTask
             {
                 catchCandidates = new int[repeat - 1];
 
-                for (int i = 0; i < repeat - 1; i++) catchCandidates[i] = i + 2; // adjust because repeat count uses base-1 and to ignore trial 1
+                for (int i = 0; i < repeat - 1; i++)
+                    catchCandidates[i] = i + 2; // adjust because repeat count uses base-1 and to ignore trial 1
             }
             // Otherwise include all trials in our list
             else
@@ -183,6 +168,7 @@ public class TaskList : ExperimentTask
                 Debug.Log(catchTrialCount);
                 catchTrials.Add(catchCandidates[i]);
             }
+
             Debug.LogWarning("HERE ARE OUR CATCH TRIALS (" + catchTrials.Count + ")");
             foreach (int item in catchTrials)
             {
@@ -201,8 +187,10 @@ public class TaskList : ExperimentTask
     public void startNextTask()
     {
         // update the trial count on the overlay
-        if (overlayRepeatCount != null) overlayRepeatCount.text = string.Format("{0}: {1} / {2}", name, repeatCount, repeat);
-        if (overlayListItem != null & overideRepeat != null) overlayListItem.text = string.Format("{0}", overideRepeat.currentObject().name);
+        if (overlayRepeatCount != null)
+            overlayRepeatCount.text = string.Format("{0}: {1} / {2}", name, repeatCount, repeat);
+        if (overlayListItem != null & overideRepeat != null)
+            overlayListItem.text = string.Format("{0}", overideRepeat.currentObject().name);
 
         currentTask = tasks[currentTaskIndex].GetComponent<ExperimentTask>();
 
@@ -216,7 +204,7 @@ public class TaskList : ExperimentTask
     {
         if (skip)
         {
-            Debug.Log("Skipping "+ name);
+            Debug.Log("Skipping " + name);
             skip = false;
             return true;
         }
@@ -239,6 +227,7 @@ public class TaskList : ExperimentTask
                 return endChild();
             }
         }
+
         return false;
     }
 
@@ -308,7 +297,7 @@ public class TaskList : ExperimentTask
         log.log("LM_Output\tTaskList\n" +
                 "TaskListName\tRepetitionNumber\tCatchFlag\n" +
                 this.name + repeatCount.ToString() + catchFlag.ToString()
-                , 1);
+            , 1);
 
 
         // Turn on/off items we are skipping/adding on catch trials
@@ -319,6 +308,7 @@ public class TaskList : ExperimentTask
             {
                 item.GetComponent<ExperimentTask>().skip = catchFlag;
             }
+
             // Set the proper skip bool for tasks that are only on catch trials
             if (onlyOnCatch.Contains(item))
             {
@@ -358,7 +348,7 @@ public class TaskList : ExperimentTask
             overideRepeat.incrementCurrent();
         }
 
-        
+
         //	if (pausedTasks) {
         //currentTask = pausedTasks;
         //endTask();
@@ -372,12 +362,12 @@ public class TaskList : ExperimentTask
         {
             return endChild();
         }
+
         return false;
     }
 
     public string format(string str)
     {
-
         string[] names = new string[objectsList.Length];
         int i = 0;
         foreach (GameObject go in objectsList)
@@ -385,8 +375,7 @@ public class TaskList : ExperimentTask
             names[i] = go.name;
             i++;
         }
+
         return string.Format(str, names);
     }
-
-
 }

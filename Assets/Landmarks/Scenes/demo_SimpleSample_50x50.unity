@@ -355,6 +355,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1434858932}
     m_Modifications:
+    - target: {fileID: 6242013941690299331, guid: 4e09813be04144d928219cb9abe866cf,
+        type: 3}
+      propertyPath: skipIfResume
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6242935898904671399, guid: 4e09813be04144d928219cb9abe866cf,
+        type: 3}
+      propertyPath: skipIfResume
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6279364624764035789, guid: 4e09813be04144d928219cb9abe866cf,
         type: 3}
       propertyPath: m_RootOrder
@@ -1107,6 +1117,16 @@ PrefabInstance:
     - target: {fileID: 5308465571149786392, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
         type: 3}
       propertyPath: ignoreRotation
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5308465571225720952, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
+        type: 3}
+      propertyPath: skip
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5308465571225720952, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
+        type: 3}
+      propertyPath: skipIfResume
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5308465571715865446, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
@@ -1917,6 +1937,7 @@ MonoBehaviour:
   repeatCount: 1
   hideTargetsDuringTask: 0
   currentTask: {fileID: 0}
+  currentTaskIndex: 0
   catchTrialCount: 0
   skipOnCatch: []
   onlyOnCatch: []
@@ -1925,6 +1946,7 @@ MonoBehaviour:
   catchFlag: 0
   overlayRepeatCount: {fileID: 0}
   overlayListItem: {fileID: 0}
+  numberOfChildTaskToSkip: 0
 --- !u!1 &1411712619
 GameObject:
   m_ObjectHideFlags: 0

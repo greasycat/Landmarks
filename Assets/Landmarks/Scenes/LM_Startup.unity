@@ -243,10 +243,7 @@ MonoBehaviour:
   lastSaveFile: 
   lastSaveStack: []
   savingFolderPath: 
-  currentTaskName: 
-  currentIndex: 0
-  deleteCurrentSaveFileOnEditorQuit: 0
-  depth: 0
+  deleteCurrentSaveFileOnEditorQuit: 1
 --- !u!4 &34686137
 Transform:
   m_ObjectHideFlags: 0
@@ -2843,7 +2840,6 @@ MonoBehaviour:
   practiceTrialCount: 0
   levelNames:
   - demo_SimpleSample_50x50
-  - demo_SimplerSampler_3x3
   randomSceneOrder: 0
   levelNumber: 0
   appendLogFiles: 0

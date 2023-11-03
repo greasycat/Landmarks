@@ -342,12 +342,13 @@ public class Experiment : MonoBehaviour
                 }
 
                 done = tasks.updateTask();
+                
 
                 // THIS IS WHERE THE EXPERIMENT GET'S SHUT DOWN
                 if (done)
                 {
                     Cursor.visible = true;
-                    await EndScene();
+                    StartCoroutine(EndScene());
                 }
             }
             else
@@ -355,6 +356,7 @@ public class Experiment : MonoBehaviour
                 updatePlayback();
             }
         }
+
     }
 
 
@@ -625,8 +627,9 @@ public class Experiment : MonoBehaviour
 
 
     // MJS - Function to allow for flexible behavior at end of scene
-    async Task EndScene()
+    IEnumerator EndScene()
     {
+        yield return null;
         // ---------------------------------------------------------------------
         // Clean up tasks and logging
         // ---------------------------------------------------------------------
@@ -656,7 +659,7 @@ public class Experiment : MonoBehaviour
         {
             // Read in the log file and prepare to parse it with RegEx
             var sr = new StreamReader(dataPath + logfile);
-            var loggedData = await sr.ReadToEndAsync();
+            var loggedData = sr.ReadToEnd();
             sr.Close();
 
             // Find LM logging headers and identify unique tasks in this experiment
@@ -753,7 +756,7 @@ public class Experiment : MonoBehaviour
             else
             {
                 Debug.Log("trying to use MICROSOFT AZURE");
-                await azureStorage.BasicStorageBlockBlobOperationsAsync();
+                // await azureStorage.BasicStorageBlockBlobOperationsAsync();
             }
         }
 
