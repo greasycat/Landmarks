@@ -25,9 +25,7 @@ namespace Landmarks.Scripts.Progress
 
         // Task-related variables
         private XmlNode _currentSaveNode;
-        private Queue<KeyValuePair<string, string>> _attributeStack;
-
-        public Queue<KeyValuePair<string, string>> AttributeStack => _attributeStack;
+        private Queue<KeyValuePair<string, string>> _attributeQueue;
 
 
         // Debug variables
@@ -55,12 +53,28 @@ namespace Landmarks.Scripts.Progress
 
         private void Start()
         {
-            _attributeStack = new Queue<KeyValuePair<string, string>>();
+            _attributeQueue = new Queue<KeyValuePair<string, string>>();
             savingFolderPath = GetSystemConfigFolder();
             LoadLastSave();
             PrepareNewSave();
         }
+        
+        //**************************************************************
+        // Attribute-related methods
+        //**************************************************************
+        
+        public void AddAttribute(string key, string value)
+        {
+            _attributeQueue.Enqueue(new KeyValuePair<string, string>(key, value));
+        }
 
+        public string GetCurrentNodeAttribute(string key)
+        {
+            if (_currentSaveNode != null) return _currentSaveNode.GetAttribute(key);
+            LM_Debug.Instance.Log("Current save node is null", 1);
+            return null;
+        }
+        
 
         //**************************************************************
         // Task-related methods
@@ -83,7 +97,7 @@ namespace Landmarks.Scripts.Progress
                 { "line", _line.ToString() }
             };
             
-            RecordAttributesByType(task, attributes);
+            MoveAllAttributesFromQueue(task, attributes);
 
             WriteToCurrentSaveFileSync(XmlNode.BuildOpeningString("Task", attributes,  _depth));
             _line++;
@@ -100,8 +114,11 @@ namespace Landmarks.Scripts.Progress
                 LM_Debug.Instance.Log($"Trigger MoveToNextNode for {task.name}", 1);
                 XmlNode.MoveToNextNode(ref _currentSaveNode);
             }
-            
         }
+
+        public bool CheckIfResumeCurrentNode(ExperimentTask task) =>
+            resumeLastSave && _currentSaveNode.Name == task.name;
+        
 
 
         /// <summary>
@@ -117,11 +134,11 @@ namespace Landmarks.Scripts.Progress
             _line++;
         }
 
-        private void RecordAttributesByType(ExperimentTask task, IDictionary<string, string> attributes)
+        private void MoveAllAttributesFromQueue(ExperimentTask task, IDictionary<string, string> attributes)
         {
-            while (_attributeStack.Count > 0)
+            while (_attributeQueue.Count > 0)
             {
-                attributes.Add(_attributeStack.Dequeue());
+                attributes.Add(_attributeQueue.Dequeue());
                 Debug.Log("Dequeuing");
             }
             

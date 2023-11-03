@@ -18,6 +18,8 @@ using UnityEngine;
 using System.Collections;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Valve.Newtonsoft.Json.Utilities;
 
 public class ObjectList : ExperimentTask {
 
@@ -34,11 +36,44 @@ public class ObjectList : ExperimentTask {
 
     
 	public override void startTask () {
-        //ViewObject.startObjects.current = 0;
-        //current = 0;
+		
+        PopulateObjects(out var objs);
+		
+		if (progress.CheckIfResumeCurrentNode(this))
+		{
+			var objectString = progress.GetCurrentNodeAttribute("objects");
+			if (objectString != null)
+			{
+				var objectList = objs.ToList();
+				var orderedNames = objectString.Split(',').ToList();
+				objs = objectList.OrderBy(obj => orderedNames.IndexOf(obj.name)).ToArray();
+			}
+		}
+		else if (shuffle)
+		{
+			Debug.Log("Shuffling objects");
+			Experiment.Shuffle(objs);				
+		}
+		
+		if (progress != null)
+		{
+			progress.AddAttribute("objects", string.Join(",", objs.Select(obj => obj.name)));
+		}
+		else
+		{
+			Debug.LogWarning("No progress object found for task " + name);
+		}
+		TASK_START();
+	 
+		foreach (GameObject obj in objs) {	             
+        	objects.Add(obj);
+			log.log("TASK_ADD	" + name  + "\t" + this.GetType().Name + "\t" + obj.name  + "\t" + "null",1 );
+		}
+	}
 
-		GameObject[] objs;
-
+	public void PopulateObjects(out GameObject[] objs)
+	{
+		
         if (objects.Count == 0)
         {
             if (parentObject == null & parentName == "") Debug.LogError("No objects found for objectlist.");
@@ -66,33 +101,7 @@ public class ObjectList : ExperimentTask {
 				objs[i] = objects[i];
 			}
 		}
-        
-		// DEPRICATED
-		// if (order ) {
-		// 	// Deal with specific ordering
-		// 	ObjectOrder ordered = order.GetComponent("ObjectOrder") as ObjectOrder;
-		
-		// 	if (ordered) {
-		// 		Debug.Log("ordered");
-		// 		Debug.Log(ordered.order.Count);
-				
-		// 		if (ordered.order.Count > 0) {
-		// 			objs = ordered.order.ToArray();
-		// 		}
-		// 	}
-		// }
-			
-		if ( shuffle ) {
-			Experiment.Shuffle(objs);				
-		}
-		
-		TASK_START();
-	 
-		foreach (GameObject obj in objs) {	             
-        	objects.Add(obj);
-			log.log("TASK_ADD	" + name  + "\t" + this.GetType().Name + "\t" + obj.name  + "\t" + "null",1 );
-		}
-	}	
+	} 
 	
 	public override void TASK_ADD(GameObject go, string txt) {
 		objects.Add(go);

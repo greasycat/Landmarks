@@ -412,6 +412,11 @@ PrefabInstance:
       propertyPath: stopResumeIfNotCompleted
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5308465572058041532, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
+        type: 3}
+      propertyPath: skipIfResume
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5308465572180033509, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
         type: 3}
       propertyPath: m_LocalPosition.z
@@ -507,6 +512,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1246642368}
     m_Modifications:
+    - target: {fileID: 6242013941690299331, guid: 4e09813be04144d928219cb9abe866cf,
+        type: 3}
+      propertyPath: skipIfResume
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6242776888988061129, guid: 4e09813be04144d928219cb9abe866cf,
+        type: 3}
+      propertyPath: skipIfResume
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6242935898904671399, guid: 4e09813be04144d928219cb9abe866cf,
+        type: 3}
+      propertyPath: skipIfResume
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6279364624764035789, guid: 4e09813be04144d928219cb9abe866cf,
         type: 3}
       propertyPath: m_RootOrder

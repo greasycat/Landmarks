@@ -357,6 +357,16 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6242013941690299331, guid: 4e09813be04144d928219cb9abe866cf,
         type: 3}
+      propertyPath: repeat
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6242013941690299331, guid: 4e09813be04144d928219cb9abe866cf,
+        type: 3}
+      propertyPath: skipIfResume
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6242776888988061129, guid: 4e09813be04144d928219cb9abe866cf,
+        type: 3}
       propertyPath: skipIfResume
       value: 1
       objectReference: {fileID: 0}
@@ -1178,6 +1188,21 @@ PrefabInstance:
         type: 3}
       propertyPath: skipCondition
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5308465572124860007, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
+        type: 3}
+      propertyPath: skip
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5308465572124860007, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
+        type: 3}
+      propertyPath: skipIfResume
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5308465572124860007, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
+        type: 3}
+      propertyPath: actionButtonOn
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5308465572180033509, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
         type: 3}

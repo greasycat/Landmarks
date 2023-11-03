@@ -82,6 +82,7 @@ public class ExperimentTask : MonoBehaviour{
 	{
 		// Look for a BrainAmp EEG manager in the eperiment
         eegManager = FindObjectOfType<BrainAmpManager>();
+        progress = LM_Progress.Instance;
 	}
 
 	public void Start () 
@@ -99,7 +100,6 @@ public class ExperimentTask : MonoBehaviour{
 		overheadCamera = manager.overheadCamera;
         log = manager.dblog;
         vrEnabled = manager.usingVR;
-        progress = LM_Progress.Instance;
 
         // set up vrInput if we're using VR
         if (vrEnabled) vrInput = SteamVR_Input.GetActionSet<SteamVR_Input_ActionSet_landmarks>(default);
