@@ -142,7 +142,7 @@ public class LM_ExpStartup : MonoBehaviour
             startErrorMessage.gameObject.SetActive(true);
         }
     }
-
+    
     void readyConfig()
     {
         config = Config.Instance;
@@ -171,6 +171,17 @@ public class LM_ExpStartup : MonoBehaviour
             _errorMessage.text = "Please select a valid UI.";
             _errorMessage.gameObject.SetActive(true);
         }
+    }
+    
+    public int GetSubjectID()
+    {
+        ValidateSubjectID();
+        if (!subidError)
+        {
+            return id;
+        }
+        Debug.LogWarning("ID incorrect");
+        return -1;
     }
 
     public void ValidateSubjectID()

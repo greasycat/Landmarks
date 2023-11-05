@@ -13,7 +13,6 @@ namespace Landmarks.Scripts.Progress
         public static LM_Progress Instance { get; private set; }
 
         // Config variables
-        [SerializeField] public string rootTaskName = "LM_Timeline";
         [SerializeField] public string applicationName = "Landmarks";
         [SerializeField] public bool resumeLastSave = true;
 
@@ -54,7 +53,10 @@ namespace Landmarks.Scripts.Progress
         private void Start()
         {
             _attributeQueue = new Queue<KeyValuePair<string, string>>();
-            savingFolderPath = GetSystemConfigFolder();
+        }
+
+        public void InitializeSave()
+        {
             LoadLastSave();
             PrepareNewSave();
         }
@@ -266,6 +268,12 @@ namespace Landmarks.Scripts.Progress
                 LM_Debug.Instance.Log("Save file deleted: " + file);
             }
         }
+        
+        public static IEnumerable<string> GetSaveFiles(string filepath)
+        {
+            var files = Directory.GetFiles(filepath);
+            return files.Where(file => file.EndsWith(".xml"));
+        }
 
         public static string GetLastSaveFile(string filepath)
         {
@@ -308,6 +316,17 @@ namespace Landmarks.Scripts.Progress
             LM_Debug.Instance.Log("Config folder: " + path);
             return path;
         }
+        
+        public string GetSaveFolderWithId(string id)
+        {
+            var saveFolder = Path.Combine(GetSystemConfigFolder(), id);
+            if (!Directory.Exists(saveFolder))
+            {
+                Directory.CreateDirectory(saveFolder);
+            }
+
+            return saveFolder;
+        }
 
         //method to create a save file with current timestamp
         public static string CreateSaveFile(string folderPath)
@@ -324,6 +343,7 @@ namespace Landmarks.Scripts.Progress
             LM_Debug.Instance.Log("Save file created: " + saveFile);
             return saveFile;
         }
+
 
         //**************************************************************
         // Helper methods
