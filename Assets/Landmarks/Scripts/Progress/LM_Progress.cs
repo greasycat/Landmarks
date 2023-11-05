@@ -13,7 +13,9 @@ namespace Landmarks.Scripts.Progress
         public static LM_Progress Instance { get; private set; }
 
         // Config variables
-        [SerializeField] public string applicationName = "Landmarks";
+        private const string ApplicationName = "Landmarks";
+        private const string SaveFolderName = "saves";
+
         [SerializeField] public bool resumeLastSave = true;
 
         // Saves-related variables
@@ -55,16 +57,31 @@ namespace Landmarks.Scripts.Progress
             _attributeQueue = new Queue<KeyValuePair<string, string>>();
         }
 
-        public void InitializeSave()
+        public void InitializeSave(string savePath = "")
         {
-            LoadLastSave();
+            LoadLastSave(savePath);
             PrepareNewSave();
         }
-        
+
+        public void SetSavingFolderPath(string path)
+        {
+            savingFolderPath = path;
+        }
+
+        public void EnableResuming()
+        {
+            resumeLastSave = true;
+        }
+
+        public void DisableResuming()
+        {
+            resumeLastSave = false;
+        }
+
         //**************************************************************
         // Attribute-related methods
         //**************************************************************
-        
+
         public void AddAttribute(string key, string value)
         {
             _attributeQueue.Enqueue(new KeyValuePair<string, string>(key, value));
@@ -76,7 +93,7 @@ namespace Landmarks.Scripts.Progress
             LM_Debug.Instance.Log("Current save node is null", 1);
             return null;
         }
-        
+
 
         //**************************************************************
         // Task-related methods
@@ -98,12 +115,12 @@ namespace Landmarks.Scripts.Progress
                 { "name", task.name },
                 { "line", _line.ToString() }
             };
-            
+
             MoveAllAttributesFromQueue(task, attributes);
 
-            WriteToCurrentSaveFileSync(XmlNode.BuildOpeningString("Task", attributes,  _depth));
+            WriteToCurrentSaveFileSync(XmlNode.BuildOpeningString("Task", attributes, _depth));
             _line++;
-            
+
             LM_Debug.Instance.Log($"Recording start: {task.name}", 1);
             _depth++;
 
@@ -120,7 +137,6 @@ namespace Landmarks.Scripts.Progress
 
         public bool CheckIfResumeCurrentNode(ExperimentTask task) =>
             resumeLastSave && _currentSaveNode.Name == task.name;
-        
 
 
         /// <summary>
@@ -143,19 +159,19 @@ namespace Landmarks.Scripts.Progress
                 attributes.Add(_attributeQueue.Dequeue());
                 Debug.Log("Dequeuing");
             }
-            
         }
-        
-        
+
+
         private void TrySkip(ExperimentTask task)
         {
             if (task.skip && lastSaveStack.Count != 0)
             {
-                LM_Debug.Instance.Log($"Manual Skipping task {task.name} at index {_currentSaveNode.GetAttribute("line")}", 1);
+                LM_Debug.Instance.Log(
+                    $"Manual Skipping task {task.name} at index {_currentSaveNode.GetAttribute("line")}", 1);
                 XmlNode.SkipToNextNode(ref _currentSaveNode);
                 return;
             }
-            
+
             if (!resumeLastSave || lastSaveStack.Count == 0 || !task.skipIfResume)
             {
                 LM_Debug.Instance.Log($"Skip not enabled for {task.name}", 1);
@@ -175,35 +191,35 @@ namespace Landmarks.Scripts.Progress
                 {
                     var trialSubTaskNames = task.gameObject.transform.Cast<Transform>().Select(tr => tr.name);
                     var numSubTasks = trialSubTaskNames.Count();
-                    
+
                     // Get the number of completed subtasks
                     var child = _currentSaveNode.GetAllChildren();
                     var completedSubTasks = child.Where(node => node.HasAttributeEqualTo("completed", "true"));
                     var numCompletedSubTasks = completedSubTasks.Count();
-                    
+
                     // floor division completed subtasks number by number of subtask in each trial
                     // to get the number of completed trials
                     var numCompletedTrials = numCompletedSubTasks / numSubTasks;
                     taskList.repeatCount += numCompletedTrials;
-                    
+
                     resumeLastSave = false; // Stop resuming
                     return;
                 }
+
                 LM_Debug.Instance.Log("Task not completed", 1);
                 return;
             }
-            
-            
+
+
             LM_Debug.Instance.Log($"Skipping task {task.name} at index {_currentSaveNode.GetAttribute("line")}", 1);
             task.skip = true;
             XmlNode.SkipToNextNode(ref _currentSaveNode);
-
         }
-        
+
         //**************************************************************
         // Save-related methods
         //**************************************************************
-        private void LoadLastSave()
+        private void LoadLastSave(string savePath = "")
         {
             if (!resumeLastSave)
             {
@@ -211,7 +227,8 @@ namespace Landmarks.Scripts.Progress
                 return;
             }
 
-            lastSaveFile = GetLastSaveFile(savingFolderPath);
+            lastSaveFile = savePath != "" ? savePath : GetLastSaveFile(savingFolderPath);
+
             if (lastSaveFile == "")
             {
                 lastSaveStack = new List<string>();
@@ -255,8 +272,16 @@ namespace Landmarks.Scripts.Progress
         private void DeleteSaveFile(string saveFile)
         {
             var path = Path.Combine(savingFolderPath, saveFile);
-            File.Delete(path);
-            LM_Debug.Instance.Log("Save file deleted: " + path);
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+                LM_Debug.Instance.Log("Save file deleted: " + path);
+            }
+            else
+            {
+                LM_Debug.Instance.LogWarning("Save file not found: " + path);
+            }
+
         }
 
         public void DeleteAllSaveFiles()
@@ -268,7 +293,7 @@ namespace Landmarks.Scripts.Progress
                 LM_Debug.Instance.Log("Save file deleted: " + file);
             }
         }
-        
+
         public static IEnumerable<string> GetSaveFiles(string filepath)
         {
             var files = Directory.GetFiles(filepath);
@@ -301,11 +326,11 @@ namespace Landmarks.Scripts.Progress
             return latestFile;
         }
 
-        public string GetSystemConfigFolder()
+        public static string GetSystemConfigFolder()
         {
             var configFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             // create a path at the config folder
-            var path = Path.Combine(configFolder, applicationName);
+            var path = Path.Combine(configFolder, ApplicationName);
 
             // create the folder if it doesn't exist
             if (!Directory.Exists(path))
@@ -316,10 +341,10 @@ namespace Landmarks.Scripts.Progress
             LM_Debug.Instance.Log("Config folder: " + path);
             return path;
         }
-        
-        public string GetSaveFolderWithId(string id)
+
+        public static string GetSaveFolderWithId(string id)
         {
-            var saveFolder = Path.Combine(GetSystemConfigFolder(), id);
+            var saveFolder = Path.Combine(GetSystemConfigFolder(), SaveFolderName, id);
             if (!Directory.Exists(saveFolder))
             {
                 Directory.CreateDirectory(saveFolder);

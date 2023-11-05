@@ -58,7 +58,7 @@ namespace Landmarks.Scripts.Progress
         private static void OpenProgressSavingLocation()
         {
             var controller = LM_Progress.Instance;
-            var dir = controller.GetSystemConfigFolder();
+            var dir = LM_Progress.GetSystemConfigFolder();
             OpenFolder(dir);
         }
 

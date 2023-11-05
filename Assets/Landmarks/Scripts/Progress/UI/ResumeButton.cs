@@ -8,7 +8,7 @@ namespace Landmarks.Scripts.Progress.UI
         private ListSelect _listSelect;
         private LM_ExpStartup _expStartup;
         private LM_Progress _progress;
-        
+
         private void Start()
         {
             _listSelect = FindObjectOfType<ListSelect>();
@@ -19,16 +19,39 @@ namespace Landmarks.Scripts.Progress.UI
 
         public void OnClick()
         {
-            var id = _expStartup.GetSubjectID();
-            if (id == -1) return;
-            var path = _progress.GetSaveFolderWithId($"{id}");
-            var saves = LM_Progress.GetSaveFiles(path);
+            var saves = LM_Progress.GetSaveFiles(GetSavingFolderPathFromScreen());
             _listSelect.Show();
             _listSelect.SetList(saves.ToList());
         }
-        
-        
-        
-        
+
+        private string GetSavingFolderPathFromScreen()
+        {
+
+            var id = _expStartup.GetSubjectID();
+            return id == -1 ? "" : LM_Progress.GetSaveFolderWithId($"{id}");
+        }
+
+        public void OnConfirm(string text)
+        {
+            var folder = GetSavingFolderPathFromScreen();
+            if (folder == "")
+            {
+                _listSelect.Hide();
+                return;
+            }
+
+            _expStartup.ExtraInitCallback = () =>
+            {
+                _progress.SetSavingFolderPath(folder);
+                _progress.EnableResuming();
+                _progress.InitializeSave(text);
+            };
+
+            _expStartup.OnStartButtonClicked();
+        }
+
+
+
+
     }
 }

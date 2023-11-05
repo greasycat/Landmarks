@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,6 +9,7 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using System.Threading.Tasks;
 using TMPro;
 using System.IO;
+using Landmarks.Scripts.Progress;
 
 #if WINDOWS_UWP && ENABLE_DOTNET
 using Windows.Storage;
@@ -15,15 +17,16 @@ using Windows.Storage;
 
 public class LM_ExpStartup : MonoBehaviour
 {
-    [Header("Config Options")]
-    public Config configProvided;
+    [Header("Config Options")] public Config configProvided;
 
     [Min(0)] [Tooltip(">0: Automatically select ascending from id provided\n" + "0: Manually select with GUI")]
-        public int id = 0;
+    public int id = 0;
+
     //public bool balanceConditionOrder = true;
     public bool singleSceneBuild = true;
+
     [Tooltip("Can use some, all, or none")]
-        public GuiElements guiElements;
+    public GuiElements guiElements;
 
     // Private Variables
     private List<Config> configs = new List<Config>();
@@ -35,16 +38,19 @@ public class LM_ExpStartup : MonoBehaviour
     private bool abortExperiment;
     private string appDir;
 
+    public Action ExtraInitCallback { get; set; }
+
     private void Awake()
     {
         appDir = Application.persistentDataPath;
 
         if (id != 0 | guiElements.subID == null)
         {
-            // Set a default ID if need be 
+            // Set a default ID if need be
             if (guiElements.subID == null)
             {
-                Debug.LogError("No field for providing a subject id manually; automatically generating id starting at 1001");
+                Debug.LogError(
+                    "No field for providing a subject id manually; automatically generating id starting at 1001");
                 autoID = 1001;
             }
 
@@ -56,6 +62,7 @@ public class LM_ExpStartup : MonoBehaviour
                     autoID++;
                 }
             }
+
             Debug.Log("Participant ID: " + autoID);
             if (guiElements.subID != null) guiElements.subID.gameObject.SetActive(false);
 
@@ -69,6 +76,7 @@ public class LM_ExpStartup : MonoBehaviour
             guiElements.subID.gameObject.SetActive(true);
             gameObject.SetActive(true);
         }
+
         GetComponentInChildren<Button>().onClick.AddListener(OnStartButtonClicked);
 
         // Create a dummy config to be replaced by the one provided or the selection dropdown
@@ -95,6 +103,16 @@ public class LM_ExpStartup : MonoBehaviour
             option.text = opt.name;
             guiElements.studyCodes.options.Add(option);
         }
+
+        ExtraInitCallback = InitProgress;
+    }
+
+    private void InitProgress()
+    {
+        var progress = LM_Progress.Instance;
+        progress.SetSavingFolderPath(LM_Progress.GetSaveFolderWithId($"{id}"));
+        progress.EnableResuming();
+        progress.InitializeSave();
     }
 
     private void Update()
@@ -120,8 +138,7 @@ public class LM_ExpStartup : MonoBehaviour
 
         // check manual id if provided
 
-        ValidateSubjectID(); 
-            
+        ValidateSubjectID();
 
 
         ValidateUI();
@@ -134,6 +151,9 @@ public class LM_ExpStartup : MonoBehaviour
             }
 
             readyConfig();
+
+            ExtraInitCallback?.Invoke();
+
             SceneManager.LoadScene(config.level);
         }
         else
@@ -142,7 +162,7 @@ public class LM_ExpStartup : MonoBehaviour
             startErrorMessage.gameObject.SetActive(true);
         }
     }
-    
+
     void readyConfig()
     {
         config = Config.Instance;
@@ -172,7 +192,7 @@ public class LM_ExpStartup : MonoBehaviour
             _errorMessage.gameObject.SetActive(true);
         }
     }
-    
+
     public int GetSubjectID()
     {
         ValidateSubjectID();
@@ -180,6 +200,7 @@ public class LM_ExpStartup : MonoBehaviour
         {
             return id;
         }
+
         Debug.LogWarning("ID incorrect");
         return -1;
     }
@@ -196,9 +217,8 @@ public class LM_ExpStartup : MonoBehaviour
             // if so, make sure it's an int
             if (int.TryParse(guiElements.subID.text, out int _subID))
             {
-
                 // If this id has already been used to save data, flag an error
-                if (!Application.isEditor & 
+                if (!Application.isEditor &
                     Directory.Exists(appDir + "/" + config.experiment + "/" + guiElements.subID.text))
                 {
                     subidError = true;
@@ -230,15 +250,20 @@ public class LM_ExpStartup : MonoBehaviour
 
     public void ChangeConfig()
     {
-        
         if (config != null) Destroy(config.gameObject);
 
         if (configProvided != null)
         {
             config = Instantiate(configProvided);
         }
-        try {config = Instantiate(configs[guiElements.studyCodes.value - 1]);}
-        catch (System.Exception ex) { } 
+
+        try
+        {
+            config = Instantiate(configs[guiElements.studyCodes.value - 1]);
+        }
+        catch (System.Exception ex)
+        {
+        }
     }
 }
 
