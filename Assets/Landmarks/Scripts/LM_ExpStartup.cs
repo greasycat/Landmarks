@@ -111,7 +111,7 @@ public class LM_ExpStartup : MonoBehaviour
     {
         var progress = LM_Progress.Instance;
         progress.SetSavingFolderPath(LM_Progress.GetSaveFolderWithId($"{id}"));
-        progress.EnableResuming();
+        progress.DisableResuming();
         progress.InitializeSave();
     }
 

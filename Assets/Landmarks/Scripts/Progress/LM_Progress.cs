@@ -136,7 +136,7 @@ namespace Landmarks.Scripts.Progress
         }
 
         public bool CheckIfResumeCurrentNode(ExperimentTask task) =>
-            resumeLastSave && _currentSaveNode.Name == task.name;
+            resumeLastSave && _currentSaveNode?.Name != null && _currentSaveNode.Name == task.name;
 
 
         /// <summary>
@@ -200,7 +200,14 @@ namespace Landmarks.Scripts.Progress
                     // floor division completed subtasks number by number of subtask in each trial
                     // to get the number of completed trials
                     var numCompletedTrials = numCompletedSubTasks / numSubTasks;
+                    
+                    // The repeatCount is 1-indexed but its initial value 0
+                    // This value is used to check if subject finish the repeating set 
                     taskList.repeatCount += numCompletedTrials;
+                    
+                    // The overideRepeat is 0-indexed and its initial value is 0
+                    // This determines which of the object is going to be displayed in the next trial
+                    taskList.overideRepeat.current += numCompletedTrials - 1;
 
                     resumeLastSave = false; // Stop resuming
                     return;

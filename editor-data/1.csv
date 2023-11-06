@@ -1,0 +1,4 @@
+﻿id,condition,sceneName,sceneNumber,task,block,trial,Navigate_target,Navigate_actualPath,Navigate_optimalPath,Navigate_excessPath,Navigate_clockwiseTravel,Navigate_duration,
+1,default,demo_SimpleSample_50x50,1,TASK_NavigationTask,1,1,Green Cylinder,48.30009,21.48452,26.81557,-48.88217,11.01579,
+1,default,demo_SimpleSample_50x50,1,TASK_NavigationTask,2,3,Blue Capsule,50.3001,50.07718,0.2229195,180.1815,21.09711,
+1,default,demo_SimpleSample_50x50,1,TASK_NavigationTask,2,4,Red Sphere,66.74014,33.97152,32.76863,269.0761,11.40245,
