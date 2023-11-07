@@ -158,5 +158,39 @@ public class ObjectList : ExperimentTask
         {
             current = 0;
         }
-    }
+		else 
+		{
+			objs = new GameObject[objects.Count];
+			for (int i = 0; i < objects.Count; i++)
+			{
+				objs[i] = objects[i];
+			}
+		}
+        
+		// DEPRICATED
+		// if (order ) {
+		// 	// Deal with specific ordering
+		// 	ObjectOrder ordered = order.GetComponent("ObjectOrder") as ObjectOrder;
+		
+		// 	if (ordered) {
+		// 		Debug.Log("ordered");
+		// 		Debug.Log(ordered.order.Count);
+				
+		// 		if (ordered.order.Count > 0) {
+		// 			objs = ordered.order.ToArray();
+		// 		}
+		// 	}
+		// }
+			
+		if ( shuffle ) {
+			Experiment.Shuffle(objs);				
+		}
+		
+		TASK_START();
+	 
+		foreach (GameObject obj in objs) {	             
+        	objects.Add(obj);
+			log.log("TASK_ADD	" + name  + "\t" + this.GetType().Name + "\t" + obj.name  + "\t" + "null",1 );
+		}
+	}	
 }

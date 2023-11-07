@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.07126847, g: 0.11027719, b: 0.15529415, a: 1}
+  m_IndirectSpecularColor: {r: 0.07126811, g: 0.11027662, b: 0.15529321, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -97,7 +97,8 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000000, guid: 8c2db99eb7e58430abb28d59cbb553e3,
+    type: 2}
   m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
@@ -6320,14 +6321,14 @@ MonoBehaviour:
   m_VerticalScrollbarEventHandler: {fileID: 0}
   m_LayoutGroup: {fileID: 0}
   m_ScrollSensitivity: 1
-  m_ContentType: 2
+  m_ContentType: 0
   m_InputType: 0
   m_AsteriskChar: 42
-  m_KeyboardType: 4
+  m_KeyboardType: 0
   m_LineType: 0
   m_HideMobileInput: 0
   m_HideSoftKeyboard: 0
-  m_CharacterValidation: 2
+  m_CharacterValidation: 0
   m_RegexValue: 
   m_GlobalPointSize: 14
   m_CharacterLimit: 0
@@ -7031,8 +7032,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 422f5f25c5eaee34e8a6f051a53e2217, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  configProvided: {fileID: 1668696710}
-  id: 0
+  configProvided: {fileID: 0}
+  id: 
   singleSceneBuild: 0
   guiElements:
     studyCodes: {fileID: 1413139276}

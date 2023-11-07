@@ -40,6 +40,8 @@ public class LM_ExpStartup : MonoBehaviour
 
     public Action ExtraInitCallback { get; set; }
 
+    public Action ExtraInitCallback { get; set; }
+
     private void Awake()
     {
         appDir = Application.persistentDataPath;
@@ -154,7 +156,10 @@ public class LM_ExpStartup : MonoBehaviour
 
             ExtraInitCallback?.Invoke();
 
-            SceneManager.LoadScene(config.level);
+            SceneManager.LoadScene(config.levelNames[config.levelNumber]);
+
+
+            //SceneManager.LoadScene(config.level);
         }
         else
         {
