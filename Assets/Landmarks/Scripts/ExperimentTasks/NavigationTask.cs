@@ -120,7 +120,7 @@ public class NavigationTask : ExperimentTask
         // Debug.Log ("Find " + current.name);
 
         // if it's a target, open the door to show it's active
-        if (currentTarget.GetComponentInChildren<LM_TargetStore>() != null)
+        if (currentTarget != null && currentTarget.GetComponentInChildren<LM_TargetStore>() != null)
         {
             currentTarget.GetComponentInChildren<LM_TargetStore>().OpenDoor();
         }

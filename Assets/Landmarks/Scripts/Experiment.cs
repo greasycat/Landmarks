@@ -764,6 +764,8 @@ public class Experiment : MonoBehaviour
         // ---------------------------------------------------------------------
         // Load the next level/scene/condition or quit
         // ---------------------------------------------------------------------
+        Destroy(GameObject.Find("UnusedTargets"));
+        Destroy(GameObject.Find("UsedTargets"));
 
         //increment the level number (accounting for the zero-base compared to a count (starts with 1)
         config.levelNumber++;
@@ -781,8 +783,9 @@ public class Experiment : MonoBehaviour
             }
             else
             {
+                
                 Debug.Log("Loading new scene " + config.levelNames[config.levelNumber]);
-                SceneManager.LoadSceneAsync(config.levelNames[config.levelNumber]); 
+                SceneManager.LoadScene(config.levelNames[config.levelNumber]);
                 Destroy(transform.parent.gameObject);
                 // otherwise, just load the level like usual
             }

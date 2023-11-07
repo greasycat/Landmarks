@@ -46,7 +46,6 @@ public class ExperimentTask : MonoBehaviour{
 	
 	public bool skip = false;
 	public bool skipIfResume = false;
-	public bool stopResumeIfNotCompleted = true;
 	public bool canIncrementLists = true;
 
 	public int interval = 0;

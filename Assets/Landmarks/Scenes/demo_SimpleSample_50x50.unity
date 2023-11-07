@@ -1121,6 +1121,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5308465571149786392, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
         type: 3}
+      propertyPath: skip
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5308465571149786392, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5308465571149786392, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
+        type: 3}
       propertyPath: ignoreYPos
       value: 1
       objectReference: {fileID: 0}
@@ -1935,7 +1945,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skip: 0
   skipIfResume: 1
-  stopResumeIfNotCompleted: 1
   canIncrementLists: 1
   interval: 0
   interruptTasks: {fileID: 0}

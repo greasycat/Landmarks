@@ -128,7 +128,7 @@ namespace Landmarks.Scripts.Progress
             TrySkip(task);
             // LM_Debug.Instance.Log("Start-After:" + _currentSaveNode.Name, 1);
 
-            if (!task.skip)
+            if (!task.skip && resumeLastSave)
             {
                 LM_Debug.Instance.Log($"Trigger MoveToNextNode for {task.name}", 1);
                 XmlNode.MoveToNextNode(ref _currentSaveNode);
@@ -164,7 +164,7 @@ namespace Landmarks.Scripts.Progress
 
         private void TrySkip(ExperimentTask task)
         {
-            if (task.skip && lastSaveStack.Count != 0)
+            if (task.skip && lastSaveStack.Count != 0 && resumeLastSave)
             {
                 LM_Debug.Instance.Log(
                     $"Manual Skipping task {task.name} at index {_currentSaveNode.GetAttribute("line")}", 1);
@@ -207,7 +207,7 @@ namespace Landmarks.Scripts.Progress
                     
                     // The overideRepeat is 0-indexed and its initial value is 0
                     // This determines which of the object is going to be displayed in the next trial
-                    taskList.overideRepeat.current += numCompletedTrials - 1;
+                    taskList.overideRepeat.current = taskList.repeatCount - 1;
 
                     resumeLastSave = false; // Stop resuming
                     return;
