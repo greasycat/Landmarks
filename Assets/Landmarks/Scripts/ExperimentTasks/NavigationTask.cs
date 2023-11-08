@@ -89,6 +89,12 @@ public class NavigationTask : ExperimentTask
     private List<GameObject> borderObjects2 = new List<GameObject>();
     public Vector2 playerBorderSumAndMeasurements;
 
+    //For distance to walls logging (note: Walls are just walls)
+    public string wallsTag = "Walls"; // Tag for the wall objects
+    private List<float> distancesToWalls = new List<float>(); // List to store frame by frame distances to walls
+    private List<GameObject> walls2 = new List<GameObject>();
+    public Vector2 playerWallSumAndMeasurements;
+
     // record which object they end at, and whether they went to the right object
     private GameObject participantEndTarget;
     private GameObject dummyLogging;
@@ -339,7 +345,14 @@ public class NavigationTask : ExperimentTask
             Debug.Log("BORDER OBJECT -------------------------------" + b_obj.name);
             borderObjects2.Add(b_obj);
             }
-            
+
+            //Adding Walls Objects to List
+            foreach (var wall_obj in GameObject.FindGameObjectsWithTag("Walls"))
+            {
+                Debug.Log("WALL OBJECT -------------------------------" + wall_obj.name);
+                walls2.Add(wall_obj);
+            }
+
         }
 
         //find starting location of player (where the trial started)
@@ -467,8 +480,21 @@ public class NavigationTask : ExperimentTask
         var closestBorder = playerBorderDistances.OrderBy(kvp => kvp.Value).First();
         Debug.Log(closestBorder.Key + " is the closest border object, located " + closestBorder.Value + "m, orthongonally from the player");
         playerBorderSumAndMeasurements += new Vector2(closestBorder.Value, 1);
-                
-        
+
+        //Keep updating the calculations for wallDistances
+        //logging distance to walls at each frame, then finding the average value for the entire trial 
+        var playerWallDistances = new Dictionary<string, float>();
+        foreach (GameObject wall in walls2)
+        {
+            Vector3 closestWallPoint = wall.GetComponent<Collider>().ClosestPointOnBounds(manager.player.transform.position);
+            float player2wallDist = Vector3Distance2D(closestWallPoint, manager.player.transform.position);
+            playerWallDistances.Add(wall.name, player2wallDist);
+
+        }
+        var closestWall = playerWallDistances.OrderBy(kvp => kvp.Value).First();
+        Debug.Log(closestWall.Key + " is the closest wall object, located " + closestWall.Value + "m, orthongonally from the player");
+        playerWallSumAndMeasurements += new Vector2(closestWall.Value, 1);
+
         if (isScaled)
         {
             scaledPlayerDistance += Vector3.Distance(scaledAvatar.transform.position, scaledPlayerLastPosition);
@@ -725,10 +751,14 @@ public class NavigationTask : ExperimentTask
 
         var avgDist2border = playerBorderSumAndMeasurements[0] / playerBorderSumAndMeasurements[1];
         Debug.Log("Sum of all Dist measurements: " + playerBorderSumAndMeasurements[0] + "\t Total Measurements: " + playerBorderSumAndMeasurements[1] + "\t Avg Dist: " + avgDist2border);
-       
+
 
         //float averageDistanceToBorder = totaldistancesToBorder / distancesToBorder.Count;
         //Debug.Log("Average Distance: " + averageDistanceToBorder);
+
+        //calculating average distance to wall for trial 
+        var avgDist2wall = playerWallSumAndMeasurements[0] / playerWallSumAndMeasurements[1];
+        Debug.Log("Sum of all Dist to Wall measurements: " + playerWallSumAndMeasurements[0] + "\t Total Measurements: " + playerWallSumAndMeasurements[1] + "\t Avg Dist: " + avgDist2wall);
 
         //find finishing location of player (closest target object & distance to that target object)
         GameObject[] objs = GameObject.FindGameObjectsWithTag("Target");
@@ -768,6 +798,7 @@ public class NavigationTask : ExperimentTask
         taskLog.AddData(transform.name + "_clockwiseTravel", clockwiseTravel.ToString());
         taskLog.AddData(transform.name + "_duration", navTime.ToString());
         taskLog.AddData(transform.name + "averageDistToBorder", avgDist2border.ToString());
+        taskLog.AddData(transform.name + "averageDistToWall", avgDist2wall.ToString());
         taskLog.AddData(transform.name + "_trialEndClosestTarget", closest_obj.name);
         taskLog.AddData(transform.name + "_trialEndClosestTargetDist", closestobjDistance.ToString());
         //taskLog.AddData("testtesttest" + "_correctPosition", interfacePivots.correctPosition.ToString());
