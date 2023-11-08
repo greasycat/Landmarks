@@ -82,7 +82,12 @@ namespace Landmarks.Scripts.Progress
         // Attribute-related methods
         //**************************************************************
 
-        public void AddAttribute(string key, string value)
+        public void AddAttributeAhead(string key, string value)
+        {
+            _attributeQueue.Enqueue(new KeyValuePair<string, string>(key, value));
+        }
+        
+        public void AddAttributeBehind(string key, string value)
         {
             _attributeQueue.Enqueue(new KeyValuePair<string, string>(key, value));
         }

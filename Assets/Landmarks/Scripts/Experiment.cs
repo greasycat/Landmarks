@@ -363,7 +363,7 @@ public class Experiment : MonoBehaviour
                 if (done)
                 {
                     Cursor.visible = true;
-                    StartCoroutine(EndScene());
+                    await EndScene();
                 }
             }
             else
@@ -642,9 +642,8 @@ public class Experiment : MonoBehaviour
 
 
     // MJS - Function to allow for flexible behavior at end of scene
-    IEnumerator EndScene()
+    async Task EndScene()
     {
-        yield return null;
         // ---------------------------------------------------------------------
         // Clean up tasks and logging
         // ---------------------------------------------------------------------

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.07126811, g: 0.11027662, b: 0.15529321, a: 1}
+  m_IndirectSpecularColor: {r: 0.07126847, g: 0.11027719, b: 0.15529415, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -508,7 +508,7 @@ MonoBehaviour:
   lastSaveFile: 
   lastSaveStack: []
   savingFolderPath: 
-  deleteCurrentSaveFileOnEditorQuit: 1
+  deleteCurrentSaveFileOnEditorQuit: 0
 --- !u!4 &34686137
 Transform:
   m_ObjectHideFlags: 0
@@ -4662,7 +4662,6 @@ MonoBehaviour:
   subjectPath: default
   subject: default
   session: default
-  level: default
   condition: default
   initialized: 0
 --- !u!4 &1668696711
@@ -5787,7 +5786,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -410.65515, y: -11593.769}
+  m_AnchoredPosition: {x: -481.45776, y: -13592.17}
   m_SizeDelta: {x: 0, y: 800}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &2017697669

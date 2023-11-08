@@ -20,7 +20,7 @@ public class LM_ExpStartup : MonoBehaviour
     [Header("Config Options")] public Config configProvided;
 
     [Min(0)] [Tooltip(">0: Automatically select ascending from id provided\n" + "0: Manually select with GUI")]
-    public int id = 0;
+    public string id = "";
 
     //public bool balanceConditionOrder = true;
     public bool singleSceneBuild = true;
@@ -53,7 +53,7 @@ public class LM_ExpStartup : MonoBehaviour
             {
                 Debug.LogError(
                     "No field for providing a subject id manually; automatically generating id starting at 1001");
-                autoID = 1001;
+                autoID = "1001";
             }
 
             // find an id with no data saved (don't overwrite)
@@ -61,7 +61,7 @@ public class LM_ExpStartup : MonoBehaviour
             {
                 while (Directory.Exists(appDir + "/" + config.experiment + "/" + autoID))
                 {
-                    autoID++;
+                    autoID = "0000";
                 }
             }
 
@@ -198,7 +198,7 @@ public class LM_ExpStartup : MonoBehaviour
         }
     }
 
-    public int GetSubjectID()
+    public string GetSubjectID()
     {
         ValidateSubjectID();
         if (!subidError)
@@ -207,7 +207,7 @@ public class LM_ExpStartup : MonoBehaviour
         }
 
         Debug.LogWarning("ID incorrect");
-        return -1;
+        return "";
     }
 
     public void ValidateSubjectID()

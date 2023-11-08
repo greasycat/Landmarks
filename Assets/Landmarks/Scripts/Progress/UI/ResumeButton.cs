@@ -28,7 +28,7 @@ namespace Landmarks.Scripts.Progress.UI
         {
 
             var id = _expStartup.GetSubjectID();
-            return id == -1 ? "" : LM_Progress.GetSaveFolderWithId($"{id}");
+            return id == "" ? "" : LM_Progress.GetSaveFolderWithId($"{id}");
         }
 
         public void OnConfirm(string text)

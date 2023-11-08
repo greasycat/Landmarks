@@ -19,6 +19,7 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Landmarks.Scripts.Progress;
 using Valve.Newtonsoft.Json.Utilities;
 
 public class ObjectList : ExperimentTask
@@ -37,8 +38,11 @@ public class ObjectList : ExperimentTask
     public override void startTask()
     {
         PopulateObjects(out var objs);
+        
+        if (progress == null)
+            progress = LM_Progress.Instance;
 
-        if (progress.CheckIfResumeCurrentNode(this))
+        if (progress != null && progress.CheckIfResumeCurrentNode(this))
         {
             var objectString = progress.GetCurrentNodeAttribute("objects");
             if (objectString != null)
@@ -62,7 +66,7 @@ public class ObjectList : ExperimentTask
 
         if (progress != null)
         {
-            progress.AddAttribute("objects", string.Join(",", objs.Select(obj => obj.name)));
+            progress.AddAttributeAhead("objects", string.Join(",", objs.Select(obj => obj.name)));
         }
         else
         {
@@ -149,48 +153,61 @@ public class ObjectList : ExperimentTask
             return objects[current];
         }
     }
-
-    public new void incrementCurrent()
-    {
-        current++;
-
+    
+    	public new void incrementCurrent()
+	//TL TLDR: increments the "current" trial by adding 1
+	{
+		
+		current++;
+        //TL: When running this method: current (the trial number?) increments by 1
         if (current >= objects.Count && EndListBehavior == EndListMode.Loop)
-        {
-            current = 0;
-        }
-		else 
+		//don't need to worry about this if loop, since our end behavior is set to "end" and not "loop"
 		{
-			objs = new GameObject[objects.Count];
-			for (int i = 0; i < objects.Count; i++)
-			{
-				objs[i] = objects[i];
-			}
+			current = 0;
 		}
-        
-		// DEPRICATED
-		// if (order ) {
-		// 	// Deal with specific ordering
-		// 	ObjectOrder ordered = order.GetComponent("ObjectOrder") as ObjectOrder;
-		
-		// 	if (ordered) {
-		// 		Debug.Log("ordered");
-		// 		Debug.Log(ordered.order.Count);
-				
-		// 		if (ordered.order.Count > 0) {
-		// 			objs = ordered.order.ToArray();
-		// 		}
-		// 	}
-		// }
-			
-		if ( shuffle ) {
-			Experiment.Shuffle(objs);				
-		}
-		
-		TASK_START();
-	 
-		foreach (GameObject obj in objs) {	             
-        	objects.Add(obj);
-			log.log("TASK_ADD	" + name  + "\t" + this.GetType().Name + "\t" + obj.name  + "\t" + "null",1 );
-		}
-	}	
+	}
+
+ //    public new void incrementCurrent()
+ //    {
+ //        current++;
+ //
+ //        if (current >= objects.Count && EndListBehavior == EndListMode.Loop)
+ //        {
+ //            current = 0;
+ //        }
+	// 	else 
+	// 	{
+	// 		objs = new GameObject[objects.Count];
+	// 		for (int i = 0; i < objects.Count; i++)
+	// 		{
+	// 			objs[i] = objects[i];
+	// 		}
+	// 	}
+ //        
+	// 	// DEPRICATED
+	// 	// if (order ) {
+	// 	// 	// Deal with specific ordering
+	// 	// 	ObjectOrder ordered = order.GetComponent("ObjectOrder") as ObjectOrder;
+	// 	
+	// 	// 	if (ordered) {
+	// 	// 		Debug.Log("ordered");
+	// 	// 		Debug.Log(ordered.order.Count);
+	// 			
+	// 	// 		if (ordered.order.Count > 0) {
+	// 	// 			objs = ordered.order.ToArray();
+	// 	// 		}
+	// 	// 	}
+	// 	// }
+	// 		
+	// 	if ( shuffle ) {
+	// 		Experiment.Shuffle(objs);				
+	// 	}
+	// 	
+	// 	TASK_START();
+	//  
+	// 	foreach (GameObject obj in objs) {	             
+ //        	objects.Add(obj);
+	// 		log.log("TASK_ADD	" + name  + "\t" + this.GetType().Name + "\t" + obj.name  + "\t" + "null",1 );
+	// 	}
+	// }	
 }
