@@ -86,7 +86,7 @@ namespace Landmarks.Scripts.Progress
         {
             _attributeQueue.Enqueue(new KeyValuePair<string, string>(key, value));
         }
-        
+
         public void AddAttributeBehind(string key, string value)
         {
             _attributeQueue.Enqueue(new KeyValuePair<string, string>(key, value));
@@ -117,8 +117,8 @@ namespace Landmarks.Scripts.Progress
         {
             var attributes = new Dictionary<string, string>
             {
-                { "name", task.name },
-                { "line", _line.ToString() }
+                {"name", task.name},
+                {"line", _line.ToString()}
             };
 
             MoveAllAttributesFromQueue(task, attributes);
@@ -206,13 +206,33 @@ namespace Landmarks.Scripts.Progress
                     // to get the number of completed trials
                     var numCompletedTrials = numCompletedSubTasks / numSubTasks;
                     
+                    LM_Debug.Instance.Log($"Number of completed trials: {numCompletedTrials}", 10);
+
                     // The repeatCount is 1-indexed but its initial value 0
                     // This value is used to check if subject finish the repeating set 
                     taskList.repeatCount += numCompletedTrials;
-                    
+
                     // The overideRepeat is 0-indexed and its initial value is 0
                     // This determines which of the object is going to be displayed in the next trial
-                    taskList.overideRepeat.current = taskList.repeatCount - 1;
+                    if (taskList.overideRepeat != null)
+                        taskList.overideRepeat.current = taskList.repeatCount - 1;
+
+                    foreach (Transform childTransform in taskList.transform)
+                    {
+                        if (childTransform.TryGetComponent(typeof(LM_IncrementLists), out var component))
+                        {
+                            var incrementLists = (LM_IncrementLists) component;
+
+                            incrementLists.Increment(numCompletedTrials);
+                            
+                            LM_Debug.Instance.Log($"Increment trial number by triggering {childTransform.name}", 2);
+                        }
+                        else
+                        {
+                            LM_Debug.Instance.Log($"Cannot find LM_IncrementLists component in {childTransform.name}", 1);
+                        }
+                    }
+
 
                     resumeLastSave = false; // Stop resuming
                     return;
@@ -293,7 +313,6 @@ namespace Landmarks.Scripts.Progress
             {
                 LM_Debug.Instance.LogWarning("Save file not found: " + path);
             }
-
         }
 
         public void DeleteAllSaveFiles()

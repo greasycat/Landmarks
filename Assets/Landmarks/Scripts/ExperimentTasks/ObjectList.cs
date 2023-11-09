@@ -19,7 +19,9 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using Landmarks.Scripts.Progress;
+using Newtonsoft.Json;
 using Valve.Newtonsoft.Json.Utilities;
 
 public class ObjectList : ExperimentTask
@@ -38,22 +40,30 @@ public class ObjectList : ExperimentTask
     public override void startTask()
     {
         PopulateObjects(out var objs);
-        
+
         if (progress == null)
             progress = LM_Progress.Instance;
 
         if (progress != null && progress.CheckIfResumeCurrentNode(this))
         {
-            var objectString = progress.GetCurrentNodeAttribute("objects");
-            if (objectString != null)
+            var objectJsonString = progress.GetCurrentNodeAttribute("objects");
+            if (objectJsonString != null)
             {
-                var objectList = objs.ToList();
-                var orderedNames = objectString.Split(',').ToList();
-                if (orderedNames.Count > 0)
+                var lookUp = SerializationHelper.ConvertToLookupDictionary(objs);
+                Debug.Log("Keys: " + string.Join(",", lookUp.Keys.ToArray()));
+                try
                 {
-                    Debug.Log("Ordering objects...");
-                    objs = objectList.OrderBy(obj => orderedNames.IndexOf(obj.name)).ToArray();
+                    Debug.Log("Json" + objectJsonString);
+                    var objectList =
+                        SerializationHelper.Deserialize<List<Dictionary<string, string>>>(objectJsonString);
+
+                    objs = SerializationHelper.ConvertToGameObjectList(objectList, lookUp).ToArray();
+
                     shuffle = false;
+                }
+                catch (JsonReaderException e)
+                {
+                    Debug.LogError("Cannot deserialize object list, fail to load resume save " + e.Message);
                 }
             }
         }
@@ -64,16 +74,12 @@ public class ObjectList : ExperimentTask
             Experiment.Shuffle(objs);
         }
 
-        if (progress != null)
-        {
-            progress.AddAttributeAhead("objects", string.Join(",", objs.Select(obj => obj.name)));
-        }
-        else
-        {
-            Debug.LogWarning("No progress object found for task " + name);
-        }
+
+        progress.AddAttributeAhead("objects",
+            SerializationHelper.Serialize(SerializationHelper.ConvertToDictionaryList(objs)));
 
         TASK_START();
+
 
         foreach (GameObject obj in objs)
         {
@@ -81,6 +87,7 @@ public class ObjectList : ExperimentTask
             log.log("TASK_ADD	" + name + "\t" + this.GetType().Name + "\t" + obj.name + "\t" + "null", 1);
         }
     }
+
 
     public void PopulateObjects(out GameObject[] objs)
     {
@@ -153,61 +160,60 @@ public class ObjectList : ExperimentTask
             return objects[current];
         }
     }
-    
-    	public new void incrementCurrent()
-	//TL TLDR: increments the "current" trial by adding 1
-	{
-		
-		current++;
+
+    public new void incrementCurrent(int increment = 1)
+        //TL TLDR: increments the "current" trial by adding 1
+    {
+        current += increment;
         //TL: When running this method: current (the trial number?) increments by 1
         if (current >= objects.Count && EndListBehavior == EndListMode.Loop)
-		//don't need to worry about this if loop, since our end behavior is set to "end" and not "loop"
-		{
-			current = 0;
-		}
-	}
+            //don't need to worry about this if loop, since our end behavior is set to "end" and not "loop"
+        {
+            current = 0;
+        }
+    }
 
- //    public new void incrementCurrent()
- //    {
- //        current++;
- //
- //        if (current >= objects.Count && EndListBehavior == EndListMode.Loop)
- //        {
- //            current = 0;
- //        }
-	// 	else 
-	// 	{
-	// 		objs = new GameObject[objects.Count];
-	// 		for (int i = 0; i < objects.Count; i++)
-	// 		{
-	// 			objs[i] = objects[i];
-	// 		}
-	// 	}
- //        
-	// 	// DEPRICATED
-	// 	// if (order ) {
-	// 	// 	// Deal with specific ordering
-	// 	// 	ObjectOrder ordered = order.GetComponent("ObjectOrder") as ObjectOrder;
-	// 	
-	// 	// 	if (ordered) {
-	// 	// 		Debug.Log("ordered");
-	// 	// 		Debug.Log(ordered.order.Count);
-	// 			
-	// 	// 		if (ordered.order.Count > 0) {
-	// 	// 			objs = ordered.order.ToArray();
-	// 	// 		}
-	// 	// 	}
-	// 	// }
-	// 		
-	// 	if ( shuffle ) {
-	// 		Experiment.Shuffle(objs);				
-	// 	}
-	// 	
-	// 	TASK_START();
-	//  
-	// 	foreach (GameObject obj in objs) {	             
- //        	objects.Add(obj);
-	// 		log.log("TASK_ADD	" + name  + "\t" + this.GetType().Name + "\t" + obj.name  + "\t" + "null",1 );
-	// 	}
-	// }	
+    //    public new void incrementCurrent()
+    //    {
+    //        current++;
+    //
+    //        if (current >= objects.Count && EndListBehavior == EndListMode.Loop)
+    //        {
+    //            current = 0;
+    //        }
+    // 	else 
+    // 	{
+    // 		objs = new GameObject[objects.Count];
+    // 		for (int i = 0; i < objects.Count; i++)
+    // 		{
+    // 			objs[i] = objects[i];
+    // 		}
+    // 	}
+    //        
+    // 	// DEPRICATED
+    // 	// if (order ) {
+    // 	// 	// Deal with specific ordering
+    // 	// 	ObjectOrder ordered = order.GetComponent("ObjectOrder") as ObjectOrder;
+    // 	
+    // 	// 	if (ordered) {
+    // 	// 		Debug.Log("ordered");
+    // 	// 		Debug.Log(ordered.order.Count);
+    // 			
+    // 	// 		if (ordered.order.Count > 0) {
+    // 	// 			objs = ordered.order.ToArray();
+    // 	// 		}
+    // 	// 	}
+    // 	// }
+    // 		
+    // 	if ( shuffle ) {
+    // 		Experiment.Shuffle(objs);				
+    // 	}
+    // 	
+    // 	TASK_START();
+    //  
+    // 	foreach (GameObject obj in objs) {	             
+    //        	objects.Add(obj);
+    // 		log.log("TASK_ADD	" + name  + "\t" + this.GetType().Name + "\t" + obj.name  + "\t" + "null",1 );
+    // 	}
+    // }	
 }
