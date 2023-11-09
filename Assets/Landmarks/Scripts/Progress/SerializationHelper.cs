@@ -1,72 +1,112 @@
 ﻿using System;
 using System.Linq;
+using System.Security;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace Landmarks.Scripts.Progress
 {
-using System.Collections.Generic;
-using UnityEngine;
+    using System.Collections.Generic;
+    using UnityEngine;
 
-public static class SerializationHelper
-{
-    public static Dictionary<string, GameObject> ConvertToDictionary(IEnumerable<GameObject> gameObjects)
+    public static class SerializationHelper
     {
-        return gameObjects.ToDictionary(gameObject => gameObject.name);
-    }
-
-    public static string SerializeGameObjectList(List<List<GameObject>> listOfLists)
-    {
-        StringBuilder sb = new StringBuilder();
-        sb.Append('[');
-        for (int i = 0; i < listOfLists.Count; i++)
+        public static Dictionary<string, GameObject> ConvertToLookupDictionary(IEnumerable<GameObject> gameObjects)
         {
-            sb.Append('[');
-            for (int j = 0; j < listOfLists[i].Count; j++)
+            var lookup = new Dictionary<string, GameObject>();
+            foreach (var gameObject in gameObjects)
             {
-                sb.AppendFormat("\"{0}\"", listOfLists[i][j].name);
-                if (j < listOfLists[i].Count - 1)
-                    sb.Append(',');
-            }
-            sb.Append(']');
-            if (i < listOfLists.Count - 1)
-                sb.Append(',');
-        }
-        sb.Append(']');
-
-        return sb.ToString();
-    }
-    
-    
-    public static List<List<GameObject>> DeserializeGameObjectList(string serializedData, IDictionary<string, GameObject> gameObjectLookup)
-    {
-        var listOfLists = new List<List<GameObject>>();
-        var outerLists = serializedData.Trim('[', ']').Split(new string[] { "],[" }, StringSplitOptions.None);
-
-        foreach (var outerList in outerLists)
-        {
-            var innerList = new List<GameObject>();
-            var gameObjectNames = outerList.Trim('[', ']').Split(',');
-
-            foreach (var name in gameObjectNames)
-            {
-                var trimmedName = name.Trim('"');
-                if (gameObjectLookup.TryGetValue(trimmedName, out var gameObject))
+                var key = Uid.TryGetUid(gameObject, out var uid) ? $"{uid}" : gameObject.name;
+                if (!lookup.ContainsKey(key))
                 {
-                    innerList.Add(gameObject);
+                    lookup.Add(key, gameObject);
+                }
+            }
+
+            return lookup;
+        }
+        
+        
+        public static Dictionary<string, GameObject> ConvertToLookupDictionary(IEnumerable<IEnumerable<GameObject>> gameObjects)
+        {
+            var flattenList = gameObjects.SelectMany(objs => objs);
+            return ConvertToLookupDictionary(flattenList);
+        }
+
+
+        public static List<Dictionary<string, string>> ConvertToDictionaryList(IEnumerable<GameObject> gameObjects)
+        {
+            return gameObjects.Select(obj =>
+            {
+                if (Uid.TryGetUid(obj, out var uid))
+                {
+                    return new Dictionary<string, string>()
+                    {
+                        {"uid", $"{uid}"},
+                        {"name", obj.name}
+                    };
+                }
+
+                return new Dictionary<string, string>()
+                {
+                    {"name", obj.name}
+                };
+            }).ToList();
+        }
+
+        public static List<List<Dictionary<string, string>>> ConvertToDictionaryList(
+            IEnumerable<IEnumerable<GameObject>> gameObjects)
+        {
+            return gameObjects.Select(ConvertToDictionaryList).ToList();
+        }
+
+        public static List<GameObject> ConvertToGameObjectList(IEnumerable<Dictionary<string, string>> gameObjects,
+            IDictionary<string, GameObject> gameObjectLookup)
+        {
+            return gameObjects.Select(obj =>
+            {
+                var key = "";
+                
+                // First getting the uid if not fallback to name
+                if (obj.TryGetValue("uid", out var uidString))
+                {
+                    key = uidString;
+                }
+                else if (obj.TryGetValue("name", out var name))
+                {
+                    key = name;
                 }
                 else
                 {
-                    // Handle the case where the GameObject is not found
-                    Debug.LogWarning($"GameObject with name {trimmedName} not found.");
+                    return default;
                 }
-            }
 
-            listOfLists.Add(innerList);
+                if (gameObjectLookup.TryGetValue(key, out var gameObject)) return gameObject;
+                
+                Debug.LogError($"Cannot find object with key {key}");
+                return default;
+
+            }).ToList();
         }
 
-        return listOfLists;
+        public static string Serialize(object obj)
+        {
+            var unformatted = JsonConvert.SerializeObject(obj);
+            return SecurityElement.Escape(unformatted);
+        }
+        
+        public static T Deserialize<T>(string json)
+        {
+            var unescaped = new SecurityElement("", json).Text;
+            Debug.Log("unescaped: " + unescaped);
+            return JsonConvert.DeserializeObject<T>(unescaped);
+        }
+        
+        public static List<List<GameObject>> ConvertToGameObjectList(
+            IEnumerable<IEnumerable<Dictionary<string, string>>> gameObjects,
+            IDictionary<string, GameObject> gameObjectLookup)
+        {
+            return gameObjects.Select(objs => ConvertToGameObjectList(objs, gameObjectLookup)).ToList();
+        }
     }
-
-}
-
 }
