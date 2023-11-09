@@ -73,6 +73,11 @@ public class LM_CompassPointing : ExperimentTask
     //Handle HUD message positioning
     private float offset = 1.0f;
 
+    public RectTransform rectTransform;
+    public float newWidth;
+    public float newHeight;
+    private Vector2 originalRectTransformSize;
+
     public override void startTask()
     {
         TASK_START();
@@ -85,6 +90,9 @@ public class LM_CompassPointing : ExperimentTask
     {
         if (!manager) Start();
         base.startTask();
+
+        originalRectTransformSize = rectTransform.sizeDelta;
+        rectTransform.sizeDelta = new Vector2(newWidth, newHeight);
 
         startTime = Time.time;
 
@@ -442,6 +450,8 @@ public class LM_CompassPointing : ExperimentTask
     public override void TASK_END()
     {
         base.endTask();
+
+        rectTransform.sizeDelta = originalRectTransformSize;
 
         if (listOfTriads != null && (listOfLocations == null && listofTargets == null))
         {

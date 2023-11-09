@@ -18,7 +18,7 @@ public class TL_WayfindingTrialsCounter : MonoBehaviour
 
     private void Start()
     {
-        guiStyle.fontSize = 70;
+        //guiStyle.fontSize = 70;
         guiStyle.normal.textColor = Color.red;
         totalTrials = taskListReference.repeat;
     }
@@ -26,14 +26,21 @@ public class TL_WayfindingTrialsCounter : MonoBehaviour
     {
         if (objectListReference.objects.Count > 0)
         {
-            string trialCountText = "Finished Trial: " + finishedTrialCount + "/" + totalTrials; Vector2 textSize = GUI.skin.label.CalcSize(new GUIContent(trialCountText));
-            GUI.Label(new Rect(1300, 1000, 1000, 200), trialCountText, guiStyle);
+            string trialCountText = "Finished Trial: " + finishedTrialCount + "/" + totalTrials;
+
+            float x = Screen.width * 0.60f; // __ from the left side of the screen
+            float y = Screen.height * 0.925f; // __ from the top of the screen
+            float width = Screen.width * 0.9f; // 90% of screen width
+            float height = Screen.height * 0.1f; // 10% of screen height
+
+            GUI.Label(new Rect(x, y, width, height), trialCountText, guiStyle);
         }
     }
 
     
     void Update()
     {
+         guiStyle.fontSize = (int)(Screen.height * 0.06f);
         if (lmIncrementLists != null)
         {
             int currentTrialCount = 0;

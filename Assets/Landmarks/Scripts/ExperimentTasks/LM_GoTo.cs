@@ -23,6 +23,11 @@ public class LM_GoTo : ExperimentTask
     private bool atDestination;
     private Collider them;
 
+    public RectTransform rectTransform;
+    public float newWidth;
+    public float newHeight;
+    private Vector2 originalRectTransformSize;
+
     private new void Awake()
     {   
         GetComponent<Collider>().enabled = false;
@@ -40,6 +45,8 @@ public class LM_GoTo : ExperimentTask
     {
         if (!manager) Start();
         base.startTask();
+        originalRectTransformSize = rectTransform.sizeDelta;
+        rectTransform.sizeDelta = new Vector2(newWidth, newHeight);
 
         them = avatar.GetComponent<LM_PlayerController>().collisionObject;
         Debug.Log(them.name);
@@ -135,6 +142,7 @@ public class LM_GoTo : ExperimentTask
         base.endTask();
 
         // WRITE TASK EXIT CODE HERE
+        rectTransform.sizeDelta = originalRectTransformSize;
         GetComponent<Collider>().enabled = false;
         arriveAt.SetActive(false);
         if (hideEnvironment) 
