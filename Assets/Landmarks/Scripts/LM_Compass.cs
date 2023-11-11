@@ -21,47 +21,49 @@ public class LM_Compass : MonoBehaviour
     {
         if (interactable)
         {
-            if (Input.GetKey(KeyCode.LeftArrow))
+            //if (Input.GetKey(KeyCode.LeftArrow))
+            //{
+            //    pointer.transform.Rotate(new Vector3(0f, -1 * rotationSpeedMultiplier * Time.deltaTime, 0f), Space.Self);
+
+            //}
+            //else if (Input.GetKey(KeyCode.RightArrow))
+            //{
+            //    pointer.transform.Rotate(new Vector3(0f, rotationSpeedMultiplier * Time.deltaTime, 0f), Space.Self);
+
+            //}
+
+
+            // Making pointer point in the direction where the player is facing 
+            //if (playerCamera != null)
+            //{
+            //    // Get the rotation of the player camera
+            //    Quaternion cameraRotation = playerCamera.rotation;
+
+            //    // Keep the x and z-axis coordinates fixed at zero, only grab rotation values for y axis;
+            //    Vector3 newRotation = new Vector3(0, cameraRotation.eulerAngles.y, 0);
+
+            //    // Set the rotation of the pointer to match the camera's rotation (only in y axis)
+            //    pointer.transform.rotation = Quaternion.Euler(newRotation); 
+            //}
+            if (vRPlayerCamera != null)
             {
-                pointer.transform.Rotate(new Vector3(0f, -1 * rotationSpeedMultiplier * Time.deltaTime, 0f), Space.Self);
-                
-            }
-            else if (Input.GetKey(KeyCode.RightArrow))
-            {
-                pointer.transform.Rotate(new Vector3(0f, rotationSpeedMultiplier * Time.deltaTime, 0f), Space.Self);
-                
-            }
-        }
+                // Get the rotation of the VR player camera
+                Quaternion cameraRotation = vRPlayerCamera.rotation;
 
-        // Making pointer point in the direction where the player is facing 
-        if (playerCamera != null)
-        {
-            // Get the rotation of the player camera
-            Quaternion cameraRotation = playerCamera.rotation;
+                // Keep the x and z-axis coordinates fixed at zero, only grab rotation values for y axis;
+                Vector3 newRotation = new Vector3(0, cameraRotation.eulerAngles.y, 0);
 
-            // Keep the x and z-axis coordinates fixed at zero, only grab rotation values for y axis;
-            Vector3 newRotation = new Vector3(0, cameraRotation.eulerAngles.y, 0);
-
-            // Set the rotation of the pointer to match the camera's rotation (only in y axis)
-            pointer.transform.rotation = Quaternion.Euler(newRotation); 
-        }
-        else if (vRPlayerCamera != null)
-        {
-            // Get the rotation of the VR player camera
-            Quaternion cameraRotation = vRPlayerCamera.rotation;
-
-            // Keep the x and z-axis coordinates fixed at zero, only grab rotation values for y axis;
-            Vector3 newRotation = new Vector3(0, cameraRotation.eulerAngles.y, 0);
-
-            // Set the rotation of the pointer to match the camera's rotation (only in y axis)
-            //Note: we are multiplying y axis rotation value by 180 to ensure that red end of compass faces player camera direction instead of opposite direction
-            pointer.transform.rotation = Quaternion.Euler(newRotation); 
+                // Set the rotation of the pointer to match the camera's rotation (only in y axis)
+                //Note: we are multiplying y axis rotation value by 180 to ensure that red end of compass faces player camera direction instead of opposite direction
+                pointer.transform.rotation = Quaternion.Euler(newRotation);
                 //Quaternion.Euler(0, 0, 0);
-        }
+            }
 
-        else
-        {
-            Debug.LogError("either desktop or VR player camera is not assigned to the PointerController script!");
+            else
+            {
+                Debug.LogError("either desktop or VR player camera is not assigned to the PointerController script!");
+            }
+
         }
     }
 

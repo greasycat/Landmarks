@@ -70,9 +70,6 @@ public class LM_CompassPointing : ExperimentTask
     //Handle the rendering of the environment 
     public bool hideEnvironment;
 
-    //Handle HUD message positioning
-    private float offset = 1.0f;
-
     public RectTransform rectTransform;
     public float newWidth;
     public float newHeight;
@@ -195,7 +192,7 @@ public class LM_CompassPointing : ExperimentTask
         // Put up the HUD
         if (format == Format.SOP)
         {
-            hud.setMessage("Please face the floating target object in front of you. \nPress the trigger button to proceed.");
+            hud.setMessage("Face the floating object in front of you. \nPress the trigger button to proceed.");
         }
         else if (format == Format.JRD)
         {
@@ -252,33 +249,40 @@ public class LM_CompassPointing : ExperimentTask
 
         oriented = false;
 
-        //setting where the task messages should appear (i.e., slightly to the left of each starting location)
-        /*Vector3 hudInitial = hud.hudRig.transform.position;
-        Debug.Log("HUD original position is" + hudInitial);*/
+        //setting where the task messages should appear (i.e., either above, below, left, or right to location object)
         Vector3 huDPosition = location.transform.position;
         Debug.Log("HUD Position is" + huDPosition);
 
+        //huDPosition.x -= 0.25f;
+
         if (location.name == "Juice" || location.name == "Bananas")
         {
-            huDPosition.z -= 1.0f; //subtracting 1 from z-axis
-            huDPosition.y += 0.4f; //adding 1 to y-axis 
+              huDPosition.z -= 1.0f; //subtracting 1 from z-axis
+              huDPosition.y += 0.4f; //adding 1 to y-axis 
+              
         }
         else if (location.name == "Pizza")
         {
             huDPosition.z -= 1.25f; //subtracting 1.5 from z-axis
             huDPosition.y += 0.4f; //adding 1 to y-axis
+            //huDPosition.x -= 1.0f;
         }
         else
         { 
             huDPosition.z += 1.0f; //adding 1 to z-axis
             huDPosition.y += 0.4f; //adding 1 to y-axis
+            //huDPosition.x -= 1.0f;
         }
 
         hud.hudRig.transform.position = huDPosition; // setting position
+       
         Debug.Log("Reset HUD Position is" + huDPosition);
 
-        //turn off glowing orientation rings 
-        hud.hudNonEssentials.SetActive(false);
+        if (vrEnabled)
+        {
+            //turn off glowing orientation rings 
+            hud.hudNonEssentials.SetActive(false);
+        }
     }
 
 
@@ -322,6 +326,8 @@ public class LM_CompassPointing : ExperimentTask
                     compass.interactable = true;
                     orientTime = Time.time - startTime; // save the orientation time
                     startTime = Time.time; // reset the start clock for the answer portion
+                    
+                   
 
                     return false; // don't end the trial
                 }
@@ -367,7 +373,7 @@ public class LM_CompassPointing : ExperimentTask
                             //avatar.GetComponent<FirstPersonController>().ResetMouselook(); // reset the zero position to be our current cam orientation
 
                             var compassparent = compass.transform.parent;
-                            compass.transform.parent = avatar.GetComponentInChildren<LM_SnapPoint>().transform; // make it the child of the snappoint 
+                            compass.transform.parent = avatar.GetComponentInChildren<LM_SnapPoint>().transform; // make it the child of the ForwardSnapPoint object  
                             compass.transform.localPosition = compassPosOffset; // adjust position
                             compass.transform.localEulerAngles = compassRotOffset; // adjust rotation
                             compass.transform.parent = compassparent; // send it back to its old parent to avoid funky movement effects
@@ -397,7 +403,6 @@ public class LM_CompassPointing : ExperimentTask
                         responseTime = Time.time - startTime;
 
                         // Record the response as an angle between -180 and 180
-                        //response = avatar.GetComponentInChildren<Camera>().transform.localEulerAngles.y;
                         response = compass.pointer.transform.localEulerAngles.y;
 
                         // Record angle from 
@@ -469,7 +474,13 @@ public class LM_CompassPointing : ExperimentTask
         // Free Movement
         if (avatar.GetComponent<FirstPersonController>() != null) avatar.GetComponent<FirstPersonController>().enabled = true; // if using 1stPerson controller
         manager.player.GetComponent<CharacterController>().enabled = true;
-        hud.hudNonEssentials.SetActive(true); //turning on the glowing orientation rings
+
+        if (vrEnabled)
+        {
+            hud.hudNonEssentials.SetActive(true); //turning on the glowing orientation rings
+        }
+
+        hud.ReCenter(manager.player.GetComponent<LM_PlayerController>().collisionObject.transform); //re-centering HUD
     }
 
 }

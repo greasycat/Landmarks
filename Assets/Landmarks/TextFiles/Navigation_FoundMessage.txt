@@ -1,4 +1,4 @@
-Navigate back to the {0}.
+Navigate again to the {0}.
 
 Repeat the same route you took in the previous trial. 
 

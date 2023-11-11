@@ -1,32 +1,156 @@
-63835055600224	TASK_START	LM_Timeline	TaskList
-63835055600229	TASK_START	InitializeExperiment	TaskList
-63835055600231	TASK_START	UpdateTargetObjects	LM_UpdateTargetObjects
-63835055600315	TASK_END	UpdateTargetObjects	LM_UpdateTargetObjects	84
-63835055600319	TASK_START	AssignTargetColors	LM_TargetColorAssignments
-63835055600593	TASK_END	AssignTargetColors	LM_TargetColorAssignments	274
-63835055600594	TASK_START	PlaceTargets	TaskList
-63835055600596	TASK_START	ListTargetLocations	ObjectList
-63835055603219	TASK_END	ListTargetLocations	ObjectList	2623
-63835055603222	TASK_START	ListTargets	ObjectList
-63835055603223	TASK_ADD	ListTargets	ObjectList	Juice	null
-63835055603223	TASK_ADD	ListTargets	ObjectList	Pizza	null
-63835055603223	TASK_ADD	ListTargets	ObjectList	Cereal Box	null
-63835055603223	TASK_ADD	ListTargets	ObjectList	Chips	null
-63835055603223	TASK_ADD	ListTargets	ObjectList	Cake	null
-63835055603223	TASK_ADD	ListTargets	ObjectList	Bananas	null
-63835055603339	TASK_END	ListTargets	ObjectList	117
-63835055603341	TASK_START	PopulateTargets	MoveObjects
-63835055603341	INFO	skip task	PopulateTargets
-63835055603369	TASK_END	PopulateTargets	MoveObjects	28
-63835055603371	LM_Output	TaskList
+63835237570732	TASK_START	LM_Timeline	TaskList
+63835237570733	TASK_START	InitializeExperiment	TaskList
+63835237570734	TASK_START	UpdateTargetObjects	LM_UpdateTargetObjects
+63835237570758	TASK_END	UpdateTargetObjects	LM_UpdateTargetObjects	24
+63835237570761	TASK_START	AssignTargetColors	LM_TargetColorAssignments
+63835237570813	TASK_END	AssignTargetColors	LM_TargetColorAssignments	53
+63835237570814	TASK_START	PlaceTargets	TaskList
+63835237570815	TASK_START	ListTargetLocations	ObjectList
+63835237571364	TASK_END	ListTargetLocations	ObjectList	549
+63835237571365	TASK_START	ListTargets	ObjectList
+63835237571366	TASK_ADD	ListTargets	ObjectList	Bananas	null
+63835237571366	TASK_ADD	ListTargets	ObjectList	Cake	null
+63835237571366	TASK_ADD	ListTargets	ObjectList	Chips	null
+63835237571368	TASK_ADD	ListTargets	ObjectList	Pizza	null
+63835237571368	TASK_ADD	ListTargets	ObjectList	Cereal Box	null
+63835237571368	TASK_ADD	ListTargets	ObjectList	Juice	null
+63835237571427	TASK_END	ListTargets	ObjectList	62
+63835237571429	TASK_START	PopulateTargets	MoveObjects
+63835237571430	INFO	skip task	PopulateTargets
+63835237571449	TASK_END	PopulateTargets	MoveObjects	20
+63835237571450	LM_Output	TaskList
 TaskListName	RepetitionNumber	CatchFlag
 PlaceTargets1False
-63835055603372	TASK_END	PlaceTargets	TaskList	2778
-63835055603373	TASK_START	ListNavigationStarts	ObjectList
-63835055603373	TASK_ADD	ListNavigationStarts	ObjectList	Exploration_Start_Location	null
-63835055603421	TASK_END	ListNavigationStarts	ObjectList	48
-63835055603422	LM_Output	TaskList
+63835237571451	TASK_END	PlaceTargets	TaskList	636
+63835237571452	TASK_START	ListNavigationStarts	ObjectList
+63835237571452	TASK_ADD	ListNavigationStarts	ObjectList	Exploration_Start_Location	null
+63835237571471	TASK_END	ListNavigationStarts	ObjectList	19
+63835237571471	LM_Output	TaskList
 TaskListName	RepetitionNumber	CatchFlag
 InitializeExperiment1False
-63835055603422	TASK_END	InitializeExperiment	TaskList	3193
-63835055603424	TASK_START	BeginMessage	InstructionsTask
+63835237571471	TASK_END	InitializeExperiment	TaskList	738
+63835237571473	TASK_START	BeginMessage	InstructionsTask
+63835237601607	INPUT_EVENT    PlayerPressedActionButton    1
+63835237601608	TASK_END	BeginMessage	InstructionsTask	30135
+63835237601609	TASK_START	Tasks	TaskList
+63835237601611	TASK_START	TASK_Exploration	TaskList
+63835237601623	TASK_END	TASK_Exploration	TaskList	13
+63835237601624	TASK_START	TASK_Exploration_Testing	TaskList
+63835237601640	TASK_END	TASK_Exploration_Testing	TaskList	16
+63835237601642	TASK_START	TASK_NavigationTask	TaskList
+63835237601663	TASK_END	TASK_NavigationTask	TaskList	22
+63835237601664	TASK_START	TASK_Orientation	TaskList
+63835237601665	TASK_START	OBJECT_Compass	LM_Dummy
+63835237601677	TASK_END	OBJECT_Compass	LM_Dummy	12
+63835237601678	TASK_START	ListPointingStarts	ObjectList
+63835237601678	TASK_ADD	ListPointingStarts	ObjectList	Cake	null
+63835237601679	TASK_ADD	ListPointingStarts	ObjectList	Cereal Box	null
+63835237601679	TASK_ADD	ListPointingStarts	ObjectList	Juice	null
+63835237601679	TASK_ADD	ListPointingStarts	ObjectList	Chips	null
+63835237601680	TASK_ADD	ListPointingStarts	ObjectList	Bananas	null
+63835237601680	TASK_ADD	ListPointingStarts	ObjectList	Pizza	null
+63835237601692	TASK_END	ListPointingStarts	ObjectList	13
+63835237601692	TASK_START	Pointing_Instructions	InstructionsTask
+63835237605502	INPUT_EVENT    PlayerPressedActionButton    1
+63835237605502	TASK_END	Pointing_Instructions	InstructionsTask	3810
+63835237605503	TASK_START	PointingTrials	TaskList
+63835237605505	TASK_START	FootprintsInstructions	InstructionsTask
+63835237608513	TASK_END	FootprintsInstructions	InstructionsTask	3009
+63835237608514	TASK_START	ThisObjectsRandomListOfTargets	ObjectList
+63835237608514	TASK_ADD	ThisObjectsRandomListOfTargets	ObjectList	Cereal Box	null
+63835237608514	TASK_ADD	ThisObjectsRandomListOfTargets	ObjectList	Bananas	null
+63835237608515	TASK_ADD	ThisObjectsRandomListOfTargets	ObjectList	Pizza	null
+63835237608515	TASK_ADD	ThisObjectsRandomListOfTargets	ObjectList	Cake	null
+63835237608515	TASK_ADD	ThisObjectsRandomListOfTargets	ObjectList	Chips	null
+63835237608516	TASK_ADD	ThisObjectsRandomListOfTargets	ObjectList	Juice	null
+63835237608529	TASK_END	ThisObjectsRandomListOfTargets	ObjectList	15
+63835237608531	TASK_START	MoveTrialStart	MoveObject
+63835237608532	TASK_ROTATE	WalkToNextTrialStart	MoveObject	(0.0, 0.0, 0.0)
+63835237608532	TASK_POSITION	WalkToNextTrialStart	MoveObject	(-2.3, 0.0, -7.2)
+63835237608545	TASK_END	MoveTrialStart	MoveObject	15
+63835237608546	TASK_START	WalkToNextTrialStart	LM_GoTo
+63835237625676	INPUT_EVENT    Player Arrived at Destination    1
+63835237625677	TASK_END	WalkToNextTrialStart	LM_GoTo	17131
+63835237625681	TASK_START	Pointing	LM_CompassPointing
+63835237635146	TASK_END	Pointing	LM_CompassPointing	9465
+63835237635149	TASK_START	FootprintsOrientInstructions 	InstructionsTask
+63835237639148	TASK_END	FootprintsOrientInstructions 	InstructionsTask	4000
+63835237639149	TASK_START	MoveTrialStart (1)	MoveObject
+63835237639150	TASK_ROTATE	WalkToNextTrialStart (1)	MoveObject	(0.0, 0.0, 0.0)
+63835237639151	TASK_POSITION	WalkToNextTrialStart (1)	MoveObject	(-2.3, 0.0, -7.2)
+63835237639168	TASK_END	MoveTrialStart (1)	MoveObject	18
+63835237639168	TASK_START	WalkToNextTrialStart (1)	LM_GoTo
+63835237646802	INPUT_EVENT    Player Arrived at Destination    1
+63835237646803	TASK_END	WalkToNextTrialStart (1)	LM_GoTo	7635
+63835237646804	TASK_START	Pointing (1)	LM_CompassPointing
+63835237661013	TASK_END	Pointing (1)	LM_CompassPointing	14209
+63835237661014	TASK_START	FootprintsOrientInstructions (1)	InstructionsTask
+63835237663519	TASK_END	FootprintsOrientInstructions (1)	InstructionsTask	2505
+63835237663520	TASK_START	MoveTrialStart (2)	MoveObject
+63835237663520	TASK_ROTATE	WalkToNextTrialStart (2)	MoveObject	(0.0, 0.0, 0.0)
+63835237663521	TASK_POSITION	WalkToNextTrialStart (2)	MoveObject	(-2.3, 0.0, -7.2)
+63835237663532	TASK_END	MoveTrialStart (2)	MoveObject	13
+63835237663533	TASK_START	WalkToNextTrialStart (2)	LM_GoTo
+63835237667412	INPUT_EVENT    Player Arrived at Destination    1
+63835237667412	TASK_END	WalkToNextTrialStart (2)	LM_GoTo	3879
+63835237667414	TASK_START	Pointing (2)	LM_CompassPointing
+63835237677165	TASK_END	Pointing (2)	LM_CompassPointing	9750
+63835237677166	TASK_START	FootprintsOrientInstructions (2)	InstructionsTask
+63835237679667	TASK_END	FootprintsOrientInstructions (2)	InstructionsTask	2501
+63835237679667	TASK_START	MoveTrialStart (3)	MoveObject
+63835237679667	TASK_ROTATE	WalkToNextTrialStart (3)	MoveObject	(0.0, 0.0, 0.0)
+63835237679668	TASK_POSITION	WalkToNextTrialStart (3)	MoveObject	(-2.3, 0.0, -7.2)
+63835237679678	TASK_END	MoveTrialStart (3)	MoveObject	11
+63835237679680	TASK_START	WalkToNextTrialStart (3)	LM_GoTo
+63835237685540	INPUT_EVENT    Player Arrived at Destination    1
+63835237685541	TASK_END	WalkToNextTrialStart (3)	LM_GoTo	5860
+63835237685542	TASK_START	Pointing (3)	LM_CompassPointing
+63835237706900	TASK_END	Pointing (3)	LM_CompassPointing	21357
+63835237706901	TASK_START	FootprintsOrientInstructions (3)	InstructionsTask
+63835237709409	TASK_END	FootprintsOrientInstructions (3)	InstructionsTask	2508
+63835237709410	TASK_START	MoveTrialStart (4)	MoveObject
+63835237709411	TASK_ROTATE	WalkToNextTrialStart (4)	MoveObject	(0.0, 0.0, 0.0)
+63835237709411	TASK_POSITION	WalkToNextTrialStart (4)	MoveObject	(-2.3, 0.0, -7.2)
+63835237709425	TASK_END	MoveTrialStart (4)	MoveObject	14
+63835237709425	TASK_START	WalkToNextTrialStart (4)	LM_GoTo
+63835237712714	INPUT_EVENT    Player Arrived at Destination    1
+63835237712715	TASK_END	WalkToNextTrialStart (4)	LM_GoTo	3289
+63835237712716	TASK_START	Pointing (4)	LM_CompassPointing
+63835237718195	TASK_END	Pointing (4)	LM_CompassPointing	5478
+63835237718196	TASK_START	FootprintsOrientInstructions (4)	InstructionsTask
+63835237720700	TASK_END	FootprintsOrientInstructions (4)	InstructionsTask	2503
+63835237720700	TASK_START	MoveTrialStart (5)	MoveObject
+63835237720701	TASK_ROTATE	WalkToNextTrialStart (5)	MoveObject	(0.0, 0.0, 0.0)
+63835237720701	TASK_POSITION	WalkToNextTrialStart (5)	MoveObject	(-2.3, 0.0, -7.2)
+63835237720713	TASK_END	MoveTrialStart (5)	MoveObject	13
+63835237720714	TASK_START	WalkToNextTrialStart (5)	LM_GoTo
+63835237724512	INPUT_EVENT    Player Arrived at Destination    1
+63835237724513	TASK_END	WalkToNextTrialStart (5)	LM_GoTo	3799
+63835237724514	TASK_START	Pointing (5)	LM_CompassPointing
+63835237731382	TASK_END	Pointing (5)	LM_CompassPointing	6867
+63835237731383	TASK_START	IncrementTrialLists	LM_IncrementLists
+63835237731395	TASK_END	IncrementTrialLists	LM_IncrementLists	12
+LandmarksTrialData:
+--------------------
+id	condition	sceneName	sceneNumber	task	block	trial	Pointing_task	Pointing_location	Pointing_target	Pointing_compassStartAngle	Pointing_responseCW	Pointing_answerCW	Pointing_signedError	Pointing_absError	Pointing_SOPorientingTime	Pointing_responseTime	Pointing (1)_task	Pointing (1)_location	Pointing (1)_target	Pointing (1)_compassStartAngle	Pointing (1)_responseCW	Pointing (1)_answerCW	Pointing (1)_signedError	Pointing (1)_absError	Pointing (1)_SOPorientingTime	Pointing (1)_responseTime	Pointing (2)_task	Pointing (2)_location	Pointing (2)_target	Pointing (2)_compassStartAngle	Pointing (2)_responseCW	Pointing (2)_answerCW	Pointing (2)_signedError	Pointing (2)_absError	Pointing (2)_SOPorientingTime	Pointing (2)_responseTime	Pointing (3)_task	Pointing (3)_location	Pointing (3)_target	Pointing (3)_compassStartAngle	Pointing (3)_responseCW	Pointing (3)_answerCW	Pointing (3)_signedError	Pointing (3)_absError	Pointing (3)_SOPorientingTime	Pointing (3)_responseTime	Pointing (4)_task	Pointing (4)_location	Pointing (4)_target	Pointing (4)_compassStartAngle	Pointing (4)_responseCW	Pointing (4)_answerCW	Pointing (4)_signedError	Pointing (4)_absError	Pointing (4)_SOPorientingTime	Pointing (4)_responseTime	Pointing (5)_task	Pointing (5)_location	Pointing (5)_target	Pointing (5)_compassStartAngle	Pointing (5)_responseCW	Pointing (5)_answerCW	Pointing (5)_signedError	Pointing (5)_absError	Pointing (5)_SOPorientingTime	Pointing (5)_responseTime	
+default	default	Supermarket #3B	1	TASK_Orientation	1	1	SOP	Cake	Cereal Box	156.349	286.3282	284.2233	2.104828	2.104828	3.499966	5.968773	SOP	Cake	Bananas	217.113	295.549	288.2259	7.32309	7.32309	5.896942	8.313622	SOP	Cake	Pizza	207.6798	281.2497	273.2175	8.032196	8.032196	3.522995	6.229881	SOP	Cake	Cake	279.2804	358.7914	0	-1.208588	1.208588	5.46418	15.89587	SOP	Cake	Chips	61.98216	306.4907	292.6395	13.8512	13.8512	1.657913	3.822311	SOP	Cake	Juice	24.40359	313.2043	305.4044	7.799896	7.799896	2.907074	3.962021	
+--------------------
+
+63835237731399	LM_Output	TaskList
+TaskListName	RepetitionNumber	CatchFlag
+PointingTrials2False
+63835237731401	TASK_START	FootprintsInstructions	InstructionsTask
+63835237734406	TASK_END	FootprintsInstructions	InstructionsTask	3006
+63835237734407	TASK_START	ThisObjectsRandomListOfTargets	ObjectList
+63835237734408	TASK_ADD	ThisObjectsRandomListOfTargets	ObjectList	Chips	null
+63835237734408	TASK_ADD	ThisObjectsRandomListOfTargets	ObjectList	Cereal Box	null
+63835237734408	TASK_ADD	ThisObjectsRandomListOfTargets	ObjectList	Bananas	null
+63835237734409	TASK_ADD	ThisObjectsRandomListOfTargets	ObjectList	Cake	null
+63835237734409	TASK_ADD	ThisObjectsRandomListOfTargets	ObjectList	Pizza	null
+63835237734409	TASK_ADD	ThisObjectsRandomListOfTargets	ObjectList	Juice	null
+63835237734420	TASK_END	ThisObjectsRandomListOfTargets	ObjectList	13
+63835237734421	TASK_START	MoveTrialStart	MoveObject
+63835237734422	TASK_ROTATE	WalkToNextTrialStart	MoveObject	(0.0, 90.0, 0.0)
+63835237734422	TASK_POSITION	WalkToNextTrialStart	MoveObject	(-2.4, 0.0, 2.3)
+63835237734435	TASK_END	MoveTrialStart	MoveObject	13
+63835237734436	TASK_START	WalkToNextTrialStart	LM_GoTo
