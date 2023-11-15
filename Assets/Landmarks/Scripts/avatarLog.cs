@@ -14,6 +14,15 @@ public class avatarLog : MonoBehaviour
 	private dbLog log;
 	private Experiment manager;
 	private LM_PlayerController controller;
+	public ExplorationTask VP_ExplorationTask;
+    
+    public TL_ExplorationCountdownTimer VP_ExplorationCountdownTimer;
+  
+
+    public TL_WayfindingCountdownTimer VP_WayfindingCountdownTimer;
+
+
+
 
 	private string location = "CURRENTLY NOWHERE";
 	private string previousLocation = "PREVIOUSLY Nowhere";
@@ -88,8 +97,19 @@ public class avatarLog : MonoBehaviour
 					"Camera Rotation   (xyz): \t" + head.eulerAngles.x + "\t" + head.eulerAngles.y + "\t" + head.eulerAngles.z + "\t" +
 					"Location (Object/Hallway): \t" + location + "\t" +
 					"Keypress(True/False): \t" + KeyPress + "\t" +
-					"TargetObjectVisibility: \t" + TargetObjectVisibility + "\t"
-					, 1);
+					"TargetObjectVisibility: \t" + TargetObjectVisibility + "\t" +
+					
+
+			////////////// Explore Times
+
+                    
+                    "Explore CountdownTimer: \t" + VP_ExplorationCountdownTimer.runningCountdownTimer.ToString() + "\t" +
+                    "Explore LearningTime: \t" + VP_ExplorationTask.initialExplorationTime.ToString() + "\t" + // logging the "initial" exploration time from ExplorationTask Script
+
+                    
+            ///////////// Wayfinding Times
+
+                    "Wayfinding CountdownTimer: \t" + VP_WayfindingCountdownTimer.wayfindingRunningCountdownTimer.ToString() + "\t", 1);
 
 		}
 

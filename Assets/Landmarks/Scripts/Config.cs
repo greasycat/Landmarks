@@ -280,7 +280,7 @@ public class Config : MonoBehaviour
 
             // Replace current values with loaded values
             subject = data.id;
-            levelNumber = data.lastLevelFinished+1;
+            levelNumber = data.lastLevelFinished + 1;
 
             levelNames.Clear();
             foreach (var lev in data.levelNames)

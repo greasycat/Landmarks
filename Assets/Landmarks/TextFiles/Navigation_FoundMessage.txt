@@ -2,4 +2,4 @@ Navigate again to the {0}.
 
 Repeat the same route you took in the previous trial. 
 
-Press the trigger to select the red sphere you think is the target. 
+Press the trigger to select the red sphere you think is the {0}. 

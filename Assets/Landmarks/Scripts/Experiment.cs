@@ -42,7 +42,11 @@ public enum UserInterface
     ViveVirtualizer,
     ViveKatwalk
 }
-
+public static class GlobalPaths
+{
+    public static string DataPath { get; set; }
+}
+[DefaultExecutionOrder(-100)]
 public class Experiment : MonoBehaviour
 {
 
@@ -79,7 +83,7 @@ public class Experiment : MonoBehaviour
     public string logfile;
     [HideInInspector]
     public string dataPath;
-
+    public GameObject currentTask;
     private bool playback = false;
     private bool pause = true;
     private bool done = false;
@@ -102,6 +106,7 @@ public class Experiment : MonoBehaviour
     //public string collidingWithTargetNamed = "";
     //public string triggeredFromTargetNamed = "";
     public GameObject currentlyAtTarget;
+    public string timestamp;
 
     // -------------------------------------------------------------------------
     // -------------------------- Builtin Methods ------------------------------
@@ -110,7 +115,8 @@ public class Experiment : MonoBehaviour
 
     void Awake()
     {
-
+        gameObject.GetComponent<Experiment>().enabled= true;
+        Debug.Log("Experiment Script is set active");
         // ------------------------------
         // Clean up & Initialize Scene
         // ------------------------------
@@ -156,6 +162,7 @@ public class Experiment : MonoBehaviour
         playerCamera.enabled = true;
         hud.showOnlyHUD();
         player.tag = "Player";
+        currentTask = GameObject.FindGameObjectWithTag("Task");
 
         // Deactivate all other controllers
         foreach (Transform child in GameObject.Find("PlayerControllers").transform)
@@ -190,7 +197,7 @@ public class Experiment : MonoBehaviour
         // --------------------------------------
         // Handle Config file & Storage path
         // --------------------------------------
-
+        timestamp = DateTime.Now.ToString("yyyy_MM_dd_hh_mm_tt");
         //when in editor
         if (Application.isEditor)
         {
@@ -212,18 +219,26 @@ public class Experiment : MonoBehaviour
                     dataPath =
                         Directory.GetCurrentDirectory() + "/" +
                         "editor-data/";
-                    logfile =
-                        "test.log";
+                    GlobalPaths.DataPath = Application.persistentDataPath + "/" + config.experiment + "/" + config.subject + "/";
+                    //logfile =
+                    //    "AvatarLog.log";
+                    logfile = $"{config.experiment}_{config.subject}_task-{currentTask.name}_{timestamp}_AvatarLog.log";
+                    
                 }
             }
             // otherwise just save to the project folder for easy access
             else
             {
-                dataPath =
-                    Directory.GetCurrentDirectory() + "/" +
-                    "editor-data/";
-                logfile =
-                    "test.log";
+                //dataPath =
+                //    Directory.GetCurrentDirectory() + "/" +
+                //    "editor-data/";
+                //GlobalPaths.DataPath = Directory.GetCurrentDirectory() + "/" + "editor-data/";
+                GlobalPaths.DataPath = Application.persistentDataPath + "/" + config.experiment + "/" + config.subject + "/";
+                Debug.Log($"The file path for logging (UPDATED) is: {GlobalPaths.DataPath}");
+                //logfile =
+                //    "AvatarLog.log";
+                logfile = $"{config.experiment}_sub-{config.subject}_{currentTask.name}_{timestamp}_AvatarLog.log";
+                
             }
 
         }
@@ -231,58 +246,73 @@ public class Experiment : MonoBehaviour
         else
         {
             Debug.Log("SAVING BUILD DATA IN PERSISTENTDATAPATH");
-            dataPath =
+            GlobalPaths.DataPath =
                 Application.persistentDataPath + "/" +
                 config.experiment + "/" +
                 config.subject + "/";
             if (config.appendLogFiles)
             {
-                logfile =
-                   config.experiment + "_" +
-                   config.subject + ".log";
+                logfile = $"{config.experiment}_sub-{config.subject}_{currentTask.name}_{timestamp}_AvatarLog.log";
+
+                // logfile =
+                //    config.experiment + "_" +
+                //    config.subject + ".log";
             }
             else
             {
-                logfile =
-                    config.experiment + "_" +
-                    config.subject + "_" +
-                    config.levelNames[config.levelNumber] + "_" +
-                    config.conditions[config.levelNumber] + ".log";
+                logfile = $"{config.experiment}_sub-{config.subject}_{currentTask.name}_{timestamp}_AvatarLog.log";
+                // logfile =
+                //     config.experiment + "_" +
+                //     config.subject + "_" +
+                //     config.levelNames[config.levelNumber] + "_" +
+                //     config.conditions[config.levelNumber] + ".log";
             }
+            Debug.Log("Other log data will be saved as" + GlobalPaths.DataPath + logfile);
         }
         Debug.Log("data will be saved as " + dataPath + logfile);
 
         configfile =
-                dataPath +
+                GlobalPaths.DataPath +
                 config.filename;
 
-        if(config.levelNames.Count == 0) config.levelNames.Add(SceneManager.GetActiveScene().name);
+        //if(config.levelNames.Count == 0) config.levelNames.Add(SceneManager.GetActiveScene().name);
         Debug.Log("!!!!!!!!!!!!\t" + SceneManager.GetActiveScene().name + "\t" + config.levelNames[0]);
-        if (!Directory.Exists(dataPath))
+        if (!Directory.Exists(GlobalPaths.DataPath))
         {
-            Directory.CreateDirectory(dataPath);
+            Directory.CreateDirectory(GlobalPaths.DataPath);
         }
         // Prevent editor log files from appending to a previous session's LM_TaskLog
         // by deleting the directory and recreating, unless we're loading multiple scenes
         // in which case we would want to append to these editor files
-        else if (Directory.Exists(dataPath) & Application.isEditor & 
+        else if (Directory.Exists(GlobalPaths.DataPath) & Application.isEditor & 
                 SceneManager.GetActiveScene().name == config.levelNames[0])
         {
             Debug.Log("OVERWRITING EXISTING EDITOR DATA");
-            Directory.Delete(dataPath, recursive:true);
-            Directory.CreateDirectory(dataPath);
+            Directory.Delete(GlobalPaths.DataPath, recursive: true);
+            Directory.CreateDirectory(GlobalPaths.DataPath);
         }
 
         if (config.runMode == ConfigRunMode.NEW)
         {
-            dblog.logFileName = dataPath + logfile;
+            dblog.logFileName = GlobalPaths.DataPath + logfile;
             dblog.appendToLog = true; //config.appendLogFiles && config.levelNumber > 0; 
         }
         else if (config.runMode == ConfigRunMode.RESUME)
         {
-            dblog.logFileName = dataPath + logfile;
+            dblog.logFileName = GlobalPaths.DataPath + logfile;
             dblog.appendToLog = true;
         }
+        //fixmefixmefixme ??? does this need to be commented out or not?
+        else if (config.runMode == ConfigRunMode.PLAYBACK)
+        {
+            CharacterController c = avatar.GetComponent<CharacterController>();
+            c.detectCollisions = false;
+            dblog = new dbPlaybackLog(GlobalPaths.DataPath + logfile);
+        }
+
+        /// this line is causing trouble!! "ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection. Parameter name: index
+        dblog.log("EXPERIMENT:\t" + PlayerPrefs.GetString("expID") + "\tSUBJECT:\t" + config.subject +
+                  "\tSTART_SCENE\t" + config.levelNames[config.levelNumber] + "\tSTART_CONDITION:\t" + config.conditions[config.levelNumber] + "\tUI:\t" + userInterface.ToString(), 1);
         // else if (config.runMode == ConfigRunMode.PLAYBACK)
         // {
         //     CharacterController c = avatar.GetComponent<CharacterController>();
@@ -297,7 +327,7 @@ public class Experiment : MonoBehaviour
 
     void Start()
     {
-
+        gameObject.GetComponent<Experiment>().enabled = true;
         ConfigOverrides.parse(configfile, dblog);
         hud.showFPS = config.showFPS;
         hud.showTimestamp = (config.runMode == ConfigRunMode.PLAYBACK);
@@ -330,12 +360,12 @@ public class Experiment : MonoBehaviour
             scaledEnvironment = null;
         }
         
-        if (trialCounter != null) trialCounter.text = string.Format("{0} / {1}", config.levelNumber+1, config.levelNames.Count);
+        if (trialCounter != null) trialCounter.text = string.Format("{0} / {1}", config.levelNumber + 1, config.levelNames.Count);
     }
 
     async void Update()
     {
-
+        gameObject.GetComponent<Experiment>().enabled = true;
         if (!done)
         {
             if (config.runMode != ConfigRunMode.PLAYBACK)
@@ -660,7 +690,7 @@ public class Experiment : MonoBehaviour
         try
         {
             // Read in the log file and prepare to parse it with RegEx
-            var sr = new StreamReader(dataPath + logfile);
+            var sr = new StreamReader(GlobalPaths.DataPath + logfile);
             var loggedData = await sr.ReadToEndAsync();
             sr.Close();
 
@@ -697,7 +727,7 @@ public class Experiment : MonoBehaviour
                 //filename = "task_" + taskCount;
 
                 // Don't overwrite data unless in Editor or if we are appending multiple log files (set on the config)
-                if (File.Exists(dataPath + filename + ".csv") & !Application.isEditor)
+                if (File.Exists(GlobalPaths.DataPath + filename + ".csv") & !Application.isEditor)
                 {
                     int duplicate = 1;
                     while (File.Exists(dataPath + filename + "_" + duplicate + ".csv"))
@@ -709,7 +739,7 @@ public class Experiment : MonoBehaviour
                 filename += ".csv";
 
                 // Create the formatted csv file, if there's more than 1 level, append to existing
-                StreamWriter sw = new StreamWriter(dataPath + filename, false, System.Text.Encoding.UTF8);
+                StreamWriter sw = new StreamWriter(GlobalPaths.DataPath + filename, false, System.Text.Encoding.UTF8);
 
                 sw.WriteLine(taskHeader.Replace("\t", ",")); // commas for excel
 
@@ -743,7 +773,10 @@ public class Experiment : MonoBehaviour
         // Shut down any LM_TaskLogs
         foreach (var log in FindObjectsOfType<LM_TaskLog>())
         {
+            if (log.output != null)
+            {
             log.output.Close();
+            }
         }
 
 
@@ -769,7 +802,7 @@ public class Experiment : MonoBehaviour
         // ---------------------------------------------------------------------
 
         // Save scene order/data in the config
-        config.Save();
+        //config.Save();
 
         //increment the level number (accounting for the zero-base compared to a count (starts with 1)
         config.levelNumber++;
@@ -795,7 +828,7 @@ public class Experiment : MonoBehaviour
         // Otherwise, close down; we're done
         else
         {
-            config.DeleteTemporaryProgressData();
+            //config.DeleteTemporaryProgressData();
             // shut it down
             Application.Quit();
         }

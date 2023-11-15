@@ -99,8 +99,16 @@ public class NavigationTask : ExperimentTask
     private GameObject participantEndTarget;
     private GameObject dummyLogging;
 
+    //showing the time remaining on the navigation trials
+    public float timeRemaining;
+
+    //variable to reset the time remaining
+    public float defaultTimeRemaining;
+
     //hiding the exploration phase countdown timer when the navigation task begins
     public TL_ExplorationCountdownTimer ExplorationCountdownTimer;
+
+    
 
     public float GetStartTime()
     {
@@ -517,7 +525,7 @@ public class NavigationTask : ExperimentTask
 
 
         float distanceRemaining = distanceAllotted - playerDistance;
-        float timeRemaining = timeAllotted - (Time.time - startTime);
+        timeRemaining = timeAllotted - (Time.time - startTime);
         // If we have a place to output ongoing trial info (time/dist remaining), use it
         if (printRemainingTimeTo != null)
         {
@@ -862,6 +870,8 @@ public class NavigationTask : ExperimentTask
             destinations.incrementCurrent();
         }
         currentTarget = destinations.currentObject();
+
+        timeRemaining = 0f;
     }
 
     //fixme COMMENTED THIS CHUNK OUT AS IT WAS INTERFERING WITH TRIAL PROGRESSION
@@ -908,7 +918,11 @@ public class NavigationTask : ExperimentTask
         //  Starting GameObject Meshrenderer: ENABLED (.enabled = true;)
     }
 
-
+    public void ResetTimeRemaining()
+    {
+        timeRemaining = defaultTimeRemaining;
+        Debug.Log("Time Remaining After ResetTimeRemaining:" + timeRemaining);
+    }
 
 }
 

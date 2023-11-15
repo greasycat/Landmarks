@@ -35,6 +35,7 @@ public class ExplorationTask : ExperimentTask
     [Tooltip("in seconds")]
     public float timeAllotted = Mathf.Infinity;
     public float timeRemaining;
+    public float initialExplorationTime;
     [Tooltip("Do we want time or distance remaining to be broadcast somewhere?")]
     public TextMeshProUGUI printRemainingTimeTo;
     private string baseText;
@@ -537,6 +538,14 @@ public class ExplorationTask : ExperimentTask
         {
             return KillCurrent();
         }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            initialExplorationTime = Time.time - startTime;
+            Debug.Log("Player Finished Initial Learning(Time):" + initialExplorationTime);
+            log.log("INPUT_EVENT    Initial ExplorationTask Learning Time   1", 1);
+        }
+
 
         // In order to allow manual progression, allowContinueAfter must not be zero and enough time must have passed
         if (allowContinueAfter != Mathf.Infinity && Time.time - startTime > allowContinueAfter)

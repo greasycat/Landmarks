@@ -34,10 +34,12 @@ public class LM_TaskLog : MonoBehaviour
     {
         Debug.LogWarning("LM_TaskLog is logging trial data!!!!!");
         exp = FindObjectOfType<Experiment>();
-        output = new StreamWriter(exp.dataPath +
-                                    "/sub-" + exp.config.subject +
-                                    "_task-" + name +
-                                    "_behav.csv", append:true);
+        // output = new StreamWriter(exp.dataPath +
+        //                             "/sub-" + exp.config.subject +
+        //                             "_task-" + name +
+        //                             "_behav.csv", append:true);
+        output = new StreamWriter($"{GlobalPaths.DataPath}{exp.config.experiment}_sub-{exp.config.subject}_{exp.currentTask.name}_{exp.timestamp}_BehavData.csv", append: true);
+
         Debug.Log("Logging to: " + ((FileStream)(output.BaseStream)).Name);
 
         string header = string.Empty;

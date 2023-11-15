@@ -3795,14 +3795,14 @@ MonoBehaviour:
   m_VerticalScrollbarEventHandler: {fileID: 0}
   m_LayoutGroup: {fileID: 0}
   m_ScrollSensitivity: 1
-  m_ContentType: 2
+  m_ContentType: 0
   m_InputType: 0
   m_AsteriskChar: 42
-  m_KeyboardType: 4
+  m_KeyboardType: 0
   m_LineType: 0
   m_HideMobileInput: 0
   m_HideSoftKeyboard: 0
-  m_CharacterValidation: 2
+  m_CharacterValidation: 0
   m_RegexValue: 
   m_GlobalPointSize: 14
   m_CharacterLimit: 0
@@ -4061,7 +4061,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 55daed433791b89408d060163e250e30, type: 3}
+  m_Texture: {fileID: 2800000, guid: 233635177ef5c436183dcaf0c7ae8ade, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -4506,8 +4506,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 422f5f25c5eaee34e8a6f051a53e2217, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  configProvided: {fileID: 4382041383786376091, guid: e19f0c336f46b47a3bb6801e1272915a,
-    type: 3}
+  configProvided: {fileID: 0}
   id: 0
   singleSceneBuild: 0
   guiElements:
@@ -4627,7 +4626,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 43bdd49e7fedacd4db88e95c417919eb, type: 3}
+  m_Texture: {fileID: 2800000, guid: 6876ce18e6d8c4d2881e689703c1363d, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0

@@ -19,7 +19,7 @@ public class LM_ExpStartup : MonoBehaviour
     public Config configProvided;
 
     [Min(0)] [Tooltip(">0: Automatically select ascending from id provided\n" + "0: Manually select with GUI")]
-        public int id = 0;
+        public string id = "";
     //public bool balanceConditionOrder = true;
     public bool singleSceneBuild = true;
     [Tooltip("Can use some, all, or none")]
@@ -28,7 +28,7 @@ public class LM_ExpStartup : MonoBehaviour
     // Private Variables
     private List<Config> configs = new List<Config>();
     private Config config;
-    private int autoID;
+    private string autoID;
     private List<int> usedIds = new List<int>();
     private bool subidError = true;
     private bool uiError = true;
@@ -40,13 +40,13 @@ public class LM_ExpStartup : MonoBehaviour
     {
         appDir = Application.persistentDataPath;
 
-        if (id != 0 | guiElements.subID == null)
+        if (id != "" | guiElements.subID == null)
         {
             // Set a default ID if need be 
             if (guiElements.subID == null)
             {
                 Debug.LogError("No field for providing a subject id manually; automatically generating id starting at 1001");
-                autoID = 1001;
+                autoID = 1001.ToString();
             }
 
             // find an id with no data saved (don't overwrite)
@@ -54,11 +54,11 @@ public class LM_ExpStartup : MonoBehaviour
             {
                 while (Directory.Exists(appDir + "/" + config.experiment + "/" + autoID))
                 {
-                    autoID++;
+                    autoID = 0000.ToString();
                 }
             }
             Debug.Log("Participant ID: " + autoID);
-            if (guiElements.subID != null) guiElements.subID.gameObject.SetActive(false);
+            //if (guiElements.subID != null) guiElements.subID.gameObject.SetActive(false);
 
             // set our public ID value that gets fed to Config.instance
             id = autoID;
@@ -188,7 +188,7 @@ public class LM_ExpStartup : MonoBehaviour
         if (guiElements.subID.text != "")
         {
             // if so, make sure it's an int
-            if (int.TryParse(guiElements.subID.text, out int _subID))
+            //if (int.TryParse(guiElements.subID.text, out int _subID))
             {
                 // If this id has already been used to save data, flag an error
                 if (!Application.isEditor &
@@ -198,7 +198,7 @@ public class LM_ExpStartup : MonoBehaviour
                     {
                         subidError = false;
                         existingData = true;
-                        id = int.Parse(guiElements.subID.text);
+                        id = guiElements.subID.text;
                         _errorMessage.text = "Loading SubjectID data from a previous session.";
                         _errorMessage.gameObject.SetActive(true);
                     }
@@ -211,18 +211,18 @@ public class LM_ExpStartup : MonoBehaviour
                 }
                 else
                 {
-                    id = int.Parse(guiElements.subID.text);
+                    id = guiElements.subID.text;
                     subidError = false;
                     _errorMessage.gameObject.SetActive(false); // then and only then, will we release the flag
                 }
             }
-            // if the subID is not an int, throw the message to fix
-            else
-            {
-                subidError = true;
-                _errorMessage.text = "Subject ID must be an integer.";
-                _errorMessage.gameObject.SetActive(true);
-            }
+            //// if the subID is not an int, throw the message to fix
+            //else
+            //{
+            //    subidError = true;
+            //    _errorMessage.text = "Subject ID must be an integer.";
+            //    _errorMessage.gameObject.SetActive(true);
+            //}
         }
         else
         {
@@ -241,7 +241,7 @@ public class LM_ExpStartup : MonoBehaviour
         {
             config = Instantiate(configProvided);
         }
-        try {config = Instantiate(configs[guiElements.studyCodes.value - 1]);}
+        try { config = Instantiate(configs[guiElements.studyCodes.value - 1]); }
         catch (System.Exception ex) { } 
     }
 }
