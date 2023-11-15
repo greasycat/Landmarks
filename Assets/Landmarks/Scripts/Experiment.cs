@@ -276,7 +276,7 @@ public class Experiment : MonoBehaviour
                 config.filename;
 
         //if(config.levelNames.Count == 0) config.levelNames.Add(SceneManager.GetActiveScene().name);
-        Debug.Log("!!!!!!!!!!!!\t" + SceneManager.GetActiveScene().name + "\t" + config.levelNames[0]);
+        //Debug.Log("!!!!!!!!!!!!\t" + SceneManager.GetActiveScene().name + "\t" + config.levelNames[0]);
         if (!Directory.Exists(GlobalPaths.DataPath))
         {
             Directory.CreateDirectory(GlobalPaths.DataPath);
