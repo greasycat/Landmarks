@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18360132, g: 0.22910744, b: 0.30537397, a: 1}
+  m_IndirectSpecularColor: {r: 0.18360177, g: 0.22910838, b: 0.30537552, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -97,7 +97,8 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000000, guid: 25b159381fbe2334d94f119316c0436e,
+    type: 2}
   m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
@@ -10078,6 +10079,51 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4eaab902dc4dc3443839e20103a09d8f, type: 3}
+--- !u!1 &435254869
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 435254871}
+  - component: {fileID: 435254870}
+  m_Layer: 0
+  m_Name: Wayfinding_CountdownTimerDummy
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &435254870
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 435254869}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1641bbc28fb9448bb981c26fcd1df1ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  navigationTaskReference: {fileID: 2031292337}
+  wayfindingRunningCountdownTimer: 
+--- !u!4 &435254871
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 435254869}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.29000002, y: 1.8800001, z: -0.21}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &440021311
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14021,7 +14067,7 @@ MonoBehaviour:
   navLog: 0
   VP_ExplorationTask: {fileID: 1290081303}
   VP_ExplorationCountdownTimer: {fileID: 6283521767554458752}
-  VP_WayfindingCountdownTimer: {fileID: 0}
+  VP_WayfindingCountdownTimer: {fileID: 435254870}
 --- !u!1001 &550505254
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -17319,7 +17365,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-5734
+  m_Name: pb_Mesh-97916
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -21789,7 +21835,7 @@ PrefabInstance:
         type: 3}
       propertyPath: VP_WayfindingCountdownTimer
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 435254870}
     - target: {fileID: 722609337442248017, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
         type: 3}
       propertyPath: VP_ExplorationCountdownTimer
@@ -32614,7 +32660,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-7152
+  m_Name: pb_Mesh-99164
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -46478,7 +46524,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-2872
+  m_Name: pb_Mesh-95084
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -48790,6 +48836,100 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 98567582113585e468a4235b7ed41b17, type: 3}
+--- !u!1 &2031292336
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2031292338}
+  - component: {fileID: 2031292337}
+  m_Layer: 0
+  m_Name: Wayfinding_TaskDummy
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2031292337
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2031292336}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a143aa6c55cc4ba9b524fdac40b25f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skip: 0
+  canIncrementLists: 1
+  interval: 0
+  interruptTasks: {fileID: 0}
+  interruptInterval: 0
+  repeatInterrupts: 9999
+  currentInterrupt: 0
+  pausedTasks: {fileID: 0}
+  parentTask: {fileID: 0}
+  firstPersonCamera: {fileID: 0}
+  overheadCamera: {fileID: 0}
+  debugButton: {fileID: 0}
+  actionButton: {fileID: 0}
+  vrEnabled: 0
+  taskLog: {fileID: 0}
+  triggerLabel: 
+  triggerOnStart: 0
+  triggerOnEnd: 0
+  destinations: {fileID: 0}
+  currentTarget: {fileID: 0}
+  listOfNavStarts: {fileID: 0}
+  startingLocation: {fileID: 0}
+  NavigationInstruction: {fileID: 0}
+  desiredSphereYPosition: 1.5
+  distanceAllotted: Infinity
+  timeAllotted: Infinity
+  printRemainingTimeTo: {fileID: 0}
+  scoreIncrement: 50
+  penaltyRate: 2000
+  showScoring: 0
+  hideTargetOnStart: 0
+  unmaskStartObjectFor: 0
+  targetMaskPrefab: {fileID: 0}
+  showTargetAfterSeconds: 0
+  hideNonTargets: 0
+  assistCompass: {fileID: 0}
+  SecondsUntilAssist: Infinity
+  compassPosOffset: {x: 0, y: 0, z: 0}
+  compassRotOffset: {x: 0, y: 0, z: 0}
+  startTime: 0
+  allowContinueAfter: Infinity
+  onlyContinueFromTargets: 0
+  haptics: 0
+  logStartEnd: 0
+  borderObjectTag: BorderObjects
+  playerBorderSumAndMeasurements: {x: 0, y: 0}
+  wallsTag: Walls
+  playerWallSumAndMeasurements: {x: 0, y: 0}
+  timeRemaining: 0
+  defaultTimeRemaining: 0
+  ExplorationCountdownTimer: {fileID: 0}
+--- !u!4 &2031292338
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2031292336}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.29000002, y: 1.8800001, z: -0.21}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2034288951
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -51136,7 +51276,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-3612
+  m_Name: pb_Mesh-95786
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
