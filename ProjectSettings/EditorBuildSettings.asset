@@ -8,7 +8,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Landmarks/Scenes/LM_Startup.unity
     guid: c04c809e574054910923b01d66e4e790
-  - enabled: 0
+  - enabled: 1
     path: Assets/Landmarks/Scenes/Practice_Environment.unity
     guid: 7eb748078c9f9474883fcfc53d769130
   - enabled: 1
