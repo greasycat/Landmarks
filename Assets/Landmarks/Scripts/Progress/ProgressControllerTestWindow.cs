@@ -1,17 +1,17 @@
-﻿using Landmarks.Scripts.Debugging;
+﻿#if UNITY_EDITOR
+using Landmarks.Scripts.Debugging;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Landmarks.Scripts.Progress
 {
-    public class ProgressControllerTest : LM_UnitTest
+    public class ProgressControllerTestWindow : LM_EditorWindow
     {
-        [MenuItem("LM_UnitTests/ProgressController")]
+        [MenuItem("LM_ProgressController/TestWindow")]
         public static void ShowWindow()
         {
-            var window = GetWindow<ProgressControllerTest>("ProgressController Unit Test");
-            window.titleContent = new GUIContent("Progress Controller Unit Test");
+            LM_EditorWindow.ShowWindow<ProgressControllerTestWindow>("ProgressControllerTestWindow");
         }
 
         public new void CreateGUI()
@@ -40,7 +40,7 @@ namespace Landmarks.Scripts.Progress
             var controller = LM_Progress.Instance;
             controller.DeleteAllSaveFiles();
         }
-    
+
         private static void TestGetLastSaveFile()
         {
             var controller = LM_Progress.Instance;
@@ -48,13 +48,13 @@ namespace Landmarks.Scripts.Progress
             Debug.Log(file);
         }
 
-        private void OpenCurrentSaveFile()
+        private static void OpenCurrentSaveFile()
         {
             var controller = LM_Progress.Instance;
             var file = LM_Progress.GetLastSaveFile(controller.savingFolderPath);
             OpenFolder(file);
         }
-    
+
         private static void OpenProgressSavingLocation()
         {
             var controller = LM_Progress.Instance;
@@ -64,3 +64,5 @@ namespace Landmarks.Scripts.Progress
 
     }
 }
+
+#endif
