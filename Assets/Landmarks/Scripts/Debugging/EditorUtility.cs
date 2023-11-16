@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿#if UNITY_EDITOR
+using System.Collections.Generic;
 using Landmarks.Scripts.Progress;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace Landmarks.Scripts.Debugging
 {
@@ -48,7 +48,7 @@ namespace Landmarks.Scripts.Debugging
                     uid.ID = GetUnusedID(usedIds);
                     usedIds.Add(uid.ID);
                 }
-                
+
                 UnityEditor.EditorUtility.SetDirty(uid);
             }
         }
@@ -56,7 +56,7 @@ namespace Landmarks.Scripts.Debugging
         [MenuItem("EditorUtility/Remove All Uid")]
         public static void RemoveAllUid()
         {
-            
+
             if (!(FindObjectsOfType(typeof(Transform)) is Transform[] transforms)) return;
             foreach (var transform in transforms)
             {
@@ -66,7 +66,7 @@ namespace Landmarks.Scripts.Debugging
                     DestroyImmediate(uid);
                 }
             }
-            
+
         }
 
         private static readonly System.Random Random = new System.Random();
@@ -87,3 +87,4 @@ namespace Landmarks.Scripts.Debugging
         }
     }
 }
+#endif
