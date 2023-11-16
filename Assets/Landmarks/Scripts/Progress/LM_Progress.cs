@@ -13,8 +13,8 @@ namespace Landmarks.Scripts.Progress
         public static LM_Progress Instance { get; private set; }
 
         // Config variables
-        private const string ApplicationName = "Landmarks";
-        private const string SaveFolderName = "saves";
+        public static readonly string ApplicationName = "Landmarks";
+        public static readonly string SaveFolderName = "saves";
 
         [SerializeField] public bool resumeLastSave = true;
 
@@ -82,15 +82,11 @@ namespace Landmarks.Scripts.Progress
         // Attribute-related methods
         //**************************************************************
 
-        public void AddAttributeAhead(string key, string value)
+        public void AddAttribute(string key, string value)
         {
             _attributeQueue.Enqueue(new KeyValuePair<string, string>(key, value));
         }
 
-        public void AddAttributeBehind(string key, string value)
-        {
-            _attributeQueue.Enqueue(new KeyValuePair<string, string>(key, value));
-        }
 
         public string GetCurrentNodeAttribute(string key)
         {
@@ -121,17 +117,16 @@ namespace Landmarks.Scripts.Progress
                 {"line", _line.ToString()}
             };
 
-            MoveAllAttributesFromQueue(task, attributes);
 
+            TrySkip(task); // This may add some attributes to the attributes dictionary
+            
+            MoveAllAttributesFromQueue(attributes); // Push all the attributes from the queue to the dictionary
             WriteToCurrentSaveFileSync(XmlNode.BuildOpeningString("Task", attributes, _depth));
             _line++;
 
             LM_Debug.Instance.Log($"Recording start: {task.name}", 1);
             _depth++;
 
-            // LM_Debug.Instance.Log("Start-Before:" + _currentSaveNode.Name, 1);
-            TrySkip(task);
-            // LM_Debug.Instance.Log("Start-After:" + _currentSaveNode.Name, 1);
 
             if (!task.skip && resumeLastSave)
             {
@@ -157,7 +152,7 @@ namespace Landmarks.Scripts.Progress
             _line++;
         }
 
-        private void MoveAllAttributesFromQueue(ExperimentTask task, IDictionary<string, string> attributes)
+        private void MoveAllAttributesFromQueue(IDictionary<string, string> attributes)
         {
             while (_attributeQueue.Count > 0)
             {
@@ -208,7 +203,20 @@ namespace Landmarks.Scripts.Progress
 
                     // floor division completed subtasks number by number of subtask in each trial
                     // to get the number of completed trials
+
+                    // For Taylor's experiment, there are 8 subtasks in each trial
+                    // If the last disorientation task is incomplete, the number of completed subtasks will still be 8
+                    if (numCompletedSubTasks % 8 == 7)
+                    {
+                        numCompletedSubTasks += 1;
+                    }
+                    
                     var numCompletedTrials = numCompletedSubTasks / numSubTasks;
+
+                    if (int.TryParse(_currentSaveNode.GetAttribute("numCompletedTrials"), out var lastResumedNumber))
+                    {
+                        numCompletedTrials += lastResumedNumber;
+                    }
 
                     LM_Debug.Instance.Log($"Number of completed trials: {numCompletedTrials}", 10);
 
@@ -235,7 +243,9 @@ namespace Landmarks.Scripts.Progress
                         {
                             LM_Debug.Instance.Log($"Cannot find LM_IncrementLists component in {childTransform.name}", 1);
                         }
-                    }
+                    } 
+                    
+                    AddAttribute("numCompletedTrials", numCompletedTrials.ToString());
 
 
                     resumeLastSave = false; // Stop resuming
@@ -386,6 +396,11 @@ namespace Landmarks.Scripts.Progress
             }
 
             return saveFolder;
+        }
+
+        public static string GetSaveFolder()
+        {
+            return GetSaveFolderWithId("");
         }
 
         //method to create a save file with current timestamp

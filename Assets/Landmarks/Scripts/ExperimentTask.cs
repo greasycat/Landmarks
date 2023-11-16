@@ -81,12 +81,11 @@ public class ExperimentTask : MonoBehaviour{
 	{
 		// Look for a BrainAmp EEG manager in the eperiment
         eegManager = FindObjectOfType<BrainAmpManager>();
-        progress = LM_Progress.Instance;
 	}
 
 	public void Start () 
     {
-
+		progress = LM_Progress.Instance;
 	}
 	
 	public virtual void startTask() {
@@ -137,8 +136,11 @@ public class ExperimentTask : MonoBehaviour{
             log.log("EEG_TRIGGER\tName\t" + startLabel + "\tValue\t" + eegManager.triggers[startLabel].ToString(), 1);
         }
         
+        
         if (progress != null)
 			progress.RecordTaskStart(this);
+        
+        
     }
 	
 	public virtual void TASK_START () {
