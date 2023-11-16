@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using UnityEngine.Serialization;
+﻿using Landmarks.Scripts.Debugging;
+using UnityEngine;
 
 namespace Landmarks.Scripts.Progress
 {
@@ -16,12 +16,12 @@ namespace Landmarks.Scripts.Progress
         {
             ID = id;
         }
-        
+
         public static bool TryGetUid(GameObject gameObject, out uint uid)
         {
             uid = 0;
             if (gameObject == null) return false;
-            
+
             var uidComponent = gameObject.GetComponent<Uid>();
             if (uidComponent == null) return false;
             uid = uidComponent.ID;
