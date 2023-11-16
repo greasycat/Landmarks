@@ -7,7 +7,7 @@ using Button = UnityEngine.UIElements.Button;
 
 namespace Landmarks.Scripts.Debugging
 {
-    public class UIMaterialSetter : LM_EditorWindow
+    public class SetMaterialWindow : LM_EditorWindow
     {
 
         private ObjectField _materialField;
@@ -28,7 +28,7 @@ namespace Landmarks.Scripts.Debugging
         [MenuItem("EditorUtility/Set Material")]
         public static void ShowWindow()
         {
-            LM_EditorWindow.ShowWindow<UIMaterialSetter>("UIMaterialSetter");
+            LM_EditorWindow.ShowWindow<SetMaterialWindow>("UIMaterialSetter");
         }
 
         private void SetMaterial()

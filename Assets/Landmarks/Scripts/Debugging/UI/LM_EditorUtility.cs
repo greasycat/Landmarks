@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Landmarks.Scripts.Debugging
 {
-    public class EditorUtility : EditorWindow
+    public class LM_EditorUtility : EditorWindow
     {
         [MenuItem("EditorUtility/Expand Selected Tasks &q")]
         //https://stackoverflow.com/a/66366775

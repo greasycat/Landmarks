@@ -49,15 +49,15 @@ public class ObjectList : ExperimentTask
             var objectJsonString = progress.GetCurrentNodeAttribute("objects");
             if (objectJsonString != null)
             {
-                var lookUp = SerializationHelper.ConvertToLookupDictionary(objs);
+                var lookUp = Serializer.ConvertToLookupDictionary(objs);
                 Debug.Log("Keys: " + string.Join(",", lookUp.Keys.ToArray()));
                 try
                 {
                     Debug.Log("Json" + objectJsonString);
                     var objectList =
-                        SerializationHelper.Deserialize<List<Dictionary<string, string>>>(objectJsonString);
+                        Serializer.Deserialize<List<Dictionary<string, string>>>(objectJsonString);
 
-                    objs = SerializationHelper.ConvertToGameObjectList(objectList, lookUp).ToArray();
+                    objs = Serializer.ConvertToGameObjectList(objectList, lookUp).ToArray();
 
                     shuffle = false;
                 }
@@ -76,7 +76,7 @@ public class ObjectList : ExperimentTask
 
 
         progress.AddAttributeAhead("objects",
-            SerializationHelper.Serialize(SerializationHelper.ConvertToDictionaryList(objs)));
+            Serializer.Serialize(Serializer.ConvertToDictionaryList(objs)));
 
         TASK_START();
 

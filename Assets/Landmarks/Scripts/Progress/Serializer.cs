@@ -9,7 +9,7 @@ namespace Landmarks.Scripts.Progress
     using System.Collections.Generic;
     using UnityEngine;
 
-    public static class SerializationHelper
+    public static class Serializer
     {
         public static Dictionary<string, GameObject> ConvertToLookupDictionary(IEnumerable<GameObject> gameObjects)
         {
@@ -25,8 +25,8 @@ namespace Landmarks.Scripts.Progress
 
             return lookup;
         }
-        
-        
+
+
         public static Dictionary<string, GameObject> ConvertToLookupDictionary(IEnumerable<IEnumerable<GameObject>> gameObjects)
         {
             var flattenList = gameObjects.SelectMany(objs => objs);
@@ -66,7 +66,7 @@ namespace Landmarks.Scripts.Progress
             return gameObjects.Select(obj =>
             {
                 var key = "";
-                
+
                 // First getting the uid if not fallback to name
                 if (obj.TryGetValue("uid", out var uidString))
                 {
@@ -82,7 +82,7 @@ namespace Landmarks.Scripts.Progress
                 }
 
                 if (gameObjectLookup.TryGetValue(key, out var gameObject)) return gameObject;
-                
+
                 Debug.LogError($"Cannot find object with key {key}");
                 return default;
 
@@ -94,14 +94,14 @@ namespace Landmarks.Scripts.Progress
             var unformatted = JsonConvert.SerializeObject(obj);
             return SecurityElement.Escape(unformatted);
         }
-        
+
         public static T Deserialize<T>(string json)
         {
             var unescaped = new SecurityElement("", json).Text;
             Debug.Log("unescaped: " + unescaped);
             return JsonConvert.DeserializeObject<T>(unescaped);
         }
-        
+
         public static List<List<GameObject>> ConvertToGameObjectList(
             IEnumerable<IEnumerable<Dictionary<string, string>>> gameObjects,
             IDictionary<string, GameObject> gameObjectLookup)

@@ -197,19 +197,23 @@ namespace Landmarks.Scripts.Progress
                     var trialSubTaskNames = task.gameObject.transform.Cast<Transform>().Select(tr => tr.name);
                     var numSubTasks = trialSubTaskNames.Count();
 
+                    LM_Debug.Instance.Log($"Number of subtasks in trial: {numSubTasks}", 10);
+
                     // Get the number of completed subtasks
                     var child = _currentSaveNode.GetAllChildren();
                     var completedSubTasks = child.Where(node => node.HasAttributeEqualTo("completed", "true"));
                     var numCompletedSubTasks = completedSubTasks.Count();
 
+                    LM_Debug.Instance.Log($"Number of completed subtasks: {numCompletedSubTasks}", 10);
+
                     // floor division completed subtasks number by number of subtask in each trial
                     // to get the number of completed trials
                     var numCompletedTrials = numCompletedSubTasks / numSubTasks;
-                    
+
                     LM_Debug.Instance.Log($"Number of completed trials: {numCompletedTrials}", 10);
 
                     // The repeatCount is 1-indexed but its initial value 0
-                    // This value is used to check if subject finish the repeating set 
+                    // This value is used to check if subject finish the repeating set
                     taskList.repeatCount += numCompletedTrials;
 
                     // The overideRepeat is 0-indexed and its initial value is 0
@@ -224,7 +228,7 @@ namespace Landmarks.Scripts.Progress
                             var incrementLists = (LM_IncrementLists) component;
 
                             incrementLists.Increment(numCompletedTrials);
-                            
+
                             LM_Debug.Instance.Log($"Increment trial number by triggering {childTransform.name}", 2);
                         }
                         else

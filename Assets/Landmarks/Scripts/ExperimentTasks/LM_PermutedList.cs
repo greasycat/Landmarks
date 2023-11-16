@@ -71,9 +71,9 @@ public class LM_PermutedList : ExperimentTask
         var permutedListJson = progress.GetCurrentNodeAttribute("permutedList");
         if (permutedListJson != null)
         {
-            var lookUp = SerializationHelper.ConvertToLookupDictionary(permutedList);
-            var objectList = SerializationHelper.Deserialize<List<List<Dictionary<string, string>>>>(permutedListJson);
-            permutedList = SerializationHelper.ConvertToGameObjectList(objectList, lookUp);
+            var lookUp = Serializer.ConvertToLookupDictionary(permutedList);
+            var objectList = Serializer.Deserialize<List<List<Dictionary<string, string>>>>(permutedListJson);
+            permutedList = Serializer.ConvertToGameObjectList(objectList, lookUp);
         }
         
         // // Get subset
@@ -83,9 +83,9 @@ public class LM_PermutedList : ExperimentTask
             subset = int.Parse(subsetString);
         }
         //
-        var serializedList = SerializationHelper.ConvertToDictionaryList(permutedList);
+        var serializedList = Serializer.ConvertToDictionaryList(permutedList);
         // Debug.Log($"Original Count {permutedList.Count} Serialized list: {serializedList}");
-        progress.AddAttributeAhead("permutedList", SerializationHelper.Serialize(serializedList));
+        progress.AddAttributeAhead("permutedList", Serializer.Serialize(serializedList));
         progress.AddAttributeAhead("subset", subset.ToString());
 
         base.startTask(); //relocated to ensure the attribute queue is populated before the task starts
