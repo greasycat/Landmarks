@@ -24,31 +24,28 @@ namespace Landmarks.Scripts.Progress.UI
 
         [SerializeField]
         private ConfirmEvent onConfirm = new ConfirmEvent();
+        [SerializeField]
+        private ConfirmEvent onItemClick = new ConfirmEvent();
 
-        [SerializeField] private Canvas _canvas;
-        private List<Button> items;
+        [FormerlySerializedAs("_canvas")] [SerializeField] private Canvas canvas;
+        private List<Button> _items;
         private int SelectionIndex { get; set; }
 
 
 
         private void Start()
         {
-            items = new List<Button>();
-            itemPrefab.onClick.AddListener(() =>
-            {
-                SelectionIndex = items.IndexOf(itemPrefab);
-                selectedTextField.text = GetText(itemPrefab);
-            });
+            _items = new List<Button>();
         }
 
         public void Show()
         {
-            _canvas.enabled = true;
+            canvas.enabled = true;
         }
 
         public void Hide()
         {
-            _canvas.enabled = false;
+            canvas.enabled = false;
             selectedTextField.text = "";
         }
 
@@ -60,12 +57,31 @@ namespace Landmarks.Scripts.Progress.UI
 
         public void Confirm()
         {
-            if (selectedTextField.text == null) return;
-            onConfirm.Invoke(selectedTextField.text);
+            var text = GetSelectionText();
+            if (text == null) return;
+            onConfirm?.Invoke(text);
             ClearList();
             Hide();
         }
-        private static string GetText(Component button) => button.GetComponentInChildren<TMP_Text>().text;
+        
+        private string GetSelectionText()
+        {
+            var text = selectedTextField.text;
+            return text == null ? null : Unescape(text);
+        }
+
+        private static string GetText(Component button) => Unescape(button.GetComponentInChildren<TMP_Text>().text);
+        
+        private void AddOnClick(Button button)
+        {
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(() =>
+            {
+                SelectionIndex = _items.IndexOf(button);
+                selectedTextField.text = GetText(button);
+                onItemClick?.Invoke(GetText(button));
+            });
+        }
 
         public void SetList(IReadOnlyList<string> targetList)
         {
@@ -73,45 +89,38 @@ namespace Landmarks.Scripts.Progress.UI
             {
                 return; // The provided list is empty, so just return
             }
+            
+            ClearList();
 
             // If there are not enough buttons in the list, instantiate new ones
-            for (var i = items.Count; i < targetList.Count; i++)
+            for (var i = 0; i < targetList.Count; i++)
             {
                 Debug.Log("Instantiating new item");
                 var item = Instantiate(itemPrefab, content);
-                items.Add(item);
+                var itemTransform = item.transform;
+                var pos = itemTransform.localPosition;
+                itemTransform.localPosition = new Vector3(pos.x, pos.y - itemHeight * i, pos.z);
+                
+                item.GetComponentInChildren<TMP_Text>().text = Escape(targetList[i]); // Assuming the Button prefab has a Text child
+                AddOnClick(item);
+                _items.Add(item);
             }
 
-            // Update text and destroy any extra buttons if necessary
 
-            for (var i = 0; i < items.Count && i < targetList.Count; ++i)
-            {
-                var item = items[i];
-                var newPosition = item.transform.position;
-                item.transform.position =
-                    new Vector3(newPosition.x, newPosition.y - itemHeight * i, newPosition.z);
-                item.onClick.RemoveAllListeners();
-                item.onClick.AddListener(() =>
-                {
-                    SelectionIndex = items.IndexOf(item);
-                    selectedTextField.text = GetText(item);
-                });
-                items[i].GetComponentInChildren<TMP_Text>().text = targetList[i]; // Assuming the Button prefab has a Text child
-            }
-
-            for (int i = targetList.Count; i < items.Count; i++)
-            {
-                Destroy(items[i].gameObject); // Destroy the extra button
-            }
-
-            // Remove the destroyed buttons from the list
-            if (targetList.Count < items.Count)
-                items.RemoveRange(targetList.Count, targetList.Count - items.Count);
 
             var size = content.sizeDelta;
-
             // Adjust the scrollable content size to fit the list
             content.sizeDelta = new Vector2(size.x, itemHeight * targetList.Count);
+        }
+        
+        private static string Escape(string path)
+        {
+            return path.Replace(@"\", @"\\");
+        }
+        
+        private static string Unescape(string path)
+        {
+            return path.Replace(@"\\", @"\");
         }
 
         public delegate List<string> ItemModifier(IReadOnlyList<string> targetList);
@@ -121,14 +130,14 @@ namespace Landmarks.Scripts.Progress.UI
             SetList(newList);
         }
 
-        public void ClearList()
+        private void ClearList()
         {
-            foreach (var item in items)
+            foreach (var item in _items)
             {
                 Destroy(item.gameObject);
             }
 
-            items.Clear();
+            _items.Clear();
         }
     }
 }

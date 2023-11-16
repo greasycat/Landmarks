@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
+using Landmarks.Scripts.Debugging;
 using UnityEngine;
 
 namespace Landmarks.Scripts.Progress.UI
@@ -19,21 +21,29 @@ namespace Landmarks.Scripts.Progress.UI
 
         public void OnClick()
         {
-            var saves = LM_Progress.GetSaveFiles(GetSavingFolderPathFromScreen());
+            HandleFolder(LM_Progress.GetSaveFolder());
             _listSelect.Show();
-            _listSelect.SetList(saves.ToList());
         }
 
-        private string GetSavingFolderPathFromScreen()
-        {
-
-            var id = _expStartup.GetSubjectID();
-            return id == "" ? "" : LM_Progress.GetSaveFolderWithId($"{id}");
-        }
 
         public void OnConfirm(string text)
         {
-            var folder = GetSavingFolderPathFromScreen();
+            if (File.GetAttributes(text).HasFlag(FileAttributes.Directory))
+                HandleFolder(text);
+            else
+                HandleFile(text);
+        }
+
+        public void OnItemClick(string text)
+        {
+            LM_Debug.Instance.Log("Item clicked: " + text, 10);
+            if (File.GetAttributes(text).HasFlag(FileAttributes.Directory))
+                HandleFolder(text);
+        }
+
+        private void HandleFile(string path)
+        {
+            var folder = Path.GetDirectoryName(path);
             if (folder == "")
             {
                 _listSelect.Hide();
@@ -44,14 +54,21 @@ namespace Landmarks.Scripts.Progress.UI
             {
                 _progress.SetSavingFolderPath(folder);
                 _progress.EnableResuming();
-                _progress.InitializeSave(text);
+                _progress.InitializeSave(path);
             };
-
             _expStartup.OnStartButtonClicked();
         }
 
-
-
-
+        private void HandleFolder(string path)
+        {
+            // Set the list to a new folder
+            LM_Debug.Instance.Log("Setting list to " + path, 10);
+            var folders = Directory.GetDirectories(path).Prepend(Path.GetDirectoryName(path));
+            var files = Directory.GetFiles(path);
+            
+            // combine these two lists
+            folders = folders.Concat(files);
+            _listSelect.SetList(folders.ToList());
+        }
     }
 }
