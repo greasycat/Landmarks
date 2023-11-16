@@ -85,8 +85,8 @@ public class LM_PermutedList : ExperimentTask
         //
         var serializedList = Serializer.ConvertToDictionaryList(permutedList);
         // Debug.Log($"Original Count {permutedList.Count} Serialized list: {serializedList}");
-        progress.AddAttributeAhead("permutedList", Serializer.Serialize(serializedList));
-        progress.AddAttributeAhead("subset", subset.ToString());
+        progress.AddAttribute("permutedList", Serializer.Serialize(serializedList));
+        progress.AddAttribute("subset", subset.ToString());
 
         base.startTask(); //relocated to ensure the attribute queue is populated before the task starts
         

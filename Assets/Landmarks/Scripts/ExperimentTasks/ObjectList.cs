@@ -75,7 +75,7 @@ public class ObjectList : ExperimentTask
         }
 
 
-        progress.AddAttributeAhead("objects",
+        progress.AddAttribute("objects",
             Serializer.Serialize(Serializer.ConvertToDictionaryList(objs)));
 
         TASK_START();
