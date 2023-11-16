@@ -6,23 +6,30 @@ using UnityEngine.UIElements;
 
 namespace Landmarks.Scripts.Progress
 {
-    public class ProgressControllerUtilityWindow : LM_EditorWindow
+    public class EscapeConverter : LM_EditorWindow
     {
 
         [MenuItem("LM_ProgressController/Escape Character Converter")]
         public static void ShowWindow()
         {
-            LM_EditorWindow.ShowWindow<ProgressControllerUtilityWindow>("ProgressControllerUtilityWindow");
+            LM_EditorWindow.ShowWindow<EscapeConverter>("Escape Converter");
         }
 
         public new void CreateGUI()
         {
             // Create a large text field where the user can enter a string
             var root = rootVisualElement;
-            var textField = new TextField("Enter a string to convert");
-            textField.multiline = true;
-            textField.style.height = 200;
-            textField.style.width = 400;
+            var textField = new TextField("Enter a string to convert")
+            {
+                multiline = true,
+                style =
+                {
+                    height = 200,
+                    width = 400
+                }
+            };
+
+
             root.Add(textField);
 
             // Create a button to escape the string

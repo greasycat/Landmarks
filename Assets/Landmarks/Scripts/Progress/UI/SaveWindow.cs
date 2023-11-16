@@ -6,12 +6,12 @@ using UnityEngine.UIElements;
 
 namespace Landmarks.Scripts.Progress
 {
-    public class ProgressControllerTestWindow : LM_EditorWindow
+    public class SaveWindow : LM_EditorWindow
     {
-        [MenuItem("LM_ProgressController/TestWindow")]
+        [MenuItem("LM_ProgressController/Manage Saves")]
         public static void ShowWindow()
         {
-            LM_EditorWindow.ShowWindow<ProgressControllerTestWindow>("ProgressControllerTestWindow");
+            LM_EditorWindow.ShowWindow<SaveWindow>("Manage Saves");
         }
 
         public new void CreateGUI()
