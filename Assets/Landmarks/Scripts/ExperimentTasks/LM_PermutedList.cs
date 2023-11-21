@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using Landmarks.Scripts.Progress;
-using Newtonsoft.Json;
 
 
 public class LM_PermutedList : ExperimentTask
@@ -68,25 +67,23 @@ public class LM_PermutedList : ExperimentTask
             progress = LM_Progress.Instance;
         
         // Get permutedList
-        var permutedListJson = progress.GetCurrentNodeAttribute("permutedList");
-        if (permutedListJson != null)
-        {
-            var lookUp = Serializer.ConvertToLookupDictionary(permutedList);
-            var objectList = Serializer.Deserialize<List<List<Dictionary<string, string>>>>(permutedListJson);
-            permutedList = Serializer.ConvertToGameObjectList(objectList, lookUp);
-        }
-        
-        // // Get subset
-        var subsetString = progress.GetCurrentNodeAttribute("subset");
-        if (subsetString != null)
-        {
-            subset = int.Parse(subsetString);
-        }
+        // var permutedListJson = progress.GetCurrentNodeAttribute("permutedList");
+        // if (permutedListJson != null)
+        // {
+        //     permutedList = SerializationHelper.DeserializeGameObjectList(permutedListJson, SerializationHelper.ConvertToDictionary(listToPermute.objects));
+        // }
         //
-        var serializedList = Serializer.ConvertToDictionaryList(permutedList);
+        // // Get subset
+        // var subsetString = progress.GetCurrentNodeAttribute("subset");
+        // if (subsetString != null)
+        // {
+        //     subset = int.Parse(subsetString);
+        // }
+        //
+        // var serializedList = SerializationHelper.SerializeGameObjectList(permutedList);
         // Debug.Log($"Original Count {permutedList.Count} Serialized list: {serializedList}");
-        progress.AddAttribute("permutedList", Serializer.Serialize(serializedList));
-        progress.AddAttribute("subset", subset.ToString());
+        // progress.AddAttributeAhead("permutedList", serializedList);
+        // progress.AddAttributeAhead("subset", subset.ToString());
 
         base.startTask(); //relocated to ensure the attribute queue is populated before the task starts
         

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Landmarks.Scripts.Debugging;
@@ -23,6 +24,12 @@ namespace Landmarks.Scripts.Progress
         {
             Tag = tag;
             _attributes = new Dictionary<string, string>();
+        }
+
+        public XmlNode(string tag, Dictionary<string, string> attributes)
+        {
+            Tag = tag;
+            _attributes = attributes;
         }
 
         /************************************************************************
@@ -166,6 +173,30 @@ namespace Landmarks.Scripts.Progress
             return _children.Aggregate(str, (current, child) => current + child.HierarchyToString(depth + 1));
         }
 
+        private static void ParseFromLine(string line, ref XmlNode parent)
+        {
+            var tagString = line.Substring(1, line.Length - 2);
+            var firstSpace = tagString.IndexOf(' ');
+            var tagName = tagString.Substring(0, firstSpace);
+
+            var regex = new Regex(@"(\w+)\s*=\s*""([^""]*)""");
+            var matches = regex.Matches(line);
+
+            var attributes = new Dictionary<string, string>();
+            foreach (Match match in matches)
+            {
+                // Groups[0] is the entire match, Groups[1] is the key, Groups[2] is the value
+                if (match.Groups.Count != 3) continue;
+
+                var key = match.Groups[1].Value;
+                var value = match.Groups[2].Value;
+                attributes[key] = value;
+            }
+
+            parent.Tag = tagName;
+            parent.SetAttributes(attributes);
+        }
+
         public static XmlNode ParseFromLines(List<string> lines)
         {
             if (lines.Count == 0) return new XmlNode("NA");
@@ -174,11 +205,11 @@ namespace Landmarks.Scripts.Progress
             root.SetAttribute("name", "Root");
             var parent = root;
 
-            foreach (var tag in lines.Select(line => line.Trim()))
+            foreach (var tagLine in lines.Select(line => line.Trim()))
             {
                 // determine if it's an opening tag or a closing tag using regex
-                var openingTag = Regex.Match(tag, @"^<[^/]+>$");
-                var closingTag = Regex.Match(tag, @"^</[^/]+>$");
+                var openingTag = Regex.Match(tagLine, @"^<[^/]+>$");
+                var closingTag = Regex.Match(tagLine, @"^</[^/]+>$");
 
                 // check if it's an opening tag
 
@@ -194,26 +225,7 @@ namespace Landmarks.Scripts.Progress
                     parent = newChild;
 
                     // parse the tag
-                    var tagString = tag.Substring(1, tag.Length - 2);
-                    var firstSpace = tagString.IndexOf(' ');
-                    var tagName = tagString.Substring(0, firstSpace);
-
-                    var regex = new Regex(@"(\w+)\s*=\s*""([^""]*)""");
-                    var matches = regex.Matches(tag);
-
-                    var attributes = new Dictionary<string, string>();
-                    foreach (Match match in matches)
-                    {
-                        // Groups[0] is the entire match, Groups[1] is the key, Groups[2] is the value
-                        if (match.Groups.Count != 3) continue;
-
-                        var key = match.Groups[1].Value;
-                        var value = match.Groups[2].Value;
-                        attributes[key] = value;
-                    }
-
-                    parent.Tag = tagName;
-                    parent.SetAttributes(attributes);
+                    ParseFromLine(tagLine, ref parent);
                 }
                 else if (closingTag.Success)
                 {
@@ -268,9 +280,11 @@ namespace Landmarks.Scripts.Progress
             return str;
         }
 
-        public static string BuildOpeningString(string tagName, string name, int line, int depth)
+        public static string BuildOpeningString(XmlNode node)
         {
-            return IndentText($"<{tagName} name=\"{name}\" line=\"{line}\">", depth);
+            var depth = int.Parse(node.GetAttribute("depth"));
+            LM_Debug.Instance.LogError(depth);
+            return BuildOpeningString(node.Tag, node._attributes, depth);
         }
 
         public static string BuildClosingString(string tagName, int depth)
@@ -287,6 +301,26 @@ namespace Landmarks.Scripts.Progress
             }
 
             return indent + text;
+        }
+
+        private static void UpdateAttribute(string file, XmlNode node, string key, string value)
+        {
+            var lines = File.ReadAllLines(file).ToList();
+            try
+            {
+                var lineNumber = int.Parse(node.GetAttribute("line"));
+                var depth = int.Parse(node.GetAttribute("depth"));
+                var originalLine = lines[lineNumber];
+                ParseFromLine(originalLine, ref node);
+                node.SetAttribute(key, value);
+                lines[lineNumber] = BuildOpeningString(node);
+                File.WriteAllLines(file, lines);
+            }
+            catch (Exception e)
+            {
+                // ignored
+                LM_Debug.Instance.LogError("Fail to update attribute");
+            }
         }
     }
 }

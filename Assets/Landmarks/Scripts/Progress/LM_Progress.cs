@@ -111,20 +111,28 @@ namespace Landmarks.Scripts.Progress
         /// <param name="task"> The task that needs to be recorded </param>
         public void RecordTaskStart(ExperimentTask task)
         {
+            LM_Debug.Instance.Log($"Recording start: {task.name}", 2);
             var attributes = new Dictionary<string, string>
             {
                 {"name", task.name},
-                {"line", _line.ToString()}
+                {"line", _line.ToString()},
+                {"depth", _depth.ToString()}
             };
 
+            var attributePairs = attributes.Select(pair => $"{pair.Key}=\"{pair.Value}\"").ToList();
+            LM_Debug.Instance.Log($"Attributes: {string.Join(", ", attributePairs)}", 2);
 
             TrySkip(task); // This may add some attributes to the attributes dictionary
-            
+
             MoveAllAttributesFromQueue(attributes); // Push all the attributes from the queue to the dictionary
-            WriteToCurrentSaveFileSync(XmlNode.BuildOpeningString("Task", attributes, _depth));
+
+            var newNode = new XmlNode("Task", attributes);
+            task.taskNode = newNode;
+
+            var text = XmlNode.BuildOpeningString(newNode);
+            WriteToCurrentSaveFileSync(text);
             _line++;
 
-            LM_Debug.Instance.Log($"Recording start: {task.name}", 1);
             _depth++;
 
 
@@ -210,7 +218,7 @@ namespace Landmarks.Scripts.Progress
                     {
                         numCompletedSubTasks += 1;
                     }
-                    
+
                     var numCompletedTrials = numCompletedSubTasks / numSubTasks;
 
                     if (int.TryParse(_currentSaveNode.GetAttribute("numCompletedTrials"), out var lastResumedNumber))
@@ -243,8 +251,8 @@ namespace Landmarks.Scripts.Progress
                         {
                             LM_Debug.Instance.Log($"Cannot find LM_IncrementLists component in {childTransform.name}", 1);
                         }
-                    } 
-                    
+                    }
+
                     AddAttribute("numCompletedTrials", numCompletedTrials.ToString());
 
 
