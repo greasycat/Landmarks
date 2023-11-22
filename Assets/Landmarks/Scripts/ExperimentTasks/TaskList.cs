@@ -250,7 +250,7 @@ public class TaskList : ExperimentTask
             // If we've reached the last task but have cycles (repeats) left -- reset task index, increment repeatcount and run startNextTask()
             if (currentTaskIndex >= tasks.Length)
             {
-                Debug.LogError("HIIIII\t" + taskLog.trialData.Values.Count.ToString());
+                //Debug.LogError("HIIIII\t" + taskLog.trialData.Values.Count.ToString());
                 if (taskLog != null & taskLog.trialData.Count > 0)
                 {
                     log.Write(taskLog.FormatCurrent()); // output the formatted data to the log file

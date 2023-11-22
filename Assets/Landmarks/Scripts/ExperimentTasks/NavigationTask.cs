@@ -496,9 +496,20 @@ public class NavigationTask : ExperimentTask
         {
             Vector3 closestWallPoint = wall.GetComponent<Collider>().ClosestPointOnBounds(manager.player.transform.position);
             float player2wallDist = Vector3Distance2D(closestWallPoint, manager.player.transform.position);
-            playerWallDistances.Add(wall.name, player2wallDist);
+            
+            if (playerWallDistances.ContainsKey(wall.name))// adding this if statement to prevent task from crashing on route retracing trial 
+            {
+                playerWallDistances[wall.name] += player2wallDist;
+            }
+
+            else
+            {
+                playerWallDistances.Add(wall.name, player2wallDist);
+            }
+            //playerWallDistances.Add(wall.name, player2wallDist);
 
         }
+
         var closestWall = playerWallDistances.OrderBy(kvp => kvp.Value).First();
         Debug.Log(closestWall.Key + " is the closest wall object, located " + closestWall.Value + "m, orthongonally from the player");
         playerWallSumAndMeasurements += new Vector2(closestWall.Value, 1);
