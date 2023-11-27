@@ -4,6 +4,8 @@ using UnityEngine;
 using TMPro;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
+using System.Linq;
+using Landmarks.Scripts.Progress;
 
 public enum HideTargetOnStart
 {
@@ -30,13 +32,13 @@ public class NavigationTask : ExperimentTask
     public float timeAllotted = Mathf.Infinity;
     [Tooltip("Do we want time or distance remaining to be broadcast somewhere?")]
     public TextMeshProUGUI printRemainingTimeTo;
-    private string baseText;
+    protected string baseText;
 
     // Use a scoring/points system (not currently configured)
-    [HideInInspector] private int score = 0;
+    [HideInInspector] protected int score = 0;
     [HideInInspector] public int scoreIncrement = 50;
     [HideInInspector] public int penaltyRate = 2000;
-    [HideInInspector] private float penaltyTimer = 0;
+    [HideInInspector] protected float penaltyTimer = 0;
     [HideInInspector] public bool showScoring;
 
     // Handle the rendering of the target objects (default: always show)
@@ -69,16 +71,33 @@ public class NavigationTask : ExperimentTask
     // 4/27/2022 Added for Loop Closure Task
     public float allowContinueAfter = Mathf.Infinity; // flag to let participants press a button to continue without necessarily arriving
     public bool haptics;
-    private float clockwiseTravel = 0; // relative to the origin (0,0,0) in world space
+    protected float clockwiseTravel = 0; // relative to the origin (0,0,0) in world space
     public bool logStartEnd;
     private Vector3 startXYZ;
     private Vector3 endXYZ;
 
-    public override void startTask ()
-	{
-		TASK_START();
-		avatarLog.navLog = true;
+
+    //showing the time remaining on the navigation trials
+    public float timeRemaining = Mathf.Infinity;
+    // variable to reset timeRemaining variable after each navigation trial
+    public float defaultTimeRemaining;
+
+    //---///fixme: 10/30
+    protected Coroutine reportTimeCoroutine;
+    
+
+    public float GetStartTime()
+    {
+        return startTime;
+    }
+
+    
+    public override void startTask()
+    {
+        TASK_START();
+        avatarLog.navLog = true;
         if (isScaled) scaledAvatarLog.navLog = true;
+        LM_Progress.Instance.StartNavigationCoroutine(this);
     }
 
 	public override void TASK_START()
@@ -245,6 +264,9 @@ public class NavigationTask : ExperimentTask
         if (logStartEnd) startXYZ = avatar.GetComponent<LM_PlayerController>().collisionObject.transform.position;
             
         if (vrEnabled & haptics) SteamVR_Actions.default_Haptic.Execute(0f, 2.0f, 65f, 1f, SteamVR_Input_Sources.Any);
+        
+        LM_Progress.Instance.ResumeLastNavigationParameters(this);
+        
     }
 
     public override bool updateTask ()
@@ -505,6 +527,17 @@ public class NavigationTask : ExperimentTask
 			destinations.incrementCurrent();
 		}
         currentTarget = destinations.currentObject();
+        
+       
+        
+        
+        timeRemaining = 0f;
+        LM_Progress.Instance.StopReportingCoroutine(this);
+    }
+
+    public override bool OnControllerColliderHit(GameObject hit)
+    {
+        return false;
     }
 
 	public override bool OnControllerColliderHit(GameObject hit)
