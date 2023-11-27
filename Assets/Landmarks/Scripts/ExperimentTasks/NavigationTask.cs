@@ -5,6 +5,8 @@ using TMPro;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
 using System.Linq;
+using System;
+using Landmarks.Scripts.ExperimentTasks;
 using Landmarks.Scripts.Progress;
 
 public enum HideTargetOnStart
@@ -17,7 +19,7 @@ public enum HideTargetOnStart
     SetProbeTrial
 }
 
-public class NavigationTask : ExperimentTask
+public class NavigationTask : ExperimentTask, INavigationTask
 {
     [Header("Task-specific Properties")]
     public ObjectList destinations;
@@ -33,6 +35,8 @@ public class NavigationTask : ExperimentTask
     [Tooltip("Do we want time or distance remaining to be broadcast somewhere?")]
     public TextMeshProUGUI printRemainingTimeTo;
     protected string baseText;
+    
+    private float originalTimeAllotted;
 
     // Use a scoring/points system (not currently configured)
     [HideInInspector] protected int score = 0;
@@ -97,7 +101,7 @@ public class NavigationTask : ExperimentTask
         TASK_START();
         avatarLog.navLog = true;
         if (isScaled) scaledAvatarLog.navLog = true;
-        LM_Progress.Instance.StartNavigationCoroutine(this);
+        LM_Progress.Instance.StartNavigationReportingCoroutine(this);
     }
 
 	public override void TASK_START()
@@ -265,7 +269,8 @@ public class NavigationTask : ExperimentTask
             
         if (vrEnabled & haptics) SteamVR_Actions.default_Haptic.Execute(0f, 2.0f, 65f, 1f, SteamVR_Input_Sources.Any);
         
-        LM_Progress.Instance.ResumeLastNavigationParameters(this);
+        originalTimeAllotted = timeAllotted;
+        LM_Progress.Instance.ResumeLastNavigationTimer(this);
         
     }
 
@@ -396,9 +401,14 @@ public class NavigationTask : ExperimentTask
                 return true;
             }
         }
+    }
 
-		return false;
-	}
+    public override void endTask()
+    {
+        TASK_END();
+        timeAllotted = originalTimeAllotted;
+        //avatarController.handleInput = false;
+    }
 
 	public override void endTask()
 	{
@@ -532,28 +542,82 @@ public class NavigationTask : ExperimentTask
         
         
         timeRemaining = 0f;
-        LM_Progress.Instance.StopReportingCoroutine(this);
+        LM_Progress.Instance.StopNavigationReportingCoroutine(this);
     }
-
+    
     public override bool OnControllerColliderHit(GameObject hit)
     {
         return false;
     }
 
-	public override bool OnControllerColliderHit(GameObject hit)
-	{
-		if ((hit == currentTarget | hit.transform.parent.gameObject == currentTarget) & 
-            hideTargetOnStart != HideTargetOnStart.DisableCompletely & hideTargetOnStart != HideTargetOnStart.SetInactive)
-		{
-			if (showScoring)
-			{
-				score = score + scoreIncrement;
-				hud.setScore(score);
-			}
-			return true;
-		}
+    public IEnumerator UnmaskStartObjectFor() // handles the "showing and hiding" the starting target object itself
+    {
+        Debug.Log($"Attempting to find startfromtarget variable!");
+        var startFromTarget = manager.targetObjects.transform.Find(listOfNavStarts.currentObject().name).gameObject;
+        Debug.Log($"Found the startFromTarget Object {startFromTarget}!");
+        startFromTarget.SetActive(true);
 
-		return false;
-	}
+        foreach (var mr in startFromTarget.transform.GetComponentsInChildren<MeshRenderer>())
+        {
+            mr.gameObject.SetActive(true); // Start GO: ON
+            mr.enabled = true; // Start GO meshrenderer: ON
+        }
+        transform.Find(startFromTarget.name + "_mask").gameObject.SetActive(false); // Target Red sphere mask: OFF
+        yield return new WaitForSeconds(unmaskStartObjectFor);
+        foreach (var mr in startFromTarget.transform.GetComponentsInChildren<MeshRenderer>())
+        {
+            mr.gameObject.SetActive(false);  // Start GO: OFF
+            mr.enabled = false; // Start GO meshrenderer: OFF
+            // is this line causing the error??? On subsequent trials, we're UNABLE to get the meshrenderer component, which could be due to 2 reasons:
+            // 1. Starting Target Gameobject was set to false in the previous trial, and never reset
+            // 2. Starting Target Gameoobject's meshrenderer was set to false in the previous trial, and never reset
+        }
+        transform.Find(startFromTarget.name + "_mask").gameObject.SetActive(true); // Target Red sphere mask: ON
+        //END RESULT AFTER FIRST RUN-THRU:
+        //  To reset ->...
+        //  Starting GameObject: ACTIVE(.setActive(true))
+        //  Starting GameObject Meshrenderer: ENABLED (.enabled = true;)
+    }
+    public void ResetTimeRemaining()
+    {
+        timeRemaining = defaultTimeRemaining;
+        Debug.Log($"Time Remaining After ResetTimeRemaining: {timeRemaining}");
+    }
+
+    public Vector3 GetPlayerPosition()
+    {
+        return hud.transform.position;
+    }
+    
+    public Quaternion GetPlayerRotation()
+    {
+        return hud.transform.rotation;
+    }
+
+    public TaskList GetParentTask()
+    {
+        return parentTask;
+    }
+
+    public float GetTimeRemaining()
+    {
+        return timeRemaining;
+    }
+    
+    public void SetTimeAllotted(float time)
+    {
+        timeAllotted = time;
+    }
+
+    public void SetStartTime(float time)
+    {
+        startTime = time;
+    }
+    
+    public float GetTimeAllotted()
+    {
+        return timeAllotted;
+    }
+    
 }
 

@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using Landmarks.Scripts.Debugging;
+using Landmarks.Scripts.ExperimentTasks;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -115,61 +116,34 @@ namespace Landmarks.Scripts.Progress
             XmlNode.UpdateAttributes(currentSaveFile, node, dictionary);
         }
 
-        public void ResumeLastNavigationParameters(NavigationTask task)
+        // Task-specific methods
+        public void ResumeLastNavigationTimer(INavigationTask task)
         {
-            var parentNode = _currentSaveNode;
-            if (parentNode == null)
+            var nodeSearch = _taskNodeLookup.Where(p => p.Value.HasAttribute("timeRemaining")).ToList();
+            if (nodeSearch.Count == 1)
             {
-                LM_Debug.Instance.Log("No parent node found", 3);
-                return;
-            }
+                var node = nodeSearch[0].Value;
+                if (float.TryParse(node.GetAttribute("timeRemaining"), out var timeRemaining))
+                {
+                    task.SetTimeAllotted(timeRemaining);
+                }
 
-            if (!parentNode.HasAttribute("timeRemaining"))
+                // remove attributes
+                node.RemoveAttribute("timeRemaining");
+            }
+            else
             {
-                LM_Debug.Instance.Log("No time remaining attribute found", 3);
-                LM_Debug.Instance.Log("Current Node: " + parentNode.Name, 3);
-                LM_Debug.Instance.Log(parentNode.GetSomeAttributesToString(3), 3);
-                return;
+                LM_Debug.Instance.Log("Found " + nodeSearch.Count + " nodes with timeRemaining attribute", 3);
             }
-
-            var timeString = parentNode.GetAttribute("timeRemaining");
-            if (float.TryParse(timeString, out var time))
-            {
-                task.timeAllotted = time;
-                LM_Debug.Instance.Log("Set time remaining to " + time, 3);
-            }
-
-            parentNode.RemoveAttribute("timeRemaining");
+        }
+        
+        public bool CheckIfResumedNavigation()
+        {
+            var nodeSearch = _taskNodeLookup.Where(p => p.Value.HasAttribute("timeRemaining")).ToList();
+            return nodeSearch.Count == 0;
         }
 
-        public void ResumeLastExplorationTimer(TL_ExplorationTask_Select task)
-        {
-            var parentNode = _currentSaveNode;
-            if (parentNode == null)
-            {
-                LM_Debug.Instance.Log("No parent node found", 3);
-                return;
-            }
-
-            if (!parentNode.HasAttribute("timeRemaining"))
-            {
-                LM_Debug.Instance.Log("No time remaining attribute found", 3);
-                LM_Debug.Instance.Log("Current Node: " + parentNode.Name, 3);
-                LM_Debug.Instance.Log(parentNode.GetSomeAttributesToString(3), 3);
-                return;
-            }
-
-            var timeString = parentNode.GetAttribute("timeRemaining");
-            if (float.TryParse(timeString, out var time))
-            {
-                task.timeAllotted = time;
-                LM_Debug.Instance.Log("Set time remaining to " + time, 3);
-            }
-
-            parentNode.RemoveAttribute("timeRemaining");
-        }
-
-        public void ResumeLastExplorationPlayerPosition(Transform startTransform)
+        public void ResumeLastPlayerPositionToNavStart(Transform startTransform)
         {
             var nodeSearch = _taskNodeLookup.Where(p => p.Value.HasAttribute("x")).ToList();
             if (nodeSearch.Count == 1)
@@ -202,38 +176,22 @@ namespace Landmarks.Scripts.Progress
             }
         }
 
-        public void StartExplorationCoroutine(TL_ExplorationTask_Select task)
-        {
-            ReportingCoroutine = StartCoroutine(ExplorationUpdatingCoroutine(task));
-        }
-
-        public void StartNavigationCoroutine(NavigationTask task)
+        public void StartNavigationReportingCoroutine(INavigationTask task)
         {
             ReportingCoroutine = StartCoroutine(NavigationUpdatingCoroutine(task));
         }
 
-        public void StopReportingCoroutine(ExperimentTask task)
+        public void StopNavigationReportingCoroutine(INavigationTask task)
         {
             if (ReportingCoroutine == null) return;
 
             StopCoroutine(ReportingCoroutine);
-            UpdateAttributeAfterWritten(task.parentTask.taskNodeToBeWritten, "timeRemaining", "");
+            UpdateAttributeAfterWritten(task.GetParentTask().taskNodeToBeWritten, "timeRemaining", "");
         }
 
-        private IEnumerator NavigationUpdatingCoroutine(NavigationTask task)
+        private IEnumerator NavigationUpdatingCoroutine(INavigationTask task)
         {
-            var parentNode = task.parentTask.taskNodeToBeWritten;
-            while (true)
-            {
-                UpdateAttributeAfterWritten(parentNode, "timeRemaining",
-                    task.timeRemaining.ToString(CultureInfo.InvariantCulture));
-                yield return new WaitForSecondsRealtime(1f);
-            }
-        }
-
-        private IEnumerator ExplorationUpdatingCoroutine(TL_ExplorationTask_Select task)
-        {
-            var parentNode = task.parentTask.taskNodeToBeWritten;
+            var parentNode = task.GetParentTask().taskNodeToBeWritten;
             while (true)
             {
                 var avatarPosition = task.GetPlayerPosition();
@@ -241,7 +199,7 @@ namespace Landmarks.Scripts.Progress
 
                 var attributes = new Dictionary<string, string>
                 {
-                    {"timeRemaining", task.timeRemaining.ToString(CultureInfo.InvariantCulture)},
+                    {"timeRemaining", task.GetTimeRemaining().ToString(CultureInfo.InvariantCulture)},
                     {"x", avatarPosition.x.ToString(CultureInfo.InvariantCulture)},
                     {"y", avatarPosition.y.ToString(CultureInfo.InvariantCulture)},
                     {"z", avatarPosition.z.ToString(CultureInfo.InvariantCulture)},
@@ -255,33 +213,6 @@ namespace Landmarks.Scripts.Progress
                 yield return new WaitForSecondsRealtime(1f);
             }
         }
-
-        // public Vector3? GetLastPositionFromCurrentNode()
-        // {
-        //     var node = _currentSaveNode;
-        //     if (float.TryParse(node.GetAttribute("x"), out var x) &&
-        //         float.TryParse(node.GetAttribute("y"), out var y) && 
-        //         float.TryParse(node.GetAttribute("z"), out var z))
-        //     {
-        //         return new Vector3(x, y, z);
-        //     }
-        //
-        //     return null;
-        // }
-        //
-        // public Quaternion? GetLastRotationFromCurrentNode()
-        // {
-        //     var node = _currentSaveNode;
-        //     if (float.TryParse(node.GetAttribute("rx"), out var x) &&
-        //         float.TryParse(node.GetAttribute("ry"), out var y) &&
-        //         float.TryParse(node.GetAttribute("rz"), out var z) &&
-        //         float.TryParse(node.GetAttribute("rw"), out var w))
-        //     {
-        //         return new Quaternion(x, y, z, w);
-        //     }
-        //
-        //     return null;
-        // }
 
 
         //**************************************************************

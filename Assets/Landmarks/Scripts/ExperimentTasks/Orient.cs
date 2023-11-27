@@ -15,6 +15,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using Landmarks.Scripts.Progress;
 using UnityEngine;
 using UnityStandardAssets.Characters.FirstPerson;
 public class Orient: ExperimentTask
@@ -107,7 +108,15 @@ public class Orient: ExperimentTask
 
         // Set the HUD's position
         hud.transform.position = newHudPosition;
-        hud.setMessage($"Orient yourself in front of the {listOfNavStarts.currentObject().name}.\n\nWhen you are ready, face the target object, and \npress the trigger button to begin.");
+
+        if (!LM_Progress.Instance.CheckIfResumedNavigation())
+        {
+            hud.setMessage($"Orient yourself in front of the {listOfNavStarts.currentObject().name}.\n\nWhen you are ready, face the target object, and \npress the trigger button to begin.");
+        }
+        else
+        {
+            hud.setMessage($"Orient yourself to the direction of the footprint.\n\nWhen you are ready, press the trigger button to continue.");
+        }
         oriented = false;
         //formattedQuestion = string.Format(orientText.ToString(), target.name); // prepare to present the question
         //hud.SecondsToShow = 999999;

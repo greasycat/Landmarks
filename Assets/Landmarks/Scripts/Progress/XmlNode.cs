@@ -213,7 +213,7 @@ namespace Landmarks.Scripts.Progress
             parent.SetAttributes(attributes);
         }
 
-        public static XmlNode ParseFromLines(List<string> lines, Dictionary<string, XmlNode> lookup = null, string key = null)
+        public static XmlNode ParseFromLines(List<string> lines, Dictionary<string, XmlNode> lookup = null, string keyToLookup = null)
         {
             if (lines.Count == 0) return new XmlNode("NA");
 
@@ -242,9 +242,13 @@ namespace Landmarks.Scripts.Progress
 
                     // parse the tag
                     ParseFromLine(tagLine, ref parent);
-                    
-                    if (!string.IsNullOrEmpty(key) && lookup != null)
-                        lookup.Add(parent.GetAttribute(key), parent);
+
+                    if (!string.IsNullOrEmpty(keyToLookup) && lookup != null)
+                    {
+                        var key = parent.GetAttribute(keyToLookup);
+                        if (!lookup.ContainsKey(key))
+                            lookup.Add(parent.GetAttribute(keyToLookup), parent);
+                    }
                 }
                 else if (closingTag.Success)
                 {

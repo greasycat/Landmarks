@@ -16,6 +16,7 @@
 
 using UnityEngine;
 using System.Collections;
+using Landmarks.Scripts.Progress;
 
 public class MoveObject : ExperimentTask {
 
@@ -54,37 +55,44 @@ public class MoveObject : ExperimentTask {
 		if (useLocalRotation) rotation = start.transform.localRotation;
         else rotation = start.transform.rotation;
 
-		
-			start.transform.position = destination.transform.position;
-			log.log("TASK_ROTATE\t" + start.name + "\t" + this.GetType().Name + "\t" + start.transform.localEulerAngles.ToString("f1"),1);
 
-			if (useLocalRotation) start.transform.localRotation = destination.transform.localRotation;
-			else start.transform.rotation = destination.transform.rotation;
-			log.log("TASK_POSITION\t" + start.name + "\t" + this.GetType().Name + "\t" + start.transform.transform.position.ToString("f1"),1);
-		
-		if (swap) {
-			destination.transform.position = position;
-			if (useLocalRotation) destination.transform.localRotation = rotation;
-			else destination.transform.rotation = rotation;
-		}
-	}
-	
-	public override bool updateTask () {
-	    return true;
-	}
-	public override void endTask() {
-		TASK_END();
-	}
-	
-	public override void TASK_END() {
-		base.endTask();
-		
-		if ( destinations ) {
-			if (canIncrementLists)
-			{
-				destinations.incrementCurrent();
-				destination = destinations.currentObject();
-			}
-		}
-	}
+        start.transform.position = destination.transform.position;
+        log.log("TASK_ROTATE\t" + start.name + "\t" + this.GetType().Name + "\t" + start.transform.localEulerAngles.ToString("f1"), 1);
+
+        if (useLocalRotation) start.transform.localRotation = destination.transform.localRotation;
+        else start.transform.rotation = destination.transform.rotation;
+        log.log("TASK_POSITION\t" + start.name + "\t" + this.GetType().Name + "\t" + start.transform.transform.position.ToString("f1"), 1);
+        
+        LM_Progress.Instance.ResumeLastPlayerPositionToNavStart(start.transform);
+
+        if (swap)
+        {
+            destination.transform.position = position;
+            if (useLocalRotation) destination.transform.localRotation = rotation;
+            else destination.transform.rotation = rotation;
+        }
+    }
+
+    public override bool updateTask()
+    {
+        return true;
+    }
+    public override void endTask()
+    {
+        TASK_END();
+    }
+
+    public override void TASK_END()
+    {
+        base.endTask();
+
+        if (destinations)
+        {
+            if (canIncrementLists)
+            {
+                destinations.incrementCurrent();
+                destination = destinations.currentObject();
+            }
+        }
+    }
 }
