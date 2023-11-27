@@ -14,21 +14,28 @@ namespace Landmarks.Scripts.Progress
 
         public XmlNode Parent { get; private set; }
         private readonly List<XmlNode> _children = new List<XmlNode>();
-        public string Tag { get; set; }
+        // public string Tag { get; set; }
 
         private Dictionary<string, string> _attributes;
+        
+        public string TagName { set; get; }
 
-        public string Name => GetAttribute("name");
-
-        private XmlNode(string tag)
+        public string Name
         {
-            Tag = tag;
+            get => GetAttribute("name");
+            set => SetAttribute("name", value);
+        }
+        
+
+        private XmlNode(string tagName)
+        {
+            TagName = tagName;
             _attributes = new Dictionary<string, string>();
         }
 
-        public XmlNode(string tag, Dictionary<string, string> attributes)
+        public XmlNode(string tagName, Dictionary<string, string> attributes)
         {
-            Tag = tag;
+            TagName = tagName;
             _attributes = attributes;
         }
 
@@ -124,6 +131,7 @@ namespace Landmarks.Scripts.Progress
 
         private void SetAttribute(string key, string value)
         {
+            if (_attributes == null) _attributes = new Dictionary<string, string>();
             _attributes[key] = value;
         }
 
@@ -132,7 +140,7 @@ namespace Landmarks.Scripts.Progress
             _attributes = attributes;
         }
 
-        private bool HasAttribute(string key)
+        public bool HasAttribute(string key)
         {
             return _attributes.ContainsKey(key);
         }
@@ -140,6 +148,14 @@ namespace Landmarks.Scripts.Progress
         public bool HasAttributeEqualTo(string key, string value)
         {
             return HasAttribute(key) && GetAttribute(key) == value;
+        }
+        
+        public void RemoveAttribute(string key)
+        {
+            if (_attributes.ContainsKey(key))
+            {
+                _attributes.Remove(key);
+            }
         }
 
         private List<KeyValuePair<string, string>> AttributesToList()
@@ -162,14 +178,14 @@ namespace Landmarks.Scripts.Progress
             return AttributesToList().GetRange(0, num);
         }
 
-        private string GetSomeAttributesToString(int num)
+        public string GetSomeAttributesToString(int num)
         {
             return GetSomeAttributes(num).Aggregate("", (current, pair) => current + $"{pair.Key}={pair.Value} ");
         }
 
         public string HierarchyToString(int depth)
         {
-            var str = new string(' ', depth * 4) + $"{Tag} {GetSomeAttributesToString(3)}\n";
+            var str = new string(' ', depth * 4) + $"{Name} {GetSomeAttributesToString(3)}\n";
             return _children.Aggregate(str, (current, child) => current + child.HierarchyToString(depth + 1));
         }
 
@@ -193,11 +209,11 @@ namespace Landmarks.Scripts.Progress
                 attributes[key] = value;
             }
 
-            parent.Tag = tagName;
+            // parent.Tag = tagName;
             parent.SetAttributes(attributes);
         }
 
-        public static XmlNode ParseFromLines(List<string> lines)
+        public static XmlNode ParseFromLines(List<string> lines, Dictionary<string, XmlNode> lookup = null, string key = null)
         {
             if (lines.Count == 0) return new XmlNode("NA");
 
@@ -216,7 +232,7 @@ namespace Landmarks.Scripts.Progress
                 if (openingTag.Success)
                 {
                     // if it's an opening tag, create a new node and add it to the parent
-                    var newChild = new XmlNode("")
+                    var newChild = new XmlNode("new")
                     {
                         Parent = parent
                     };
@@ -226,6 +242,9 @@ namespace Landmarks.Scripts.Progress
 
                     // parse the tag
                     ParseFromLine(tagLine, ref parent);
+                    
+                    if (!string.IsNullOrEmpty(key) && lookup != null)
+                        lookup.Add(parent.GetAttribute(key), parent);
                 }
                 else if (closingTag.Success)
                 {
@@ -245,46 +264,19 @@ namespace Landmarks.Scripts.Progress
          * Helper Methods
          * *********************************************************************/
 
-        // public string ToOpeningString(int depth)
-        // {
-        //     var str = "";
-        //     for (var i = 0; i < depth; ++i)
-        //     {
-        //         str += "\t";
-        //     }
-        //
-        //     str += $"<{ReplaceSpaceWithUnderscore(Tag)}";
-        //     str = _attributes.Aggregate(str,
-        //         (current, attribute) => current + $" {attribute.Key}=\"{attribute.Value}\"");
-        //     str += ">";
-        //     return str;
-        // }
-        //
-        // public string ToClosingString()
-        // {
-        //     return $"</{ReplaceSpaceWithUnderscore(Tag)}>";
-        // }
-
         public static string BuildOpeningString(string tagName, Dictionary<string, string> attributes, int depth)
         {
-            var str = "";
-            for (var i = 0; i < depth; ++i)
-            {
-                str += "\t";
-            }
+            var indent = new string(' ', depth*4);
+            var attributeString = string.Join(" ", attributes.Select(attr => $"{attr.Key}=\"{attr.Value}\""));
 
-            str += $"<{tagName}";
-            str = attributes.Aggregate(str,
-                (current, attribute) => current + $" {attribute.Key}=\"{attribute.Value}\"");
-            str += ">";
-            return str;
+            return $"{indent}<{tagName} {attributeString}>";
         }
+
 
         public static string BuildOpeningString(XmlNode node)
         {
             var depth = int.Parse(node.GetAttribute("depth"));
-            LM_Debug.Instance.LogError(depth);
-            return BuildOpeningString(node.Tag, node._attributes, depth);
+            return BuildOpeningString(node.TagName, node._attributes, depth);
         }
 
         public static string BuildClosingString(string tagName, int depth)
@@ -294,26 +286,45 @@ namespace Landmarks.Scripts.Progress
 
         private static string IndentText(string text, int depth)
         {
-            var indent = "";
-            for (var i = 0; i < depth; i++)
-            {
-                indent += "\t";
-            }
-
-            return indent + text;
+            return new string(' ', depth*4) + text;
         }
 
-        private static void UpdateAttribute(string file, XmlNode node, string key, string value)
+        public static void UpdateAttribute(string file, XmlNode node, string key, string value)
         {
             var lines = File.ReadAllLines(file).ToList();
             try
             {
                 var lineNumber = int.Parse(node.GetAttribute("line"));
-                var depth = int.Parse(node.GetAttribute("depth"));
-                var originalLine = lines[lineNumber];
+                var originalLine = lines[lineNumber-1];
                 ParseFromLine(originalLine, ref node);
                 node.SetAttribute(key, value);
-                lines[lineNumber] = BuildOpeningString(node);
+                var newLine = BuildOpeningString(node);
+                lines[lineNumber-1] = newLine;
+                File.WriteAllLines(file, lines);
+            }
+            catch (Exception e)
+            {
+                // ignored
+                LM_Debug.Instance.LogError("Fail to update attribute");
+            }
+        }
+        
+        public static void UpdateAttributes(string file, XmlNode node, Dictionary<string, string> attributes)
+        {
+            var lines = File.ReadAllLines(file).ToList();
+            try
+            {
+                var lineNumber = int.Parse(node.GetAttribute("line"));
+                var originalLine = lines[lineNumber-1];
+                ParseFromLine(originalLine, ref node);
+                
+                foreach (var pair in attributes)
+                {
+                    node.SetAttribute(pair.Key, pair.Value);
+                }
+                
+                var newLine = BuildOpeningString(node);
+                lines[lineNumber-1] = newLine;
                 File.WriteAllLines(file, lines);
             }
             catch (Exception e)
