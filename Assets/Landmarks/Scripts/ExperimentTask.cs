@@ -77,7 +77,8 @@ public class ExperimentTask : MonoBehaviour{
     public bool triggerOnEnd; // mark a unique trigger at TASK_END
     private BrainAmpManager eegManager;
 
-    public XmlNode taskNode; // The XML node assigned to this object
+    public XmlNode taskNodeLoaded; // The XML node assigned to this object
+    public XmlNode taskNodeToBeWritten; // The XML node assigned to this object
 
 
     public void Awake ()
