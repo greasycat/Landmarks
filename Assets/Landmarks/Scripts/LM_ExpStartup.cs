@@ -210,6 +210,16 @@ public class LM_ExpStartup : MonoBehaviour
         return "";
     }
 
+    public bool ValidateStudyCode()
+    {
+        var text = guiElements.studyCodes.options[guiElements.studyCodes.value].text;
+        if (!string.IsNullOrEmpty(text) && text != "[Experiment Config]") return true;
+        
+        Debug.LogWarning("Study code incorrect");
+        return false;
+
+    }
+
     public void ValidateSubjectID()
     {
         Debug.Log("checking the subject id");

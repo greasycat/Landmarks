@@ -109,13 +109,13 @@ public class Orient: ExperimentTask
         // Set the HUD's position
         hud.transform.position = newHudPosition;
 
-        if (!LM_Progress.Instance.CheckIfResumedNavigation())
+        if (LM_Progress.Instance.CheckIfResumeNavigation())
         {
-            hud.setMessage($"Orient yourself in front of the {listOfNavStarts.currentObject().name}.\n\nWhen you are ready, face the target object, and \npress the trigger button to begin.");
+            hud.setMessage($"Orient yourself to the direction at the crashing moment \n\nWhen you are ready, press the trigger button to continue.");
         }
         else
         {
-            hud.setMessage($"Orient yourself to the direction of the footprint.\n\nWhen you are ready, press the trigger button to continue.");
+            hud.setMessage($"Orient yourself in front of the {listOfNavStarts.currentObject().name}.\n\nWhen you are ready, face the target object, and \npress the trigger button to begin.");
         }
         oriented = false;
         //formattedQuestion = string.Format(orientText.ToString(), target.name); // prepare to present the question

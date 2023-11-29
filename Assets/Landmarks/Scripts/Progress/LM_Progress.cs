@@ -43,6 +43,14 @@ namespace Landmarks.Scripts.Progress
 
         private Coroutine ReportingCoroutine { get; set; }
 
+        private ResumeOptions _resumeOption;
+        
+        public enum ResumeOptions
+        {
+            LastTrialFromStart = 0, 
+            LastTrialFromProgress = 1,
+            SkipTrial = 2,
+        }
 
         //**************************************************************
         // Initialize singleton instance
@@ -88,6 +96,11 @@ namespace Landmarks.Scripts.Progress
         {
             resumeLastSave = false;
         }
+        
+        public void SetResumeOption(ResumeOptions option)
+        {
+            _resumeOption = option;
+        }
 
         //**************************************************************
         // Attribute-related methods
@@ -119,6 +132,9 @@ namespace Landmarks.Scripts.Progress
         // Task-specific methods
         public void ResumeLastNavigationTimer(INavigationTask task)
         {
+            if (_resumeOption != ResumeOptions.LastTrialFromProgress)
+                return;
+            
             var nodeSearch = _taskNodeLookup.Where(p => p.Value.HasAttribute("timeRemaining")).ToList();
             if (nodeSearch.Count == 1)
             {
@@ -137,14 +153,19 @@ namespace Landmarks.Scripts.Progress
             }
         }
         
-        public bool CheckIfResumedNavigation()
+        public bool CheckIfResumeNavigation()
         {
+            if (_resumeOption != ResumeOptions.LastTrialFromProgress)
+                return false;
             var nodeSearch = _taskNodeLookup.Where(p => p.Value.HasAttribute("timeRemaining")).ToList();
-            return nodeSearch.Count == 0;
+            return nodeSearch.Count != 0;
         }
 
         public void ResumeLastPlayerPositionToNavStart(Transform startTransform)
         {
+            if (_resumeOption != ResumeOptions.LastTrialFromProgress)
+                return;
+            
             var nodeSearch = _taskNodeLookup.Where(p => p.Value.HasAttribute("x")).ToList();
             if (nodeSearch.Count == 1)
             {
@@ -162,7 +183,7 @@ namespace Landmarks.Scripts.Progress
                     float.TryParse(node.GetAttribute("rw"), out var rw))
                 {
                     var rotation = new Quaternion(rx, ry, rz, rw);
-                    // rotate on y axis by -90 degrees
+                    // rotate on y axis by -90 degrees to match the local rotation of the footprint
                     rotation *= Quaternion.Euler(0, -90, 0);
                     startTransform.rotation = rotation;
                 }
@@ -356,6 +377,11 @@ namespace Landmarks.Scripts.Progress
                     if (int.TryParse(_currentSaveNode.GetAttribute("numCompletedTrials"), out var lastResumedNumber))
                     {
                         numCompletedTrials += lastResumedNumber;
+                    }
+                    
+                    if (ResumeOptions.SkipTrial == _resumeOption)
+                    {
+                        numCompletedTrials += 1;
                     }
 
                     LM_Debug.Instance.Log($"Number of completed trials: {numCompletedTrials}", 10);

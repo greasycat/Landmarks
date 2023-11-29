@@ -1,6 +1,8 @@
 ﻿using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
 using Landmarks.Scripts.Debugging;
+using TMPro;
 using UnityEngine;
 
 namespace Landmarks.Scripts.Progress.UI
@@ -10,6 +12,8 @@ namespace Landmarks.Scripts.Progress.UI
         private ListSelect _listSelect;
         private LM_ExpStartup _expStartup;
         private LM_Progress _progress;
+        [SerializeField] private TMP_Dropdown dropdown;
+
 
         private void Start()
         {
@@ -40,6 +44,11 @@ namespace Landmarks.Scripts.Progress.UI
             if (File.GetAttributes(text).HasFlag(FileAttributes.Directory))
                 HandleFolder(text);
         }
+        
+        private LM_Progress.ResumeOptions GetDropdownSelection()
+        {
+            return (LM_Progress.ResumeOptions) dropdown.value;
+        }
 
         private void HandleFile(string path)
         {
@@ -49,12 +58,14 @@ namespace Landmarks.Scripts.Progress.UI
                 _listSelect.Hide();
                 return;
             }
-
+            
+            if (!_expStartup.ValidateStudyCode()) return;
             _expStartup.ExtraInitCallback = () =>
             {
                 _progress.SetSavingFolderPath(folder);
                 _progress.EnableResuming();
                 _progress.InitializeSave(path);
+                _progress.SetResumeOption(GetDropdownSelection());
             };
             _expStartup.OnStartButtonClicked();
         }
