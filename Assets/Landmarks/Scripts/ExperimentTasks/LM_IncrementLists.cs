@@ -42,9 +42,14 @@ public class LM_IncrementLists : ExperimentTask
         }
 
         // WRITE TASK STARTUP CODE HERE
+        Increment();
+    }
+
+    public void Increment(int increment = 1)
+    {
         foreach (var list in lists)
         {
-            list.incrementCurrent();
+            list.incrementCurrent(increment);
         }
     }
 

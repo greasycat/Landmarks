@@ -14,14 +14,19 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+using System;
 using UnityEngine;
 using System.Collections;
 using System.Reflection;
+using Landmarks.Scripts;
+using Landmarks.Scripts.Progress;
 using UnityEngine.UI;
 using Valve.VR;
 using UnityEditor;
 
 public class ExperimentTask : MonoBehaviour{
+    // TL Comments: "Protected" keyword: means it can be accessed within the class itself and within any derived classes that inherit from the base class.
+	// Essentially, protected (dBlog log) means: that, any classes derived from ExperimentTask, can access these variables
 
 	protected GameObject avatar;
 	protected HUD hud;
@@ -29,18 +34,19 @@ public class ExperimentTask : MonoBehaviour{
 	protected dbLog log;
 	protected Experiment manager;
 	protected avatarLog avatarLog;
-	
+
     protected GameObject scaledAvatar; // MJS 2019 - track scaled avatar in scaled nav task
     protected avatarLog scaledAvatarLog; // MJS 2019 - track scaled avatar in scaled nav task
-    
+
 	protected long task_start;
 
     protected SteamVR_Input_ActionSet_landmarks vrInput;
 
     protected ArrayList trialHeader;
     protected ArrayList trialData;
-	
+
 	public bool skip = false;
+	public bool skipIfResume = false;
 	public bool canIncrementLists = true;
 
 	public int interval = 0;
@@ -71,24 +77,26 @@ public class ExperimentTask : MonoBehaviour{
     public bool triggerOnEnd; // mark a unique trigger at TASK_END
     private BrainAmpManager eegManager;
 
+    public XmlNode taskNodeLoaded; // The XML node assigned to this object
+    public XmlNode taskNodeToBeWritten; // The XML node assigned to this object
 
-    public void Awake () 
+
+    public void Awake ()
 	{
 		// Look for a BrainAmp EEG manager in the eperiment
         eegManager = FindObjectOfType<BrainAmpManager>();
 	}
 
-	public void Start () 
+	public void Start ()
     {
-
 	}
 	
 	public virtual void startTask() {
 		avatar = GameObject.FindWithTag ("Player");
 		avatarLog = avatar.GetComponentInChildren<avatarLog>() as avatarLog; //jdstokes 2015
-		hud = avatar.GetComponent("HUD") as HUD;
+		hud = avatar.GetComponent<HUD>();
 		experiment = GameObject.FindWithTag ("Experiment");
-		manager = experiment.GetComponent("Experiment") as Experiment;
+		manager = experiment.GetComponent<Experiment>();
 		firstPersonCamera = manager.playerCamera;
 		overheadCamera = manager.overheadCamera;
         log = manager.dblog;
@@ -99,7 +107,7 @@ public class ExperimentTask : MonoBehaviour{
 
         // Grab the scaled nav task/player and log it - MJS 2019
         scaledAvatar = manager.scaledPlayer;
-        scaledAvatarLog = scaledAvatar.GetComponent("avatarLog") as avatarLog;
+        scaledAvatarLog = scaledAvatar.GetComponent<avatarLog>();
 
         //debugButton = hud.debugButton.GetComponent<Button>();
         actionButton = hud.actionButton.GetComponent<Button>();
@@ -115,7 +123,7 @@ public class ExperimentTask : MonoBehaviour{
 		ResetHud();
 		hud.ForceShowMessage ();
 		//currentInterrupt = 0;        Not here since after an interuupt we will restart
-		
+
 		log.log("TASK_START\t" + name + "\t" + this.GetType().Name,1 );
 
         if (eegManager != null & triggerOnStart)
@@ -130,34 +138,34 @@ public class ExperimentTask : MonoBehaviour{
             eegManager.EEGTrigger(startLabel);
             log.log("EEG_TRIGGER\tName\t" + startLabel + "\tValue\t" + eegManager.triggers[startLabel].ToString(), 1);
         }
-    }
-	
+
+
+        LM_Progress.Instance.RecordTaskStart(this);
+	}
+
 	public virtual void TASK_START () {
+	}
 
-	}	
-	
-	public virtual bool updateTask () {
+	public virtual bool updateTask ()
+	{
+		if (skip) return true;
 
-		bool attemptInterupt = false;
-		
-		if ( interruptInterval > 0 && Experiment.Now() - task_start >= interruptInterval)  {
-	        attemptInterupt = true;
-	    }
-	    
+		bool attemptInterupt = interruptInterval > 0 && Experiment.Now() - task_start >= interruptInterval;
+
 		if( Input.GetButtonDown ("Compass") ) {
-			attemptInterupt = true;	
-		}    
-	    
-		if(attemptInterupt && interruptTasks && currentInterrupt < repeatInterrupts && !interruptTasks.skip) 
-		{	
+			attemptInterupt = true;
+		}
+
+		if(attemptInterupt && interruptTasks && currentInterrupt < repeatInterrupts && !interruptTasks.skip)
+		{
 			if (interruptTasks.skip) {
 				log.log("INFO	skip interrupt	" + interruptTasks.name,1 );
-			} 
-			else 
+			}
+			else
 			{
 				Debug.Log(currentInterrupt);
-	    		Debug.Log(repeatInterrupts);
-	    
+				Debug.Log(repeatInterrupts);
+
 				log.log("INPUT_EVENT	interrupt	" + name,1 );
 				//interruptTasks.pausedTasks = this;
 				parentTask.pausedTasks = this;
@@ -166,12 +174,12 @@ public class ExperimentTask : MonoBehaviour{
 				currentInterrupt = currentInterrupt + 1;
 				interruptTasks.startTask();
 				parentTask.currentTask = interruptTasks;
-	
+
 			}
 		}
 
 
-		
+
 		return false;
 	}
 
@@ -196,12 +204,13 @@ public class ExperimentTask : MonoBehaviour{
 		currentInterrupt = 0;    //put here because of interrupts
 		log.log("TASK_END\t" + name + "\t" + this.GetType().Name + "\t" + duration,1 );
         hud.showNothing();
+
+		LM_Progress.Instance.RecordTaskEnd(this);
 	}
 
 
 	public virtual void TASK_END ()
     {
-
 	}
 
 
@@ -240,7 +249,7 @@ public class ExperimentTask : MonoBehaviour{
 
 	}
 
-	
+
 	public virtual string currentString()
     {
 		return "";
@@ -272,7 +281,7 @@ public class ExperimentTask : MonoBehaviour{
 	}
 
 
-    public bool KillCurrent () 
+    public bool KillCurrent ()
 	{
 		killCurrent = false;
 		Debug.Log ("ForceKilling " + this.name);
@@ -287,8 +296,8 @@ public class ExperimentTask : MonoBehaviour{
 		the parent object of the player controller (tagged "Player at runtime") must have
 		the HUD position AND rotation updated.*/
 		var cam = avatar.GetComponent<LM_PlayerController>().cam.transform;
-		hud.hudRig.transform.localPosition = new Vector3(cam.localPosition.x, 
-														 hud.hudRig.transform.localPosition.y, 
+		hud.hudRig.transform.localPosition = new Vector3(cam.localPosition.x,
+														 hud.hudRig.transform.localPosition.y,
 														 cam.localPosition.z);
 		hud.hudRig.transform.localEulerAngles = new Vector3(0f, cam.localEulerAngles.y, 0f);
 	}
@@ -317,7 +326,7 @@ public class ExperimentTask : MonoBehaviour{
 		return (Mathf.Sqrt(Mathf.Pow(Mathf.Abs(v1.x - v2.x), 2f) + Mathf.Pow(Mathf.Abs(v1.z - v2.z), 2f)));
 	}
 
-	public float Vector3Angle2D(Vector3 v1, Vector3 v2) 
+	public float Vector3Angle2D(Vector3 v1, Vector3 v2)
 	{
 		return Vector2.SignedAngle(new Vector2(v1.x, v1.z), new Vector2(v2.x, v2.z));
 	}

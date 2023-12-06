@@ -98,9 +98,7 @@ public class LM_TargetColorAssignments : ExperimentTask
         for (int i = targetChildren.Length - 1; i > 0; i--)
         {
             var r = Random.Range(0, i);
-            var tmp = targetChildren[i];
-            targetChildren[i] = targetChildren[r];
-            targetChildren[r] = tmp;
+            (targetChildren[i], targetChildren[r]) = (targetChildren[r], targetChildren[i]);
         }
         
         switch (colorSpace)
@@ -216,11 +214,14 @@ public class LM_TargetColorAssignments : ExperimentTask
                 Debug.LogWarning("defaulting to LAB colorspace");
                 goto case ColorSpace.CIELAB;
         }
+        
+        Debug.Log("Task " + name + " started");
     }
 
 
     public override bool updateTask()
     {
+        Debug.Log("Task " + name + " updated");
         return true;
 
         // WRITE TASK UPDATE CODE HERE

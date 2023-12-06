@@ -25,6 +25,7 @@ public class LM_TaskLog : MonoBehaviour
     // Manage trialData values
     public virtual void AddData(string key, string value)
     {
+        if (trialData.ContainsKey(key)) return;
         trialData.Add(key, value);
         hopper.Add(key);
     }

@@ -16,6 +16,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using Landmarks.Scripts.Progress;
 
 
 public class LM_PermutedList : ExperimentTask
@@ -43,7 +44,7 @@ public class LM_PermutedList : ExperimentTask
     public override void TASK_START()
     {
         if (!manager) Start();
-        base.startTask();
+
 
         // Deal with the kind of list we are using
         if (inputLists.Length == 1)
@@ -85,7 +86,32 @@ public class LM_PermutedList : ExperimentTask
             permutedList = SortForLinking(permutedList);
             Debug.Log("Linked list contains " + permutedList.Count + "sets");
         }
+        
+        // Refer progress from Singleton if null
+        if (progress == null)
+            progress = LM_Progress.Instance;
+        
+        // Get permutedList
+        // var permutedListJson = progress.GetCurrentNodeAttribute("permutedList");
+        // if (permutedListJson != null)
+        // {
+        //     permutedList = SerializationHelper.DeserializeGameObjectList(permutedListJson, SerializationHelper.ConvertToDictionary(listToPermute.objects));
+        // }
+        //
+        // // Get subset
+        // var subsetString = progress.GetCurrentNodeAttribute("subset");
+        // if (subsetString != null)
+        // {
+        //     subset = int.Parse(subsetString);
+        // }
+        //
+        // var serializedList = SerializationHelper.SerializeGameObjectList(permutedList);
+        // Debug.Log($"Original Count {permutedList.Count} Serialized list: {serializedList}");
+        // progress.AddAttributeAhead("permutedList", serializedList);
+        // progress.AddAttributeAhead("subset", subset.ToString());
 
+        base.startTask(); //relocated to ensure the attribute queue is populated before the task starts
+        
         for (int i = 0; i < subset; i++)
         {
             var ol = new GameObject();

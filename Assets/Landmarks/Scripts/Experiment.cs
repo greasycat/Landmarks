@@ -13,7 +13,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+/// this is the "broken" experiment.cs file after merging with update-221110
 using UnityEngine;
 using System.Collections;
 using System.IO;
@@ -54,7 +54,7 @@ public class Experiment : MonoBehaviour
     public UserInterface userInterface = UserInterface.KeyboardMouse;
     public GameObject targetObjects;
     // public bool debugging = false;
-    
+
     [HideInInspector]
     public TaskList tasks;
     [HideInInspector]
@@ -75,6 +75,7 @@ public class Experiment : MonoBehaviour
     public bool usingVR;
     [HideInInspector]
     public dbLog dblog;
+    // TL Comments: dblog.log is ONLY CALLED IN EXPERIMENT.CS for logging! Every other time "logging" occurs, it is referred to as log.log.
     [HideInInspector]
     public long playback_time;
     //[HideInInspector]
@@ -123,6 +124,7 @@ public class Experiment : MonoBehaviour
 
         // trialLogger = new LM_TrialLog();
         dblog = new dbLog();
+
 
         // check if we have any old Landmarks instances from LoadScene.cs and handle them
         GameObject oldInstance = GameObject.Find("OldInstance");
@@ -324,7 +326,6 @@ public class Experiment : MonoBehaviour
         //           "\tSTART_SCENE\t" + config.levelNames[config.levelNumber] + "\tSTART_CONDITION:\t" + config.conditions[config.levelNumber] + "\tUI:\t" + userInterface.ToString(), 1);
     }
 
-
     void Start()
     {
         gameObject.GetComponent<Experiment>().enabled = true;
@@ -377,6 +378,7 @@ public class Experiment : MonoBehaviour
                 }
 
                 done = tasks.updateTask();
+                
 
                 // THIS IS WHERE THE EXPERIMENT GET'S SHUT DOWN
                 if (done)
@@ -390,6 +392,7 @@ public class Experiment : MonoBehaviour
                 updatePlayback();
             }
         }
+
     }
 
 
@@ -681,7 +684,7 @@ public class Experiment : MonoBehaviour
         // close the logfile
         dblog.close();
 
-        
+
 
         // ---------------------------------------------------------------------
         // Generate a clean .csv file for each task in the experiment
@@ -721,7 +724,6 @@ public class Experiment : MonoBehaviour
                 foreach (Match nameMatch in nameMatches)
                 {
                     GroupCollection nameGroups = nameMatch.Groups;
-                    Debug.Log(nameGroups[1].Value);
                     filename = nameGroups[1].Value;
                 }
                 //filename = "task_" + taskCount;
@@ -773,10 +775,7 @@ public class Experiment : MonoBehaviour
         // Shut down any LM_TaskLogs
         foreach (var log in FindObjectsOfType<LM_TaskLog>())
         {
-            if (log.output != null)
-            {
-            log.output.Close();
-            }
+            log.output?.Close();
         }
 
 
@@ -792,7 +791,7 @@ public class Experiment : MonoBehaviour
             else
             {
                 Debug.Log("trying to use MICROSOFT AZURE");
-                await azureStorage.BasicStorageBlockBlobOperationsAsync();
+                // await azureStorage.BasicStorageBlockBlobOperationsAsync();
             }
         }
 
@@ -800,6 +799,8 @@ public class Experiment : MonoBehaviour
         // ---------------------------------------------------------------------
         // Load the next level/scene/condition or quit
         // ---------------------------------------------------------------------
+        Destroy(GameObject.Find("UnusedTargets"));
+        Destroy(GameObject.Find("UsedTargets"));
 
         // Save scene order/data in the config
         //config.Save();
@@ -814,13 +815,16 @@ public class Experiment : MonoBehaviour
             {
                 // Use steam functions to avoid issues w/ framerate drop
                 SteamVR_LoadLevel.Begin(config.levelNames[config.levelNumber]);
-                
+
                 Destroy(transform.parent.gameObject);
                 Debug.Log("Loading new VR scene");
             }
             else
             {
-                SceneManager.LoadSceneAsync(config.levelNames[config.levelNumber]); 
+                // SceneManager.LoadSceneAsync(config.levelNames[config.levelNumber]);
+                
+                Debug.Log("Loading new scene " + config.levelNames[config.levelNumber]);
+                SceneManager.LoadScene(config.levelNames[config.levelNumber]);
                 Destroy(transform.parent.gameObject);
                 // otherwise, just load the level like usual
             }
