@@ -7,6 +7,8 @@ using Valve.VR.InteractionSystem;
 using UnityStandardAssets.Vehicles.Ball;
 using static UnityEngine.GraphicsBuffer;
 using System.Linq;
+using Landmarks.Scripts.ExperimentTasks;
+using Landmarks.Scripts.Progress;
 
 public enum HideTargetOnStart_Exploration
 {
@@ -18,7 +20,7 @@ public enum HideTargetOnStart_Exploration
     SetProbeTrial
 }
 
-public class ExplorationTask : ExperimentTask
+public class ExplorationTask : ExperimentTask, INavigationTask
 {
     [Header("Task-specific Properties")]
     public ObjectList destinations;
@@ -82,6 +84,8 @@ public class ExplorationTask : ExperimentTask
     public bool logStartEnd;
     private Vector3 startXYZ;
     private Vector3 endXYZ;
+    
+    
 
     ////For target object bobbing animation
     //public bool targetObjectBobbingAnimation; //checkbox - should be ticked during exploration, not during navigation 
@@ -105,6 +109,13 @@ public class ExplorationTask : ExperimentTask
     private List<GameObject> walls2 = new List<GameObject>();
     public Vector2 playerWallSumAndMeasurements;
 
+    // Resume
+    
+    // variable to reset timeRemaining variable after each navigation trial
+    public float defaultTimeRemaining;
+    // private float originalTimeAllotted;
+    private Coroutine reportTimeCoroutine;
+    
     public float GetStartTime()
     {
         return startTime;
@@ -114,6 +125,8 @@ public class ExplorationTask : ExperimentTask
         TASK_START();
         avatarLog.navLog = true;
         if (isScaled) scaledAvatarLog.navLog = true;
+        
+        LM_Progress.Instance.StartNavigationReportingCoroutine(this); // required for resume function
     }
 
     public override void TASK_START()
@@ -372,6 +385,9 @@ public class ExplorationTask : ExperimentTask
             Debug.Log("WALL OBJECT -------------------------------" + wall_obj.name);
             walls2.Add(wall_obj);
         }
+        
+        // originalTimeAllotted = timeAllotted;
+        LM_Progress.Instance.ResumeLastNavigationTimer(this);
     }
 
     public override bool updateTask()
@@ -851,6 +867,8 @@ public class ExplorationTask : ExperimentTask
         currentTarget = destinations.currentObject();
 
         timeRemaining = 0f;
+        
+        LM_Progress.Instance.StopNavigationReportingCoroutine(this); // resume
     }
 
     //fixme COMMENTED THIS CHUNK OUT AS IT WAS INTERFERING WITH TRIAL PROGRESSION
@@ -896,7 +914,47 @@ public class ExplorationTask : ExperimentTask
         //  Starting GameObject: ACTIVE(.setActive(true))
         //  Starting GameObject Meshrenderer: ENABLED (.enabled = true;)
     }
+    
+    // public void ResetTimeRemaining()
+    // {
+    //     timeRemaining = defaultTimeRemaining;
+    //     Debug.Log($"Time Remaining After ResetTimeRemaining: {timeRemaining}");
+    // }
 
+    public Vector3 GetPlayerPosition()
+    {
+        return hud.transform.position;
+    }
+    
+    public Quaternion GetPlayerRotation()
+    {
+        return hud.transform.rotation;
+    }
+
+    public TaskList GetParentTask()
+    {
+        return parentTask;
+    }
+
+    public float GetTimeRemaining()
+    {
+        return timeRemaining;
+    }
+    
+    public void SetTimeAllotted(float time)
+    {
+        timeAllotted = time;
+    }
+
+    public void SetStartTime(float time)
+    {
+        startTime = time;
+    }
+    
+    public float GetTimeAllotted()
+    {
+        return timeAllotted;
+    }
 
 
 }

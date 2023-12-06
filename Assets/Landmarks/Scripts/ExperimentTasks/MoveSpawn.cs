@@ -16,6 +16,7 @@
 
 using UnityEngine;
 using System.Collections;
+using Landmarks.Scripts.Progress;
 using UnityStandardAssets.Characters.FirstPerson;
 
 public class MoveSpawn : ExperimentTask {
@@ -120,7 +121,7 @@ public class MoveSpawn : ExperimentTask {
         }
 
         log.log("TASK_ROTATE\t" + start.name + "\t" + this.GetType().Name + "\t" + start.transform.localEulerAngles.ToString("f1"), 1);
-
+        
 
         //Debug.Log("-------------------------------------------------");
         //Debug.Log(start.transform.position);
