@@ -6,7 +6,7 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Landmarks/Scenes/LM_Startup.unity
+    path: Assets/Scenes/LM_Startup.unity
     guid: c04c809e574054910923b01d66e4e790
   - enabled: 1
     path: Assets/Landmarks/Scenes/Practice_Environment.unity

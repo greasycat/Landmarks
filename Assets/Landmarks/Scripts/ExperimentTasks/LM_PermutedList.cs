@@ -88,8 +88,6 @@ public class LM_PermutedList : ExperimentTask
         }
         
         // Refer progress from Singleton if null
-        if (progress == null)
-            progress = LM_Progress.Instance;
         
         // Get permutedList
         // var permutedListJson = progress.GetCurrentNodeAttribute("permutedList");

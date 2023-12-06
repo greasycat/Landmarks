@@ -67,7 +67,7 @@ public class ObjectList : ExperimentTask
         }
 
 
-        if (objects.Count == 0 || resetList)
+        if (objects.Count == 0 || resetList) {
                     shuffle = false;
         }
 

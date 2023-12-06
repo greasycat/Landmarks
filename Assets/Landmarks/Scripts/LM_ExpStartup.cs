@@ -39,7 +39,6 @@ public class LM_ExpStartup : MonoBehaviour
     private string appDir;
     private bool existingData;
 
-    public Action ExtraInitCallback { get; set; }
 
     public Action ExtraInitCallback { get; set; }
 
