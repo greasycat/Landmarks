@@ -109,12 +109,13 @@ public class LM_ExpStartup : MonoBehaviour
         ExtraInitCallback = InitProgress;
     }
 
-    private void InitProgress()
+    private static void InitProgress()
     {
         var progress = LM_Progress.Instance;
-        progress.SetSavingFolderPath(LM_Progress.GetSaveFolderWithId($"{id}"));
+        progress.SetSavingFolderPath(LM_Progress.Instance.GetSubjectSaveFolder());
         progress.DisableResuming();
         progress.InitializeSave();
+
     }
 
     private void Update()
@@ -155,6 +156,11 @@ public class LM_ExpStartup : MonoBehaviour
 
             readyConfig();
 
+
+
+            LM_Progress.Instance.SubjectId = id;
+            LM_Progress.Instance.StudyCode = guiElements.studyCodes.options[guiElements.studyCodes.value].text;
+
             ExtraInitCallback?.Invoke();
 
             SceneManager.LoadScene(config.levelNames[config.levelNumber]);
@@ -172,7 +178,7 @@ public class LM_ExpStartup : MonoBehaviour
     void readyConfig()
     {
         config = Config.Instance;
-       
+
         config.runMode = ConfigRunMode.NEW;
         config.bootstrapped = true;
         config.appPath = appDir;
@@ -217,7 +223,7 @@ public class LM_ExpStartup : MonoBehaviour
     {
         var text = guiElements.studyCodes.options[guiElements.studyCodes.value].text;
         if (!string.IsNullOrEmpty(text) && text != "[Experiment Config]") return true;
-        
+
         Debug.LogWarning("Study code incorrect");
         return false;
 
