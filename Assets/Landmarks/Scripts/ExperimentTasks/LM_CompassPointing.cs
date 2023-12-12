@@ -1,16 +1,16 @@
 ﻿/*
     LM Dummy
-       
-    Attached object holds task components that need to be effectively ignored 
-    by Tasklist but are required for the script. Thus the object this is 
-    attached to can be detected by Tasklist (won't throw error), but does nothing 
-    except start and end.   
+
+    Attached object holds task components that need to be effectively ignored
+    by Tasklist but are required for the script. Thus the object this is
+    attached to can be detected by Tasklist (won't throw error), but does nothing
+    except start and end.
 
     Copyright (C) 2019 Michael J. Starrett
 
     Navigate by StarrLite (Powered by LandMarks)
     Human Spatial Cognition Laboratory
-    Department of Psychology - University of Arizona   
+    Department of Psychology - University of Arizona
 */
 
 using System.Collections;
@@ -44,7 +44,7 @@ public class LM_CompassPointing : ExperimentTask
     [Min(0f)]
     public float secondsBeforeResponse = 0.0f; // how long before they can submit answer
 
-    public List<GameObject> questionItems; 
+    public List<GameObject> questionItems;
     private GameObject location; // standing at the...
     private GameObject orientation; // facing the...
     private GameObject target; // point to the...
@@ -67,7 +67,7 @@ public class LM_CompassPointing : ExperimentTask
     public float showTargetAfterSeconds;
     public bool hideNonTargets;
 
-    //Handle the rendering of the environment 
+    //Handle the rendering of the environment
     public bool hideEnvironment;
 
     public RectTransform rectTransform;
@@ -116,10 +116,10 @@ public class LM_CompassPointing : ExperimentTask
             Debug.LogError("You need to figure out where you're getting your objects from (listOfTriads or listOfPairs");
         }
 
-        
+
         location = questionItems[0]; // where to the player is positioned (anchor 1)
         //orientation = questionItems[1]; // where the player is facing (anchor 2)
-        target = questionItems[1]; // where the player is estimating 
+        target = questionItems[1]; // where the player is estimating
 
 
         // ---------------------------------------------------------------------
@@ -136,8 +136,8 @@ public class LM_CompassPointing : ExperimentTask
 
             case Format.JRD:
                 // Prepare JRD hud and question
-                hud.showOnlyHUD(); 
-                //formattedQuestion = string.Format(jrdText.ToString(), location.name, orientation.name, target.name); 
+                hud.showOnlyHUD();
+                //formattedQuestion = string.Format(jrdText.ToString(), location.name, orientation.name, target.name);
 
                 // Calculate the correct answer (done later for SOP)
                 answer = Vector3.SignedAngle(orientation.transform.position - location.transform.position,
@@ -163,7 +163,7 @@ public class LM_CompassPointing : ExperimentTask
             //avatar.transform.position = location.transform.position; // move player to the pointing location
 
             // Point the player at the orientation for JRD or a random orientation for SOP start
-            //avatar.transform.LookAt(orientation.transform); 
+            //avatar.transform.LookAt(orientation.transform);
 
             // Reset the camera to be zeroed on the controller position (i.e. looking straight forward)
             avatar.GetComponentInChildren<Camera>().transform.localEulerAngles = Vector3.zero; // reset the camera
@@ -187,7 +187,7 @@ public class LM_CompassPointing : ExperimentTask
         compass.transform.parent = compassparent; // send it back to its old parent to avoid funky movement effects
         compass.ResetPointer(random:randomStartRotation); // set the compass arrow to zero (or a random rotation)
         startAngle = compass.pointer.transform.localEulerAngles.y;
-        
+
 
         // Put up the HUD
         if (format == Format.SOP)
@@ -217,9 +217,9 @@ public class LM_CompassPointing : ExperimentTask
 
         //avatar.GetComponentInChildren<Camera>().transform.localEulerAngles = Vector3.zero; // reset the camera
 
-    /*    //Change height of all target objects to prevent intersection with HUD textbox 
+    /*    //Change height of all target objects to prevent intersection with HUD textbox
         GameObject[] targetObjects = GameObject.FindGameObjectsWithTag("Target");
-        
+
         foreach (GameObject targetObject in targetObjects)
         {
             // Check if the targetObject has a valid transform
@@ -258,8 +258,8 @@ public class LM_CompassPointing : ExperimentTask
         if (location.name == "Juice" || location.name == "Bananas")
         {
               huDPosition.z -= 1.0f; //subtracting 1 from z-axis
-              huDPosition.y += 0.4f; //adding 1 to y-axis 
-              
+              huDPosition.y += 0.4f; //adding 1 to y-axis
+
         }
         else if (location.name == "Pizza")
         {
@@ -268,19 +268,19 @@ public class LM_CompassPointing : ExperimentTask
             //huDPosition.x -= 1.0f;
         }
         else
-        { 
+        {
             huDPosition.z += 1.0f; //adding 1 to z-axis
             huDPosition.y += 0.4f; //adding 1 to y-axis
             //huDPosition.x -= 1.0f;
         }
 
         hud.hudRig.transform.position = huDPosition; // setting position
-       
+
         Debug.Log("Reset HUD Position is" + huDPosition);
 
         if (vrEnabled)
         {
-            //turn off glowing orientation rings 
+            //turn off glowing orientation rings
             hud.hudNonEssentials.SetActive(false);
         }
     }
@@ -289,6 +289,8 @@ public class LM_CompassPointing : ExperimentTask
     public override bool updateTask()
     {
         hud.hudPanelOFF = 0f;
+
+        if (skip) return true;
 
         if (Time.time - startTime > secondsBeforeResponse) // don't let them submit until the wait time has passed
         {
@@ -305,7 +307,7 @@ public class LM_CompassPointing : ExperimentTask
                         avatar.GetComponent<FirstPersonController>().ResetMouselook(); // reset the zero position to be our current cam orientation
 
                         var compassparent = compass.transform.parent;
-                        compass.transform.parent = avatar.GetComponentInChildren<LM_SnapPoint>().transform; // make it the child of the snappoint 
+                        compass.transform.parent = avatar.GetComponentInChildren<LM_SnapPoint>().transform; // make it the child of the snappoint
                         compass.transform.localPosition = compassPosOffset; // adjust position
                         compass.transform.localEulerAngles = compassRotOffset; // adjust rotation
                         compass.transform.parent = compassparent; // send it back to its old parent to avoid funky movement effects
@@ -326,8 +328,8 @@ public class LM_CompassPointing : ExperimentTask
                     compass.interactable = true;
                     orientTime = Time.time - startTime; // save the orientation time
                     startTime = Time.time; // reset the start clock for the answer portion
-                    
-                   
+
+
 
                     return false; // don't end the trial
                 }
@@ -340,7 +342,7 @@ public class LM_CompassPointing : ExperimentTask
                     //response = avatar.GetComponentInChildren<Camera>().transform.localEulerAngles.y;
                     response = compass.pointer.transform.localEulerAngles.y;
 
-                    // Record angle from 
+                    // Record angle from
 
                     Debug.Log("RESPONSE: " + response.ToString());
 
@@ -373,7 +375,7 @@ public class LM_CompassPointing : ExperimentTask
                             //avatar.GetComponent<FirstPersonController>().ResetMouselook(); // reset the zero position to be our current cam orientation
 
                             var compassparent = compass.transform.parent;
-                            compass.transform.parent = avatar.GetComponentInChildren<LM_SnapPoint>().transform; // make it the child of the ForwardSnapPoint object  
+                            compass.transform.parent = avatar.GetComponentInChildren<LM_SnapPoint>().transform; // make it the child of the ForwardSnapPoint object
                             compass.transform.localPosition = compassPosOffset; // adjust position
                             compass.transform.localEulerAngles = compassRotOffset; // adjust rotation
                             compass.transform.parent = compassparent; // send it back to its old parent to avoid funky movement effects
@@ -405,7 +407,7 @@ public class LM_CompassPointing : ExperimentTask
                         // Record the response as an angle between -180 and 180
                         response = compass.pointer.transform.localEulerAngles.y;
 
-                        // Record angle from 
+                        // Record angle from
 
                         Debug.Log("RESPONSE: " + response.ToString());
 
@@ -467,7 +469,7 @@ public class LM_CompassPointing : ExperimentTask
             listofTargets.incrementCurrent();
         }
 
-        
+
         oriented = false; // reset for next SOP trial (if any)
         compass.interactable = false; // shut off the compass object's function
         compass.gameObject.SetActive(false); // hide the compass
