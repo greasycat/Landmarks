@@ -80,6 +80,8 @@ public class ExperimentTask : MonoBehaviour{
     public XmlNode taskNodeLoaded; // The XML node assigned to this object
     public XmlNode taskNodeToBeWritten; // The XML node assigned to this object
 
+    private bool _originalSkip;
+
 
     public void Awake ()
 	{
@@ -89,8 +91,9 @@ public class ExperimentTask : MonoBehaviour{
 
 	public void Start ()
     {
+	    _originalSkip = skip;
 	}
-	
+
 	public virtual void startTask() {
 		avatar = GameObject.FindWithTag ("Player");
 		avatarLog = avatar.GetComponentInChildren<avatarLog>() as avatarLog; //jdstokes 2015
@@ -140,6 +143,11 @@ public class ExperimentTask : MonoBehaviour{
         }
 
 
+        if (LM_Progress.Instance.SkipSubtask(transform))
+        {
+	        skip = true;
+        }
+
         LM_Progress.Instance.RecordTaskStart(this);
 	}
 
@@ -148,13 +156,16 @@ public class ExperimentTask : MonoBehaviour{
 
 	public virtual bool updateTask ()
 	{
+
 		if (skip) return true;
+
 
 		bool attemptInterupt = interruptInterval > 0 && Experiment.Now() - task_start >= interruptInterval;
 
 		if( Input.GetButtonDown ("Compass") ) {
 			attemptInterupt = true;
 		}
+
 
 		if(attemptInterupt && interruptTasks && currentInterrupt < repeatInterrupts && !interruptTasks.skip)
 		{
@@ -206,6 +217,7 @@ public class ExperimentTask : MonoBehaviour{
         hud.showNothing();
 
 		LM_Progress.Instance.RecordTaskEnd(this);
+		skip = _originalSkip;
 	}
 
 

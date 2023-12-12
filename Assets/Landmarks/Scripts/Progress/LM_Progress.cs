@@ -7,7 +7,6 @@ using System.Linq;
 using Landmarks.Scripts.Debugging;
 using Landmarks.Scripts.ExperimentTasks;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Landmarks.Scripts.Progress
 {
@@ -35,21 +34,28 @@ namespace Landmarks.Scripts.Progress
         private Dictionary<string, XmlNode> _taskNodeLookup;
         private Queue<KeyValuePair<string, string>> _attributeQueue;
 
+        public string SubjectId { set; get; }
+        public string StudyCode { set; get; }
+
 
         // Debug variables
         [SerializeField] private bool deleteCurrentSaveFileOnEditorQuit = false;
         private int _depth = 0;
         private int _line = 1;
 
+        private Queue<uint> _subTaskSkipList;
+        private uint _completedSubTaskGroup;
+
         private Coroutine ReportingCoroutine { get; set; }
 
         private ResumeOptions _resumeOption;
-        
+
         public enum ResumeOptions
         {
-            LastTrialFromStart = 0, 
+            LastTrialFromStart = 0,
             LastTrialFromProgress = 1,
             SkipTrial = 2,
+            SkipSubTrials = 3,
         }
 
         //**************************************************************
@@ -74,6 +80,7 @@ namespace Landmarks.Scripts.Progress
             _attributeQueue = new Queue<KeyValuePair<string, string>>();
             _experiment = FindObjectOfType<Experiment>();
             _taskNodeLookup = new Dictionary<string, XmlNode>();
+            _subTaskSkipList = new Queue<uint>();
         }
 
         public void InitializeSave(string savePath = "")
@@ -96,7 +103,7 @@ namespace Landmarks.Scripts.Progress
         {
             resumeLastSave = false;
         }
-        
+
         public void SetResumeOption(ResumeOptions option)
         {
             _resumeOption = option;
@@ -134,7 +141,7 @@ namespace Landmarks.Scripts.Progress
         {
             if (_resumeOption != ResumeOptions.LastTrialFromProgress)
                 return;
-            
+
             var nodeSearch = _taskNodeLookup.Where(p => p.Value.HasAttribute("timeRemaining")).ToList();
             if (nodeSearch.Count == 1)
             {
@@ -152,7 +159,7 @@ namespace Landmarks.Scripts.Progress
                 LM_Debug.Instance.Log("Found " + nodeSearch.Count + " nodes with timeRemaining attribute", 3);
             }
         }
-        
+
         public bool CheckIfResumeNavigation()
         {
             if (_resumeOption != ResumeOptions.LastTrialFromProgress)
@@ -165,7 +172,7 @@ namespace Landmarks.Scripts.Progress
         {
             if (_resumeOption != ResumeOptions.LastTrialFromProgress)
                 return;
-            
+
             var nodeSearch = _taskNodeLookup.Where(p => p.Value.HasAttribute("x")).ToList();
             if (nodeSearch.Count == 1)
             {
@@ -187,7 +194,7 @@ namespace Landmarks.Scripts.Progress
                     rotation *= Quaternion.Euler(0, -90, 0);
                     startTransform.rotation = rotation;
                 }
-                
+
                 // remove attributes
                 node.RemoveAttribute("x");
             }
@@ -220,14 +227,14 @@ namespace Landmarks.Scripts.Progress
 
                 var attributes = new Dictionary<string, string>
                 {
-                    {"timeRemaining", task.GetTimeRemaining().ToString(CultureInfo.InvariantCulture)},
-                    {"x", avatarPosition.x.ToString(CultureInfo.InvariantCulture)},
-                    {"y", avatarPosition.y.ToString(CultureInfo.InvariantCulture)},
-                    {"z", avatarPosition.z.ToString(CultureInfo.InvariantCulture)},
-                    {"rx", avatarRotation.x.ToString(CultureInfo.InvariantCulture)},
-                    {"ry", avatarRotation.y.ToString(CultureInfo.InvariantCulture)},
-                    {"rz", avatarRotation.z.ToString(CultureInfo.InvariantCulture)},
-                    {"rw", avatarRotation.w.ToString(CultureInfo.InvariantCulture)},
+                    { "timeRemaining", task.GetTimeRemaining().ToString(CultureInfo.InvariantCulture) },
+                    { "x", avatarPosition.x.ToString(CultureInfo.InvariantCulture) },
+                    { "y", avatarPosition.y.ToString(CultureInfo.InvariantCulture) },
+                    { "z", avatarPosition.z.ToString(CultureInfo.InvariantCulture) },
+                    { "rx", avatarRotation.x.ToString(CultureInfo.InvariantCulture) },
+                    { "ry", avatarRotation.y.ToString(CultureInfo.InvariantCulture) },
+                    { "rz", avatarRotation.z.ToString(CultureInfo.InvariantCulture) },
+                    { "rw", avatarRotation.w.ToString(CultureInfo.InvariantCulture) },
                 };
 
                 UpdateAttributesAfterWritten(parentNode, attributes);
@@ -260,10 +267,10 @@ namespace Landmarks.Scripts.Progress
             LM_Debug.Instance.Log($"Recording start: {task.name}", 2);
             var attributes = new Dictionary<string, string>
             {
-                {"name", task.name},
-                {"line", _line.ToString()},
-                {"depth", _depth.ToString()},
-                {"uid", GetUid(task).ToString()}
+                { "name", task.name },
+                { "line", _line.ToString() },
+                { "depth", _depth.ToString() },
+                { "uid", GetUid(task).ToString() }
             };
 
             var attributePairs = attributes.Select(pair => $"{pair.Key}=\"{pair.Value}\"").ToList();
@@ -350,35 +357,41 @@ namespace Landmarks.Scripts.Progress
             {
                 if (task is TaskList taskList && taskList.taskListType == Role.trial)
                 {
-                    var trialSubTaskNames = task.gameObject.transform.Cast<Transform>().Select(tr => tr.name);
-                    var numSubTasks = trialSubTaskNames.Count();
+                    var trialSubTaskUIDs = task.gameObject.transform.Cast<Transform>().Select(GetUid).ToList();
+                    var numSubTasks = trialSubTaskUIDs.Count();
 
                     LM_Debug.Instance.Log($"Number of subtasks in trial: {numSubTasks}", 10);
 
                     // Get the number of completed subtasks
                     var child = _currentSaveNode.GetAllChildren();
-                    var completedSubTasks = child.Where(node => node.HasAttributeEqualTo("completed", "true"));
-                    var numCompletedSubTasks = completedSubTasks.Count();
+                    var completedSubTasks = child
+                        .Where(node => node.HasAttributeEqualTo("completed", "true"));
 
-                    LM_Debug.Instance.Log($"Number of completed subtasks: {numCompletedSubTasks}", 10);
+
+                    var numCompletedSubtasks = completedSubTasks.Count();
+
+                    LM_Debug.Instance.Log($"Number of completed subtasks: {numCompletedSubtasks}", 10);
+
+                    switch (StudyCode)
+                    {
+                        case "OrientationConfig":
+                            OrientationSkipSubtasks(trialSubTaskUIDs, numCompletedSubtasks);
+                            break;
+                    }
+
+
+                    var numCompletedTrials =
+                        numCompletedSubtasks / numSubTasks; // This is the number of completed trials as in the TaskList
 
                     // floor division completed subtasks number by number of subtask in each trial
                     // to get the number of completed trials
 
-                    // For Taylor's experiment, there are 8 subtasks in each trial
-                    // If the last disorientation task is incomplete, the number of completed subtasks will still be 8
-                    if (numCompletedSubTasks % 8 == 7)
-                    {
-                        numCompletedSubTasks += 1;
-                    }
-
-                    var numCompletedTrials = numCompletedSubTasks / numSubTasks;
 
                     if (int.TryParse(_currentSaveNode.GetAttribute("numCompletedTrials"), out var lastResumedNumber))
                     {
                         numCompletedTrials += lastResumedNumber;
                     }
-                    
+
                     if (ResumeOptions.SkipTrial == _resumeOption)
                     {
                         numCompletedTrials += 1;
@@ -399,7 +412,7 @@ namespace Landmarks.Scripts.Progress
                     {
                         if (childTransform.TryGetComponent(typeof(LM_IncrementLists), out var component))
                         {
-                            var incrementLists = (LM_IncrementLists) component;
+                            var incrementLists = (LM_IncrementLists)component;
 
                             incrementLists.Increment(numCompletedTrials);
 
@@ -427,6 +440,42 @@ namespace Landmarks.Scripts.Progress
             LM_Debug.Instance.Log($"Skipping task {task.name} at index {_currentSaveNode.GetAttribute("line")}", 1);
             task.skip = true;
             XmlNode.SkipToNextNode(ref _currentSaveNode);
+        }
+
+        private void OrientationSkipSubtasks(IReadOnlyList<uint> ids, int numSubtask)
+        {
+            numSubtask %= 26; // There are 26 subtasks in total, so get the remainder
+            if (numSubtask < 2) return; // If there are less than 2 subtasks, do not skip since it is only an ObjectList
+            var leftover = (numSubtask - 2) % 4;
+            numSubtask -= leftover;
+
+            if (ids.Count < numSubtask)
+                return;
+
+            for (var i = 1; i < numSubtask; i++)
+            {
+                _subTaskSkipList.Enqueue(ids[i]);
+            }
+
+            LM_Debug.Instance.Log($"Skipping {numSubtask} subtasks", 10);
+        }
+
+        public bool SkipSubtask(Transform tr)
+        {
+            var uid = GetUid(tr);
+            if (_subTaskSkipList.Count == 0 || _subTaskSkipList.Peek() != uid) return false;
+
+            LM_Debug.Instance.Log($"Skipping subtask {tr.name}, {uid}", 10);
+            _subTaskSkipList.Dequeue();
+            return true;
+        }
+
+        public void IncrementSubtaskGroup(ObjectList list)
+        {
+            for (var i = 0; i < _completedSubTaskGroup; ++i)
+            {
+                list.incrementCurrent();
+            }
         }
 
         //**************************************************************
@@ -554,9 +603,9 @@ namespace Landmarks.Scripts.Progress
             return path;
         }
 
-        public static string GetSaveFolderWithId(string id)
+        public string GetSubjectSaveFolder()
         {
-            var saveFolder = Path.Combine(GetSystemConfigFolder(), SaveFolderName, id);
+            var saveFolder = Path.Combine(GetSystemConfigFolder(), SaveFolderName, SubjectId, StudyCode);
             if (!Directory.Exists(saveFolder))
             {
                 Directory.CreateDirectory(saveFolder);
@@ -567,7 +616,13 @@ namespace Landmarks.Scripts.Progress
 
         public static string GetSaveFolder()
         {
-            return GetSaveFolderWithId("");
+            var folder = Path.Combine(GetSystemConfigFolder(), SaveFolderName);
+            if (!Directory.Exists(folder))
+            {
+                Directory.CreateDirectory(folder);
+            }
+
+            return folder;
         }
 
         //method to create a save file with current timestamp
