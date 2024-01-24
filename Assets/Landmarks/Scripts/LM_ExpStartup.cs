@@ -242,25 +242,25 @@ public class LM_ExpStartup : MonoBehaviour
             //if (int.TryParse(guiElements.subID.text, out int _subID))
             {
                 // If this id has already been used to save data, flag an error
-                if (!Application.isEditor &
-                    Directory.Exists(appDir + "/" + config.experiment + "/" + guiElements.subID.text))
-                {
-                    if (File.Exists(appDir + "/" + config.experiment + "/" + guiElements.subID.text + "/progress.dat"))
-                    {
-                        subidError = false;
-                        existingData = true;
-                        id = guiElements.subID.text;
-                        _errorMessage.text = "Loading SubjectID data from a previous session.";
-                        _errorMessage.gameObject.SetActive(true);
-                    }
-                    else
-                    {
-                        subidError = true;
-                        _errorMessage.text = "That SubjectID is already in use.";
-                        _errorMessage.gameObject.SetActive(true);
-                    }
-                }
-                else
+                // if (!Application.isEditor &
+                //     Directory.Exists(appDir + "/" + config.experiment + "/" + guiElements.subID.text))
+                // {
+                //     if (File.Exists(appDir + "/" + config.experiment + "/" + guiElements.subID.text + "/progress.dat"))
+                //     {
+                //         subidError = false;
+                //         existingData = true;
+                //         id = guiElements.subID.text;
+                //         _errorMessage.text = "Loading SubjectID data from a previous session.";
+                //         _errorMessage.gameObject.SetActive(true);
+                //     }
+                //     else
+                //     {
+                //         subidError = true;
+                //         _errorMessage.text = "That SubjectID is already in use.";
+                //         _errorMessage.gameObject.SetActive(true);
+                //     }
+                // }
+                // else
                 {
                     id = guiElements.subID.text;
                     subidError = false;
