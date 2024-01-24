@@ -7,7 +7,6 @@ using System.IO;
 public class customAvatarLog : avatarLog
 {
 
-	[HideInInspector] public bool navLog = true;
 	//private Transform avatar;
 	private Transform body;
 	private Transform head;
@@ -56,7 +55,7 @@ public class customAvatarLog : avatarLog
 			Debug.Log("We have left " + previousLocation + ". Now entering " + location);
 		}
 
-		// Checking if player pressed button to indicate that they've fully learned locations of all target objects 
+		// Checking if player pressed button to indicate that they've fully learned locations of all target objects
 		if (Input.GetKey(KeyCode.Space))
 		{
 			KeyPress = "True";
@@ -81,7 +80,7 @@ public class customAvatarLog : avatarLog
 			}
 		}
 
- 
+
             Debug.Log("---------------------------- " + location + " -------------------------------");
             //print("AVATAR_POS	" + "\t" +  avatar.position.ToString("f3") + "\t" + "AVATAR_Body " + "\t" +  cameraCon.localEulerAngles.ToString("f3") +"\t"+ "AVATAR_Head " + cameraRig.localEulerAngles.ToString("f3"));
             log.log("Avatar: \t" + controller.name + "\t" +
@@ -92,21 +91,21 @@ public class customAvatarLog : avatarLog
                     "Location (Object/Hallway): \t" + location + "\t" +
                     "Keypress(True/False): \t" + KeyPress + "\t" +
                     "TargetObjectVisibility: \t" + TargetObjectVisibility + "\t"
-                    , 1);     
+                    , 1);
 
     }
 	// Update is called once per frame
 	void FixedUpdate()
 	{
-	
+
 		foreach (GameObject targetObject in targetObjects)
         {
 			IsVisibleFromCamera(targetObject, controller.cam);
-			
-		}
-			
 
-		// fixmefixmefixme Checking if target objects are visible as player moves around; 
+		}
+
+
+		// fixmefixmefixme Checking if target objects are visible as player moves around;
 
 		//GameObject[] targetObjects = GameObject.FindGameObjectsWithTag("Target");
 
@@ -249,7 +248,7 @@ public class customAvatarLog : avatarLog
 	}
 
 
-	//function to check if target object are truly visible in camera's field of view, by checking if object's renderer bounds intersect with camera's field of view 
+	//function to check if target object are truly visible in camera's field of view, by checking if object's renderer bounds intersect with camera's field of view
 	//private bool IsVisibleFromCamera(GameObject targetObject, Camera camera)
 	//{
 	//	Renderer renderer = targetObject.GetComponent<Renderer>();
@@ -283,7 +282,7 @@ public class customAvatarLog : avatarLog
 	//	}
 	//	return (false);
 
-	//}	
+	//}
 
 
 
@@ -299,7 +298,7 @@ public class customAvatarLog : avatarLog
 }
 //Plane[] frustumPlanes = GeometryUtility.CalculateFrustumPlanes(camera);
 //return GeometryUtility.TestPlanesAABB(frustumPlanes, renderer.bounds);
-//}	
+//}
 
 
 
@@ -319,7 +318,7 @@ public class avatarLog : MonoBehaviour {
 	private GameObject experiment;
 	private dbLog log;
 	private Experiment manager;
-	
+
 	public GameObject player;
 	public GameObject camerarig;
 
@@ -336,7 +335,7 @@ public class avatarLog : MonoBehaviour {
 		manager = experiment.GetComponent("Experiment") as Experiment;
 		log = manager.dblog;
 		avatar = transform;
-		
+
 	}
 
     private void Update()
@@ -356,7 +355,7 @@ public class avatarLog : MonoBehaviour {
 
     // Update is called once per frame
     void FixedUpdate () {
-		// Checking if player pressed button 
+		// Checking if player pressed button
 		if (Input.GetKey(KeyCode.Space))
 		{
 			KeyPress= "True";
