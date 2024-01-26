@@ -177,9 +177,11 @@ public class ObjectList : ExperimentTask
     {
         current += increment;
         //TL: When running this method: current (the trial number?) increments by 1
-        if (current >= objects.Count && EndListBehavior == EndListMode.Loop)
+        // When Object.count is 0, it means the object list is uninitialized, however, resume function occur before this method is called, so it should be fine
+        if (current >= objects.Count && objects.Count != 0 && EndListBehavior == EndListMode.Loop)
             //don't need to worry about this if loop, since our end behavior is set to "end" and not "loop"
         {
+            Debug.Log("objects.Count: " + objects.Count);
             current = 0;
         }
     }
