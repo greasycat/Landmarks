@@ -91,10 +91,12 @@ public class ExperimentTask : MonoBehaviour{
 
 	public void Start ()
     {
-	    _originalSkip = skip;
 	}
 
 	public virtual void startTask() {
+
+	    _originalSkip = skip;
+
 		avatar = GameObject.FindWithTag ("Player");
 		avatarLog = avatar.GetComponentInChildren<avatarLog>() as avatarLog; //jdstokes 2015
 		hud = avatar.GetComponent<HUD>();
@@ -197,6 +199,7 @@ public class ExperimentTask : MonoBehaviour{
 
 	public virtual void endTask()
     {
+		skip = _originalSkip;
 
         if (eegManager != null & triggerOnEnd)
         {
@@ -217,7 +220,6 @@ public class ExperimentTask : MonoBehaviour{
         hud.showNothing();
 
 		LM_Progress.Instance.RecordTaskEnd(this);
-		skip = _originalSkip;
 	}
 
 
