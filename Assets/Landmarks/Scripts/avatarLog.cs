@@ -2,6 +2,7 @@
 using System.Collections;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
+using ViveSR.anipal.Eye;
 
 public class avatarLog : MonoBehaviour
 {
@@ -20,6 +21,8 @@ public class avatarLog : MonoBehaviour
   
 
     public TL_WayfindingCountdownTimer VP_WayfindingCountdownTimer;
+    
+    [SerializeField] private SRanipal_GazeRay gazeRay;
 
 
 
@@ -97,7 +100,15 @@ public class avatarLog : MonoBehaviour
 					"Camera Rotation   (xyz): \t" + head.eulerAngles.x + "\t" + head.eulerAngles.y + "\t" + head.eulerAngles.z + "\t" +
 					"Location (Object/Hallway): \t" + location + "\t" +
 					"Keypress(True/False): \t" + KeyPress + "\t" +
-					"TargetObjectVisibility: \t" + TargetObjectVisibility + "\t" +
+					
+			//// Eyetracking Data
+			        "EyeTracking Origin: \t" + gazeRay.getGazeOrigin() + "\t" +
+					"EyeTracking Direction: \t" + gazeRay.getGazeDirection() + "\t" +
+					"EyeTracking Last Hit: \t" + gazeRay.getLastHitTransform() + "\t" +
+					"EyeTracking Last HitTarget: \t" + gazeRay.getLastHitTargetTransform() + "\t" +
+					
+					
+					
 					
 
 			////////////// Explore Times

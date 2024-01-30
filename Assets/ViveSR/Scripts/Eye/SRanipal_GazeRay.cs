@@ -30,6 +30,7 @@ namespace ViveSR
                 
                 [SerializeField] private bool debug;
                 private SRanipal_VR_Debug _debugModule;
+                
 
                 private void Start()
                 {
@@ -192,6 +193,34 @@ namespace ViveSR
                 private static void EyeCallback(ref EyeData_v2 eyeData)
                 {
                     _eyeData = eyeData;
+                }
+
+                public Vector3 getGazeOrigin()
+                {
+                    return gazeOrigin;
+                }
+                
+                public Vector3 getGazeDirection()
+                {
+                    return gazeDirection;
+                }
+                
+                public string getLastHitTransform()
+                {
+                    if (lastHitTransform == null)
+                    {
+                        return "null";
+                    }
+                    return lastHitTransform.name;
+                }
+                
+                public string getLastHitTargetTransform()
+                {
+                    if (lastHitTargetTransform == null)
+                    {
+                        return "null";
+                    }
+                    return lastHitTargetTransform.name;
                 }
             }
         }

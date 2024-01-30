@@ -26,6 +26,7 @@ TagManager:
   - StartingLocations
   - NavigationLocations
   - Walls
+  - Wall
   layers:
   - Default
   - TransparentFX

@@ -5,7 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4addc4c6-eb7f-4f00-bcce-3c891681c7d5" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Landmarks/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Landmarks/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/BulkRename.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/BulkRename.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Landmarks/Scenes/Exploration_Task.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Landmarks/Scenes/Exploration_Task.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Landmarks/Scenes/Practice_Environment.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Landmarks/Scenes/Practice_Environment.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Landmarks/Scripts/avatarLog.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Landmarks/Scripts/avatarLog.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Landmarks/Scripts/customAvatarLog.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Landmarks/Scripts/customAvatarLog.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ViveSR/Scripts/Eye/SRanipal_GazeRay.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ViveSR/Scripts/Eye/SRanipal_GazeRay.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/TagManager.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/TagManager.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,35 +26,35 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 6
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 6
+}</component>
   <component name="ProjectId" id="2bMjr16YFvVFex0z9bu2xpHMC9G" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "Working__Branch__v3__Eyetracking",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;Working__Branch__v3__Eyetracking&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "rider.external.source.directories": [
-      "C:\\Users\\localadmin\\AppData\\Roaming\\JetBrains\\Rider2023.3\\resharper-host\\DecompilerCache",
-      "C:\\Users\\localadmin\\AppData\\Roaming\\JetBrains\\Rider2023.3\\resharper-host\\SourcesCache",
-      "C:\\Users\\localadmin\\AppData\\Local\\Symbols\\src"
+  &quot;keyToStringList&quot;: {
+    &quot;rider.external.source.directories&quot;: [
+      &quot;C:\\Users\\localadmin\\AppData\\Roaming\\JetBrains\\Rider2023.3\\resharper-host\\DecompilerCache&quot;,
+      &quot;C:\\Users\\localadmin\\AppData\\Roaming\\JetBrains\\Rider2023.3\\resharper-host\\SourcesCache&quot;,
+      &quot;C:\\Users\\localadmin\\AppData\\Local\\Symbols\\src&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
     <configuration name="Start Unity" type="RunUnityExe" factoryName="Unity Executable">
       <option name="EXE_PATH" value="C:\Program Files\Unity\Hub\Editor\2019.4.29f1\Editor\Unity.exe" />
@@ -94,6 +102,9 @@
       <option name="presentableId" value="Default" />
       <updated>1706032038762</updated>
       <workItem from="1706032043878" duration="1462000" />
+      <workItem from="1706035136268" duration="60000" />
+      <workItem from="1706035205166" duration="4000" />
+      <workItem from="1706147088402" duration="2978000" />
     </task>
     <servers />
   </component>
