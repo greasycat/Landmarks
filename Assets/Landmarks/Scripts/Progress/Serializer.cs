@@ -36,8 +36,9 @@ namespace Landmarks.Scripts.Progress
 
         public static List<Dictionary<string, string>> ConvertToDictionaryList(IEnumerable<GameObject> gameObjects)
         {
-            return gameObjects.Select(obj =>
+            return gameObjects.Where(obj => obj != null).Select(obj =>
             {
+
                 if (Uid.TryGetUid(obj, out var uid))
                 {
                     return new Dictionary<string, string>()

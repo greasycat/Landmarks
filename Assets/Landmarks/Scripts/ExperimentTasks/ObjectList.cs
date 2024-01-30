@@ -77,9 +77,16 @@ public class ObjectList : ExperimentTask
             Experiment.Shuffle(objs);
         }
 
+        if (objs == null)
+        {
+            Debug.LogError("Name: " + name +"No objects found for objectlist.");
+        }
 
-        progress.AddAttribute("objects",
-            Serializer.Serialize(Serializer.ConvertToDictionaryList(objs)));
+        if (objs != null)
+        {
+            progress.AddAttribute("objects",
+                Serializer.Serialize(Serializer.ConvertToDictionaryList(objs)));
+        }
 
         TASK_START();
 

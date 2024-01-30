@@ -9,7 +9,7 @@
 
     Navigate by StarrLite (Powered by Landmarks)
     Human Spatial Cognition Laboratory
-    Department of Psychology - University of Arizona   
+    Department of Psychology - University of Arizona
 */
 
 using System.Collections;
@@ -56,7 +56,7 @@ public class LM_PermutedList : ExperimentTask
         else if (inputLists.Length > 1)
         {
             subset = inputLists.Length;
-            
+
             for (int item = 0; item < inputLists[0].objects.Count; item++)
             {
                 var setList = new List<GameObject>();
@@ -86,30 +86,72 @@ public class LM_PermutedList : ExperimentTask
             permutedList = SortForLinking(permutedList);
             Debug.Log("Linked list contains " + permutedList.Count + "sets");
         }
-        
-        // Refer progress from Singleton if null
-        
-        // Get permutedList
-        // var permutedListJson = progress.GetCurrentNodeAttribute("permutedList");
-        // if (permutedListJson != null)
-        // {
-        //     permutedList = SerializationHelper.DeserializeGameObjectList(permutedListJson, SerializationHelper.ConvertToDictionary(listToPermute.objects));
-        // }
-        //
-        // // Get subset
-        // var subsetString = progress.GetCurrentNodeAttribute("subset");
-        // if (subsetString != null)
-        // {
-        //     subset = int.Parse(subsetString);
-        // }
-        //
-        // var serializedList = SerializationHelper.SerializeGameObjectList(permutedList);
-        // Debug.Log($"Original Count {permutedList.Count} Serialized list: {serializedList}");
-        // progress.AddAttributeAhead("permutedList", serializedList);
-        // progress.AddAttributeAhead("subset", subset.ToString());
+
+        var flattenedList = new List<GameObject>();
+        var sizesToSerialize = new List<int>();
+        foreach (var entry in permutedList)
+        {
+            sizesToSerialize.Add(entry.Count);
+            flattenedList.AddRange(entry);
+        }
+
+
+        var progress = LM_Progress.Instance;
+        if (progress.CheckIfResumeCurrentNode(this))
+        {
+            // get sizes of each sub list
+            var sizeString = progress.GetCurrentNodeAttribute("sizes");
+            var sizes = new List<int>();
+            if (sizeString != null)
+            {
+                var deserializedSizes = Serializer.Deserialize<List<int>>(sizeString);
+                sizes.AddRange(deserializedSizes);
+            }
+
+            // Get permutedList
+            var permutedListJson = progress.GetCurrentNodeAttribute("permutedList");
+            if (permutedListJson != null)
+            {
+                var deserializedList = Serializer.Deserialize<List<Dictionary<string, string>>>(permutedListJson);
+                var lookUp = Serializer.ConvertToLookupDictionary(flattenedList);
+
+
+                var gameObjectList = Serializer.ConvertToGameObjectList(deserializedList, lookUp);
+
+                if (sizes.Count > 0)
+                {
+                    permutedList.Clear();
+                }
+
+                // split into lists based on sizes
+                var i = 0;
+                foreach (var size in sizes)
+                {
+                    var sets = new List<GameObject>();
+                    for (var j = 0; j < size; j++)
+                    {
+                        sets.Add(gameObjectList[i]);
+                        i++;
+                    }
+                    permutedList.Add(sets);
+                }
+
+                flattenedList = gameObjectList;
+
+            }
+
+            // Get subset
+        }
+
+
+        var serializedList = Serializer.Serialize(Serializer.ConvertToDictionaryList(flattenedList));
+        var serializedSizes = Serializer.Serialize(sizesToSerialize);
+        Debug.Log($"Original Count {serializedSizes} Serialized list: {serializedList}");
+        progress.AddAttribute("permutedList", serializedList);
+        progress.AddAttribute("sizes", serializedSizes);
 
         base.startTask(); //relocated to ensure the attribute queue is populated before the task starts
-        
+
         for (int i = 0; i < subset; i++)
         {
             var ol = new GameObject();
@@ -288,7 +330,7 @@ public class LM_PermutedList : ExperimentTask
 
 public static List<List<GameObject>> SortForLinking(List<List<GameObject>> sacredList)
     {
-        
+
         var outList = new List<List<GameObject>>(); ;
         do
         {
@@ -297,7 +339,7 @@ public static List<List<GameObject>> SortForLinking(List<List<GameObject>> sacre
                 outList.Clear();
                 linked = true;
                 var unsortedList = sacredList;
-                
+
 
                 int r = unsortedList[0].Count; // How many samples per permutation?
                 GameObject lastEnd = null;
@@ -326,7 +368,7 @@ public static List<List<GameObject>> SortForLinking(List<List<GameObject>> sacre
             {
                 linked = false;
                 Debug.LogWarning("Hit dead end; re linking permuted list");
-               
+
             }
         } while (!linked);
         Debug.LogWarning("OutList Contains " + outList.Count);
@@ -344,7 +386,7 @@ public static List<List<GameObject>> SortForLinking(List<List<GameObject>> sacre
         {
             currentIndex = 0; // reset
             return null;
-            
+
         }
         else
         {
@@ -372,5 +414,3 @@ public static List<List<GameObject>> SortForLinking(List<List<GameObject>> sacre
         }
     }
 }
-
-

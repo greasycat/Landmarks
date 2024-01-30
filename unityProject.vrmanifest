@@ -5,10 +5,10 @@
       "app_key": "application.generated.unity.loopclosure.exe",
       "launch_type": "url",
       "url": "steam://launch/",
-      "action_manifest_path": "C:\\Users\\localadmin\\Desktop\\Vaisakh_Supermarkets\\Landmarks\\Assets\\StreamingAssets\\SteamVR\\actions.json",
+      "action_manifest_path": "C:\\Users\\error\\WorkSpace\\UCI\\Own\\LandmarkResume\\Assets\\StreamingAssets\\SteamVR\\actions.json",
       "strings": {
         "en_us": {
-          "name": "Loop-Closure [Testing]"
+          "name": "ADRC Pilot Study [Testing]"
         }
       }
     }

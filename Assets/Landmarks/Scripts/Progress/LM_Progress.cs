@@ -460,6 +460,10 @@ namespace Landmarks.Scripts.Progress
             LM_Debug.Instance.Log($"Skipping {numSubtask} subtasks", 10);
         }
 
+        private void WayfindingSkipSubtasks(IReadOnlyList<uint> ids, int numSubtask)
+        {
+        }
+
         public bool SkipSubtask(Transform tr)
         {
             var uid = GetUid(tr);
