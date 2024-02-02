@@ -93,7 +93,7 @@ public class ExplorationTask : ExperimentTask
     //For distance to closest target logging
     private Vector2 endXZ;
 
-    //For distance to border logging (note: Border Objects are walls plus shelves)
+    //For distance to border logging (note: Border Objects are shelves)
     public string borderObjectTag = "BorderObjects"; // Tag for the border objects
     private List<float> distancesToBorder = new List<float>(); // List to store frame by frame distances to border
     private List<GameObject> borderObjects2 = new List<GameObject>();

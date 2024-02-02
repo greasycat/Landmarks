@@ -5,15 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4addc4c6-eb7f-4f00-bcce-3c891681c7d5" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Landmarks/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Landmarks/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/BulkRename.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/BulkRename.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Landmarks/Scenes/Exploration_Task.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Landmarks/Scenes/Exploration_Task.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Landmarks/Scenes/Practice_Environment.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Landmarks/Scenes/Practice_Environment.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Landmarks/Scripts/avatarLog.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Landmarks/Scripts/avatarLog.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Landmarks/Scripts/customAvatarLog.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Landmarks/Scripts/customAvatarLog.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/ViveSR/Scripts/Eye/SRanipal_GazeRay.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ViveSR/Scripts/Eye/SRanipal_GazeRay.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSettings/TagManager.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/TagManager.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Landmarks/Scripts/ExperimentTasks/ExplorationTask.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Landmarks/Scripts/ExperimentTasks/ExplorationTask.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -105,6 +97,7 @@
       <workItem from="1706035136268" duration="60000" />
       <workItem from="1706035205166" duration="4000" />
       <workItem from="1706147088402" duration="2978000" />
+      <workItem from="1706901366568" duration="494000" />
     </task>
     <servers />
   </component>
