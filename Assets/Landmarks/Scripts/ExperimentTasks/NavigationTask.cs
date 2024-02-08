@@ -467,7 +467,7 @@ public class NavigationTask : ExperimentTask
 
             if (playerBorderDistances.ContainsKey(borderObject.name))// adding this if statement to prevent task from crashing on route retracing trial 
             {
-                playerBorderDistances[borderObject.name] += player2borderDist;
+                playerBorderDistances[borderObject.name] = player2borderDist;
             }
 
             else
@@ -499,7 +499,7 @@ public class NavigationTask : ExperimentTask
             
             if (playerWallDistances.ContainsKey(wall.name))// adding this if statement to prevent task from crashing on route retracing trial 
             {
-                playerWallDistances[wall.name] += player2wallDist;
+                playerWallDistances[wall.name] = player2wallDist;
             }
 
             else
