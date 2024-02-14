@@ -30,6 +30,7 @@ TagManager:
   - Floor
   - Ceiling
   - Products
+  - ExcludeEyetracking
   layers:
   - Default
   - TransparentFX

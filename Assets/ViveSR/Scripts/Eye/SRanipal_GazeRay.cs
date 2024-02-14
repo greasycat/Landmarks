@@ -22,6 +22,7 @@ namespace ViveSR
                 private static EyeData_v2 _eyeData;
                 private bool _eyeCallbackRegistered;
                 [SerializeField] private List<string> targetTags;
+                [SerializeField] private List<string> excludeTags;
 
                 public Transform lastHitTransform;
                 public Transform lastHitTargetTransform;
@@ -63,6 +64,8 @@ namespace ViveSR
                     {
                         targetTags = new List<string> {"TargetObject"};
                     }
+                    
+                    excludeTags = excludeTags ?? new List<string>();
 
                     if (debug)
                     {
@@ -155,6 +158,7 @@ namespace ViveSR
                     {
                         var hitTransform = hit.transform;
                         if ( hitTransform == lastHitTransform) return;
+                        if (excludeTags.Any(excludeTag => hitTransform.CompareTag(excludeTag))) return;
                         
                         var exitObjectName = hitTransform == null ? "null" : hitTransform.name;
                         lastHitTransform = hitTransform;
