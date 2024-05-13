@@ -97,15 +97,11 @@ public class ExplorationTask : ExperimentTask, INavigationTask
     //For distance to closest target logging
     private Vector2 endXZ;
 
-    //For distance to border logging (note: Border Objects are walls plus shelves)
-    public string borderObjectTag = "BorderObjects"; // Tag for the border objects
-    private List<float> distancesToBorder = new List<float>(); // List to store frame by frame distances to border
+    //For distance to border logging (note: Border Objects are shelves)
     private List<GameObject> borderObjects2 = new List<GameObject>();
     public Vector2 playerBorderSumAndMeasurements;
 
     //For distance to walls logging (note: Walls are just walls)
-    public string wallsTag = "Walls"; // Tag for the wall objects
-    private List<float> distancesToWalls = new List<float>(); // List to store frame by frame distances to walls
     private List<GameObject> walls2 = new List<GameObject>();
     public Vector2 playerWallSumAndMeasurements;
 
@@ -465,11 +461,12 @@ public class ExplorationTask : ExperimentTask, INavigationTask
         /*float closestDistance;
         GameObject closestBorderObject;*/
 
+        var headsetPosition = manager.playerCamera.transform.position;
         var playerBorderDistances = new Dictionary<string, float>();
         foreach (GameObject borderObject in borderObjects2)
         {
-            Vector3 closestBorderPoint = borderObject.GetComponent<Collider>().ClosestPointOnBounds(manager.player.transform.position);
-            float player2borderDist = Vector3Distance2D(closestBorderPoint, manager.player.transform.position);
+            Vector3 closestBorderPoint = borderObject.GetComponent<Collider>().ClosestPointOnBounds(headsetPosition);
+            float player2borderDist = Vector3.Distance(closestBorderPoint, headsetPosition);
             playerBorderDistances.Add(borderObject.name, player2borderDist);
 
             //float distance = Vector3.Distance(avatar.GetComponent<LM_PlayerController>().collisionObject.transform.position, borderObject.transform.position); //calculating distance from player to each border object
@@ -483,6 +480,9 @@ public class ExplorationTask : ExperimentTask, INavigationTask
             //}
         }
         var closestBorder = playerBorderDistances.OrderBy(kvp => kvp.Value).First();
+        
+        Debug.Log("Walls: " + string.Join(", ", playerBorderDistances.Keys.ToList()));
+        Debug.Log("Player to Wall Distances: " + string.Join(", ",playerBorderDistances.Values.ToList()));
         Debug.Log(closestBorder.Key + " is the closest border object, located " + closestBorder.Value + "m, orthongonally from the player");
         playerBorderSumAndMeasurements += new Vector2(closestBorder.Value, 1);
 
@@ -498,12 +498,16 @@ public class ExplorationTask : ExperimentTask, INavigationTask
         var playerWallDistances = new Dictionary<string, float>();
         foreach (GameObject wall in walls2)
         {
-            Vector3 closestWallPoint = wall.GetComponent<Collider>().ClosestPointOnBounds(manager.player.transform.position);
-            float player2wallDist = Vector3Distance2D(closestWallPoint, manager.player.transform.position);
+            Vector3 closestWallPoint = wall.GetComponent<Collider>().ClosestPointOnBounds(headsetPosition);
+            float player2wallDist = Vector3.Distance(closestWallPoint, headsetPosition);
             playerWallDistances.Add(wall.name, player2wallDist);
+            
 
         }
+        // Debug.Log("Player Transform: " + position);
+        
         var closestWall = playerWallDistances.OrderBy(kvp => kvp.Value).First();
+        
         Debug.Log(closestWall.Key + " is the closest wall object, located " + closestWall.Value + "m, orthongonally from the player");
         playerWallSumAndMeasurements += new Vector2(closestWall.Value, 1);
 

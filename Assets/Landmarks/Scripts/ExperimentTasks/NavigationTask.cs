@@ -348,13 +348,15 @@ public class NavigationTask : ExperimentTask
             if (vrEnabled & haptics) SteamVR_Actions.default_Haptic.Execute(0f, 2.0f, 65f, 1f, SteamVR_Input_Sources.Any);
 
             //Adding Border Objects to List
+            borderObjects2.Clear();
             foreach (var b_obj in GameObject.FindGameObjectsWithTag("BorderObjects"))
             {
-            Debug.Log("BORDER OBJECT -------------------------------" + b_obj.name);
-            borderObjects2.Add(b_obj);
+                Debug.Log("BORDER OBJECT -------------------------------" + b_obj.name);
+                borderObjects2.Add(b_obj);
             }
 
             //Adding Walls Objects to List
+            walls2.Clear();
             foreach (var wall_obj in GameObject.FindGameObjectsWithTag("Walls"))
             {
                 Debug.Log("WALL OBJECT -------------------------------" + wall_obj.name);
@@ -459,21 +461,14 @@ public class NavigationTask : ExperimentTask
         //float closestDistance;
         //GameObject closestBorderObject;
 
+        var headsetPosition = manager.playerCamera.transform.position;
         var playerBorderDistances = new Dictionary<string, float>();
         foreach (GameObject borderObject in borderObjects2)
         {
-            Vector3 closestBorderPoint = borderObject.GetComponent<Collider>().ClosestPointOnBounds(manager.player.transform.position);
-            float player2borderDist = Vector3Distance2D(closestBorderPoint, manager.player.transform.position);
+            Vector3 closestBorderPoint = borderObject.GetComponent<Collider>().ClosestPointOnBounds(headsetPosition);
+            float player2borderDist = Vector3.Distance(closestBorderPoint, headsetPosition);
 
-            if (playerBorderDistances.ContainsKey(borderObject.name))// adding this if statement to prevent task from crashing on route retracing trial 
-            {
-                playerBorderDistances[borderObject.name] += player2borderDist;
-            }
-
-            else
-            {
-                playerBorderDistances.Add(borderObject.name, player2borderDist);
-            }
+            playerBorderDistances.Add(borderObject.name, player2borderDist);
             //float distance = Vector3.Distance(avatar.GetComponent<LM_PlayerController>().collisionObject.transform.position, borderObject.transform.position); //calculating distance from player to each border object
 
             //if (distance < closestDistance) //initially setting the closest object & distance as the first border object's distance & name, then updating and replacing this if smaller distance value is found as script iterates through list of border objects
@@ -494,15 +489,15 @@ public class NavigationTask : ExperimentTask
         var playerWallDistances = new Dictionary<string, float>();
         foreach (GameObject wall in walls2)
         {
-            Vector3 closestWallPoint = wall.GetComponent<Collider>().ClosestPointOnBounds(manager.player.transform.position);
-            float player2wallDist = Vector3Distance2D(closestWallPoint, manager.player.transform.position);
+            Vector3 closestWallPoint = wall.GetComponent<Collider>().ClosestPointOnBounds(headsetPosition);
+            float player2wallDist = Vector3.Distance(closestWallPoint, headsetPosition);
             
-            if (playerWallDistances.ContainsKey(wall.name))// adding this if statement to prevent task from crashing on route retracing trial 
+            // if (playerWallDistances.ContainsKey(wall.name))// adding this if statement to prevent task from crashing on route retracing trial 
             {
-                playerWallDistances[wall.name] += player2wallDist;
+                // playerWallDistances[wall.name] = player2wallDist;
             }
 
-            else
+            // else
             {
                 playerWallDistances.Add(wall.name, player2wallDist);
             }

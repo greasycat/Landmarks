@@ -9448,6 +9448,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1136227219}
     m_Modifications:
+    - target: {fileID: 159450991910753822, guid: aec9e6c5824fc4e11a087bfa19c3f7e2,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 816486722065846982, guid: aec9e6c5824fc4e11a087bfa19c3f7e2,
         type: 3}
       propertyPath: m_Name
@@ -14256,6 +14261,7 @@ MonoBehaviour:
   VP_ExplorationTask: {fileID: 1290081303}
   VP_ExplorationCountdownTimer: {fileID: 6283521767554458752}
   VP_WayfindingCountdownTimer: {fileID: 435254870}
+  gazeRay: {fileID: 1391883377}
 --- !u!1001 &550505254
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -22773,6 +22779,12 @@ PrefabInstance:
     - {fileID: 5679918017152846591, guid: 0eaa84beeb5544ef08a8fa759a1176ce, type: 3}
     - {fileID: 223810149508579114, guid: 0eaa84beeb5544ef08a8fa759a1176ce, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 0eaa84beeb5544ef08a8fa759a1176ce, type: 3}
+--- !u!20 &954692554 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 2688122929513333242, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
+    type: 3}
+  m_PrefabInstance: {fileID: 954692553}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &955834423
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -24735,7 +24747,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-332304
+  m_Name: pb_Mesh-45940
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -27204,6 +27216,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1136227219}
     m_Modifications:
+    - target: {fileID: 159450991910753822, guid: aec9e6c5824fc4e11a087bfa19c3f7e2,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 816486722065846982, guid: aec9e6c5824fc4e11a087bfa19c3f7e2,
         type: 3}
       propertyPath: m_Name
@@ -33112,7 +33129,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh436738
+  m_Name: pb_Mesh149418
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -33952,6 +33969,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1136227219}
     m_Modifications:
+    - target: {fileID: 159450991910753822, guid: aec9e6c5824fc4e11a087bfa19c3f7e2,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 816486722065846982, guid: aec9e6c5824fc4e11a087bfa19c3f7e2,
         type: 3}
       propertyPath: m_Name
@@ -34552,6 +34574,103 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a9e5f558ead439941aaa9b7a955d5ea3, type: 3}
+--- !u!1001 &1391883376
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 524793866, guid: 67dd880c9bb3ffe42aa71adb69592524, type: 3}
+      propertyPath: m_Camera
+      value: 
+      objectReference: {fileID: 954692554}
+    - target: {fileID: 2129442890, guid: 67dd880c9bb3ffe42aa71adb69592524, type: 3}
+      propertyPath: debug
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2129442890, guid: 67dd880c9bb3ffe42aa71adb69592524, type: 3}
+      propertyPath: lengthOfRay
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 2129442890, guid: 67dd880c9bb3ffe42aa71adb69592524, type: 3}
+      propertyPath: renderGazeRay
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2561717650257222297, guid: 67dd880c9bb3ffe42aa71adb69592524,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2561717650257222297, guid: 67dd880c9bb3ffe42aa71adb69592524,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2561717650257222297, guid: 67dd880c9bb3ffe42aa71adb69592524,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2561717650257222297, guid: 67dd880c9bb3ffe42aa71adb69592524,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2561717650257222297, guid: 67dd880c9bb3ffe42aa71adb69592524,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2561717650257222297, guid: 67dd880c9bb3ffe42aa71adb69592524,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2561717650257222297, guid: 67dd880c9bb3ffe42aa71adb69592524,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2561717650257222297, guid: 67dd880c9bb3ffe42aa71adb69592524,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2561717650257222297, guid: 67dd880c9bb3ffe42aa71adb69592524,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2561717650257222297, guid: 67dd880c9bb3ffe42aa71adb69592524,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2561717650257222297, guid: 67dd880c9bb3ffe42aa71adb69592524,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2565444710679573633, guid: 67dd880c9bb3ffe42aa71adb69592524,
+        type: 3}
+      propertyPath: m_Name
+      value: SRanipal Eye Framework Changed
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 67dd880c9bb3ffe42aa71adb69592524, type: 3}
+--- !u!114 &1391883377 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2129442890, guid: 67dd880c9bb3ffe42aa71adb69592524,
+    type: 3}
+  m_PrefabInstance: {fileID: 1391883376}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a66375955b9b4fd1a725999c4474f09e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1399974998
 PrefabInstance:
   m_ObjectHideFlags: 0

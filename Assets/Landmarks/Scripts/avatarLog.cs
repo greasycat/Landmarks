@@ -2,6 +2,7 @@
 using System.Collections;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
+using ViveSR.anipal.Eye;
 
 public class avatarLog : MonoBehaviour
 {
@@ -15,11 +16,13 @@ public class avatarLog : MonoBehaviour
 	private Experiment manager;
 	private LM_PlayerController controller;
 	public ExplorationTask VP_ExplorationTask;
-
+    
     public TL_ExplorationCountdownTimer VP_ExplorationCountdownTimer;
-
+  
 
     public TL_WayfindingCountdownTimer VP_WayfindingCountdownTimer;
+    
+    [SerializeField] private SRanipal_GazeRay gazeRay;
 
 
 
@@ -61,7 +64,7 @@ public class avatarLog : MonoBehaviour
 			Debug.Log("We have left " + previousLocation + ". Now entering " + location);
 		}
 
-		// Checking if player pressed button to indicate that they've fully learned locations of all target objects
+		// Checking if player pressed button to indicate that they've fully learned locations of all target objects 
 		if (Input.GetKey(KeyCode.Space))
 		{
 			KeyPress = "True";
@@ -97,16 +100,24 @@ public class avatarLog : MonoBehaviour
 					"Camera Rotation   (xyz): \t" + head.eulerAngles.x + "\t" + head.eulerAngles.y + "\t" + head.eulerAngles.z + "\t" +
 					"Location (Object/Hallway): \t" + location + "\t" +
 					"Keypress(True/False): \t" + KeyPress + "\t" +
-					"TargetObjectVisibility: \t" + TargetObjectVisibility + "\t" +
-
+					
+			//// Eyetracking Data
+			        "EyeTracking Origin: \t" + gazeRay.getGazeOrigin() + "\t" +
+					"EyeTracking Direction: \t" + gazeRay.getGazeDirection() + "\t" +
+					"EyeTracking Last Hit: \t" + gazeRay.getLastHitTransform() + "\t" +
+					"EyeTracking Last HitTarget: \t" + gazeRay.getLastHitTargetTransform() + "\t" +
+					
+					
+					
+					
 
 			////////////// Explore Times
 
-
+                    
                     "Explore CountdownTimer: \t" + VP_ExplorationCountdownTimer.runningCountdownTimer.ToString() + "\t" +
                     "Explore LearningTime: \t" + VP_ExplorationTask.initialExplorationTime.ToString() + "\t" + // logging the "initial" exploration time from ExplorationTask Script
 
-
+                    
             ///////////// Wayfinding Times
 
                     "Wayfinding CountdownTimer: \t" + VP_WayfindingCountdownTimer.wayfindingRunningCountdownTimer.ToString() + "\t", 1);
@@ -117,15 +128,15 @@ public class avatarLog : MonoBehaviour
 	// Update is called once per frame
 	void FixedUpdate()
 	{
-
+	
 		foreach (GameObject targetObject in targetObjects)
         {
 			IsVisibleFromCamera(targetObject, controller.cam);
-
+			
 		}
+			
 
-
-		// fixmefixmefixme Checking if target objects are visible as player moves around;
+		// fixmefixmefixme Checking if target objects are visible as player moves around; 
 
 		//GameObject[] targetObjects = GameObject.FindGameObjectsWithTag("Target");
 
@@ -268,7 +279,7 @@ public class avatarLog : MonoBehaviour
 	}
 
 
-	//function to check if target object are truly visible in camera's field of view, by checking if object's renderer bounds intersect with camera's field of view
+	//function to check if target object are truly visible in camera's field of view, by checking if object's renderer bounds intersect with camera's field of view 
 	//private bool IsVisibleFromCamera(GameObject targetObject, Camera camera)
 	//{
 	//	Renderer renderer = targetObject.GetComponent<Renderer>();
@@ -302,7 +313,7 @@ public class avatarLog : MonoBehaviour
 	//	}
 	//	return (false);
 
-	//}
+	//}	
 
 
 
@@ -318,7 +329,7 @@ public class avatarLog : MonoBehaviour
 }
 //Plane[] frustumPlanes = GeometryUtility.CalculateFrustumPlanes(camera);
 //return GeometryUtility.TestPlanesAABB(frustumPlanes, renderer.bounds);
-//}
+//}	
 
 
 
@@ -338,7 +349,7 @@ public class avatarLog : MonoBehaviour {
 	private GameObject experiment;
 	private dbLog log;
 	private Experiment manager;
-
+	
 	public GameObject player;
 	public GameObject camerarig;
 
@@ -355,7 +366,7 @@ public class avatarLog : MonoBehaviour {
 		manager = experiment.GetComponent("Experiment") as Experiment;
 		log = manager.dblog;
 		avatar = transform;
-
+		
 	}
 
     private void Update()
@@ -375,7 +386,7 @@ public class avatarLog : MonoBehaviour {
 
     // Update is called once per frame
     void FixedUpdate () {
-		// Checking if player pressed button
+		// Checking if player pressed button 
 		if (Input.GetKey(KeyCode.Space))
 		{
 			KeyPress= "True";

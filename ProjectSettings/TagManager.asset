@@ -26,6 +26,11 @@ TagManager:
   - StartingLocations
   - NavigationLocations
   - Walls
+  - Wall
+  - Floor
+  - Ceiling
+  - Products
+  - ExcludeEyetracking
   layers:
   - Default
   - TransparentFX
