@@ -30521,6 +30521,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   skip: 0
+  skipIfResume: 0
   canIncrementLists: 0
   interval: 0
   interruptTasks: {fileID: 0}
@@ -31582,6 +31583,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   skip: 0
+  skipIfResume: 0
   canIncrementLists: 0
   interval: 0
   interruptTasks: {fileID: 0}
@@ -31627,10 +31629,9 @@ MonoBehaviour:
   onlyContinueFromTargets: 0
   haptics: 0
   logStartEnd: 1
-  borderObjectTag: BorderObjects
   playerBorderSumAndMeasurements: {x: 0, y: 0}
-  wallsTag: Walls
   playerWallSumAndMeasurements: {x: 0, y: 0}
+  defaultTimeRemaining: 0
 --- !u!1001 &1294187950
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -34656,6 +34657,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SRanipal Eye Framework Changed
+      objectReference: {fileID: 0}
+    - target: {fileID: 2565444710679573633, guid: 67dd880c9bb3ffe42aa71adb69592524,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 67dd880c9bb3ffe42aa71adb69592524, type: 3}
@@ -50007,6 +50013,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   skip: 0
+  skipIfResume: 0
   canIncrementLists: 1
   interval: 0
   interruptTasks: {fileID: 0}
@@ -52662,6 +52669,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   skip: 0
+  skipIfResume: 0
   canIncrementLists: 1
   interval: 0
   interruptTasks: {fileID: 0}
@@ -52687,6 +52695,7 @@ MonoBehaviour:
   overideRepeat: {fileID: 0}
   repeatCount: 1
   currentTask: {fileID: 0}
+  currentTaskIndex: 0
   catchTrialCount: 0
   skipOnCatch: []
   onlyOnCatch: []
@@ -52695,6 +52704,7 @@ MonoBehaviour:
   catchFlag: 0
   overlayRepeatCount: {fileID: 0}
   overlayListItem: {fileID: 0}
+  numberOfChildTaskToSkip: 0
 --- !u!114 &6242776888317137875
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -52708,6 +52718,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   skip: 0
+  skipIfResume: 0
   canIncrementLists: 1
   interval: 0
   interruptTasks: {fileID: 0}
@@ -52733,6 +52744,7 @@ MonoBehaviour:
   overideRepeat: {fileID: 0}
   repeatCount: 1
   currentTask: {fileID: 0}
+  currentTaskIndex: 0
   catchTrialCount: 0
   skipOnCatch: []
   onlyOnCatch: []
@@ -52741,6 +52753,7 @@ MonoBehaviour:
   catchFlag: 0
   overlayRepeatCount: {fileID: 0}
   overlayListItem: {fileID: 0}
+  numberOfChildTaskToSkip: 0
 --- !u!114 &6242935900380113597
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -52754,6 +52767,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   skip: 0
+  skipIfResume: 0
   canIncrementLists: 0
   interval: 0
   interruptTasks: {fileID: 0}
@@ -52914,6 +52928,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   skip: 0
+  skipIfResume: 0
   canIncrementLists: 1
   interval: 0
   interruptTasks: {fileID: 0}

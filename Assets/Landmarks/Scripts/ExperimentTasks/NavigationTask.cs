@@ -7,6 +7,7 @@ using Valve.VR.InteractionSystem;
 using UnityStandardAssets.Vehicles.Ball;
 using static UnityEngine.GraphicsBuffer;
 using System.Linq;
+using UnityEngine.Assertions;
 
 public enum HideTargetOnStart
 {
@@ -20,8 +21,7 @@ public enum HideTargetOnStart
 
 public class NavigationTask : ExperimentTask
 {
-    [Header("Task-specific Properties")]
-    public ObjectList destinations;
+    [Header("Task-specific Properties")] public ObjectList destinations;
     public GameObject currentTarget;
     public ObjectList listOfNavStarts;
     public GameObject startingLocation;
@@ -30,12 +30,12 @@ public class NavigationTask : ExperimentTask
 
 
     // Manipulate trial/task termination criteria
-    [Tooltip("in meters")]
-    public float distanceAllotted = Mathf.Infinity;
-    [Tooltip("in seconds")]
-    public float timeAllotted = Mathf.Infinity;
+    [Tooltip("in meters")] public float distanceAllotted = Mathf.Infinity;
+    [Tooltip("in seconds")] public float timeAllotted = Mathf.Infinity;
+
     [Tooltip("Do we want time or distance remaining to be broadcast somewhere?")]
     public TextMeshProUGUI printRemainingTimeTo;
+
     private string baseText;
 
     // Use a scoring/points system (not currently configured)
@@ -47,15 +47,17 @@ public class NavigationTask : ExperimentTask
 
     // Handle the rendering of the target objects (default: always show)
     public HideTargetOnStart hideTargetOnStart;
-    public float unmaskStartObjectFor; 
+    public float unmaskStartObjectFor;
     public GameObject targetMaskPrefab;
     public float showTargetAfterSeconds;
     public bool hideNonTargets;
 
     // for compass assist
     public LM_Compass assistCompass;
+
     [Tooltip("negative values denote time before compass is hidden; 0 is always on; set very high for no compass")]
     public float SecondsUntilAssist = Mathf.Infinity;
+
     public Vector3 compassPosOffset; // where is the compass relative to the active player snappoint
     public Vector3 compassRotOffset; // compass rotation relative to the active player snap point
 
@@ -72,7 +74,10 @@ public class NavigationTask : ExperimentTask
     List<GameObject> targetObjectColliders = new List<GameObject>();
 
     // 4/27/2022 Added for Loop Closure Task
-    public float allowContinueAfter = Mathf.Infinity; // flag to let participants press a button to continue without necessarily arriving
+    public float
+        allowContinueAfter =
+            Mathf.Infinity; // flag to let participants press a button to continue without necessarily arriving
+
     public bool onlyContinueFromTargets;
     public bool haptics;
     private float clockwiseTravel = 0; // relative to the origin (0,0,0) in world space
@@ -108,12 +113,12 @@ public class NavigationTask : ExperimentTask
     //hiding the exploration phase countdown timer when the navigation task begins
     public TL_ExplorationCountdownTimer ExplorationCountdownTimer;
 
-    
 
     public float GetStartTime()
     {
         return startTime;
     }
+
     public override void startTask()
     {
         TASK_START();
@@ -142,7 +147,11 @@ public class NavigationTask : ExperimentTask
 
         foreach (GameObject obj in listOfNavStarts.objects.Distinct<GameObject>())
         {
-            if (obj.activeSelf == false) { continue; }
+            if (obj.activeSelf == false)
+            {
+                continue;
+            }
+
             obj.SetActive(true);
             foreach (Transform child in obj.GetComponentsInChildren<Transform>(true))
             {
@@ -151,17 +160,17 @@ public class NavigationTask : ExperimentTask
         }
 
 
-        if (skip)
-        {
-            log.log("INFO    skip task    " + name, 1);
-            return;
-        }
+        // if (skip)
+        // {
+        //     log.log("INFO    skip task    " + name, 1);
+        //     return;
+        // }
 
         if (!destinations)
         {
             Debug.LogWarning("No target objects specified; task will run as" +
-                " free exploration with specified time Alloted or distance alloted" +
-                " (whichever is less)");
+                             " free exploration with specified time Alloted or distance alloted" +
+                             " (whichever is less)");
 
             // Make a dummy placeholder for exploration task to avoid throwing errors
             var tmp = new List<GameObject>();
@@ -171,13 +180,14 @@ public class NavigationTask : ExperimentTask
 
 
             destinations = gameObject.GetComponent<ObjectList>();
-
         }
 
         hud.showEverything();
         hud.showScore = showScoring;
 
         currentTarget = destinations.currentObject();
+
+        Assert.IsNotNull(currentTarget, "currentTarget should not be null");
 
         // update the trial count on the overlay
         //if (overlayTargetObject != null & currentTarget != null) overlayTargetObject.text = string.Format("{0}", currentTarget.name);
@@ -241,7 +251,6 @@ public class NavigationTask : ExperimentTask
             {
                 currentTarget.GetComponent<Collider>().enabled = false;
                 currentTarget.GetComponentInChildren<MeshRenderer>().enabled = false;
-
             }
 
             else if (hideTargetOnStart == HideTargetOnStart.Mask)
@@ -254,17 +263,19 @@ public class NavigationTask : ExperimentTask
                     // Instantiate a new instance of your red sphere
                     int numSpheres = 0;
                     if (numSpheres < destinations.objects.Distinct<GameObject>().Count())
-                    // if the # of spheres is less than 9...
+                        // if the # of spheres is less than 9...
                     {
                         GameObject newSphere = Instantiate(targetMaskPrefab,
-                        position: new Vector3(target.transform.position.x, desiredSphereYPosition, target.transform.position.z),
-                        rotation: Quaternion.identity,
-                        parent: transform);
+                            position: new Vector3(target.transform.position.x, desiredSphereYPosition,
+                                target.transform.position.z),
+                            rotation: Quaternion.identity,
+                            parent: transform);
                         newSphere.name = target.name + "_mask";
                         newSphere.tag = "RedSphereTag"; // after spawning in these spheres, tag them with "RedSphereTag"
                         numSpheres++;
                     }
                 }
+
             // Handle if we're temporarily showing the start
             if (unmaskStartObjectFor > 0 && unmaskStartObjectFor < Mathf.Infinity)
             {
@@ -306,7 +317,10 @@ public class NavigationTask : ExperimentTask
             {
                 optimalDistance = Vector3.Distance(scaledAvatar.transform.position, currentTarget.transform.position);
             }
-            else optimalDistance = Vector3.Distance(avatar.GetComponent<LM_PlayerController>().collisionObject.transform.position, currentTarget.transform.position);
+            else
+                optimalDistance =
+                    Vector3.Distance(avatar.GetComponent<LM_PlayerController>().collisionObject.transform.position,
+                        currentTarget.transform.position);
 
 
             // Grab our LM_Compass object and move it to the player snapPoint
@@ -345,7 +359,8 @@ public class NavigationTask : ExperimentTask
 
             if (logStartEnd) startXYZ = avatar.GetComponent<LM_PlayerController>().collisionObject.transform.position;
 
-            if (vrEnabled & haptics) SteamVR_Actions.default_Haptic.Execute(0f, 2.0f, 65f, 1f, SteamVR_Input_Sources.Any);
+            if (vrEnabled & haptics)
+                SteamVR_Actions.default_Haptic.Execute(0f, 2.0f, 65f, 1f, SteamVR_Input_Sources.Any);
 
             //Adding Border Objects to List
             borderObjects2.Clear();
@@ -362,7 +377,6 @@ public class NavigationTask : ExperimentTask
                 Debug.Log("WALL OBJECT -------------------------------" + wall_obj.name);
                 walls2.Add(wall_obj);
             }
-
         }
 
         //find starting location of player (where the trial started)
@@ -370,8 +384,8 @@ public class NavigationTask : ExperimentTask
         if (!listOfNavStarts)
         {
             Debug.LogWarning("No trial start locations specified; task will run as" +
-                " free exploration with specified time Alloted or distance alloted" +
-                " (whichever is less)");
+                             " free exploration with specified time Alloted or distance alloted" +
+                             " (whichever is less)");
 
             // Make a dummy placeholder for exploration task to avoid throwing errors
             var tmp_2 = new List<GameObject>();
@@ -381,21 +395,21 @@ public class NavigationTask : ExperimentTask
 
 
             listOfNavStarts = gameObject.GetComponent<ObjectList>();
-
         }
+
         startingLocation = listOfNavStarts.currentObject();
     }
 
     public override bool updateTask()
     {
         base.updateTask();
-        
+
         // use experiment.cs to get each target object on which the desired collider SHOULD be attached
         for (int i = 0; i < manager.targetObjects.transform.childCount; i++)
         {
             targetObjectColliders.Add(manager.targetObjects.transform.GetChild(i).gameObject);
         }
-        
+
         if (skip)
         {
             //log.log("INFO    skip task    " + name,1 );
@@ -417,7 +431,6 @@ public class NavigationTask : ExperimentTask
         //show target after set time
         if (hideTargetOnStart != HideTargetOnStart.Off && Time.time - startTime > showTargetAfterSeconds)
         {
-
             switch (hideTargetOnStart)
             {
                 case HideTargetOnStart.SetInactive:
@@ -438,7 +451,7 @@ public class NavigationTask : ExperimentTask
                     currentTarget.GetComponentInChildren<MeshRenderer>().enabled = true;
                     break;
                 case HideTargetOnStart.Mask:
-                    
+
                     break;
                 default:
                     Debug.Log("No hidden targets identified");
@@ -450,14 +463,17 @@ public class NavigationTask : ExperimentTask
         }
 
         // Keep updating the distance traveled and kill task if they reach max
-        playerDistance += Vector3.Distance(avatar.GetComponent<LM_PlayerController>().collisionObject.transform.position, playerLastPosition);
+        playerDistance +=
+            Vector3.Distance(avatar.GetComponent<LM_PlayerController>().collisionObject.transform.position,
+                playerLastPosition);
         // Subtract the counter-clockwise angle since the last frame to get clockwise movement
-        clockwiseTravel -= Vector3Angle2D(playerLastPosition, avatar.GetComponent<LM_PlayerController>().collisionObject.transform.position);
+        clockwiseTravel -= Vector3Angle2D(playerLastPosition,
+            avatar.GetComponent<LM_PlayerController>().collisionObject.transform.position);
         playerLastPosition = avatar.GetComponent<LM_PlayerController>().collisionObject.transform.position;
 
 
         // Keep updating the calculations for borderDistances
-        //logging distance to border at each frame, then finding the average value for the entire trial 
+        //logging distance to border at each frame, then finding the average value for the entire trial
         //float closestDistance;
         //GameObject closestBorderObject;
 
@@ -481,18 +497,19 @@ public class NavigationTask : ExperimentTask
         }
 
         var closestBorder = playerBorderDistances.OrderBy(kvp => kvp.Value).First();
-        Debug.Log(closestBorder.Key + " is the closest border object, located " + closestBorder.Value + "m, orthongonally from the player");
+        Debug.Log(closestBorder.Key + " is the closest border object, located " + closestBorder.Value +
+                  "m, orthongonally from the player");
         playerBorderSumAndMeasurements += new Vector2(closestBorder.Value, 1);
 
         //Keep updating the calculations for wallDistances
-        //logging distance to walls at each frame, then finding the average value for the entire trial 
+        //logging distance to walls at each frame, then finding the average value for the entire trial
         var playerWallDistances = new Dictionary<string, float>();
         foreach (GameObject wall in walls2)
         {
             Vector3 closestWallPoint = wall.GetComponent<Collider>().ClosestPointOnBounds(headsetPosition);
             float player2wallDist = Vector3.Distance(closestWallPoint, headsetPosition);
-            
-            // if (playerWallDistances.ContainsKey(wall.name))// adding this if statement to prevent task from crashing on route retracing trial 
+
+            // if (playerWallDistances.ContainsKey(wall.name))// adding this if statement to prevent task from crashing on route retracing trial
             {
                 // playerWallDistances[wall.name] = player2wallDist;
             }
@@ -502,11 +519,11 @@ public class NavigationTask : ExperimentTask
                 playerWallDistances.Add(wall.name, player2wallDist);
             }
             //playerWallDistances.Add(wall.name, player2wallDist);
-
         }
 
         var closestWall = playerWallDistances.OrderBy(kvp => kvp.Value).First();
-        Debug.Log(closestWall.Key + " is the closest wall object, located " + closestWall.Value + "m, orthongonally from the player");
+        Debug.Log(closestWall.Key + " is the closest wall object, located " + closestWall.Value +
+                  "m, orthongonally from the player");
         playerWallSumAndMeasurements += new Vector2(closestWall.Value, 1);
 
         if (isScaled)
@@ -520,10 +537,12 @@ public class NavigationTask : ExperimentTask
         {
             // Keep the assist compass pointing at the target (even if it isn't visible)
             var targetDirection = 2 * assistCompass.transform.position - currentTarget.transform.position;
-            targetDirection = new Vector3(targetDirection.x, assistCompass.pointer.transform.position.y, targetDirection.z);
+            targetDirection = new Vector3(targetDirection.x, assistCompass.pointer.transform.position.y,
+                targetDirection.z);
             assistCompass.pointer.transform.LookAt(targetDirection, Vector3.up);
             // Show assist compass if and when it is needed
-            if (assistCompass.gameObject.activeSelf == false & SecondsUntilAssist >= 0 & (Time.time - startTime > SecondsUntilAssist))
+            if (assistCompass.gameObject.activeSelf == false & SecondsUntilAssist >= 0 &
+                (Time.time - startTime > SecondsUntilAssist))
             {
                 assistCompass.gameObject.SetActive(true);
             }
@@ -535,7 +554,8 @@ public class NavigationTask : ExperimentTask
         // If we have a place to output ongoing trial info (time/dist remaining), use it
         if (printRemainingTimeTo != null)
         {
-            printRemainingTimeTo.text = string.Format(baseText, Mathf.Round(distanceRemaining), Mathf.Round(timeRemaining));
+            printRemainingTimeTo.text =
+                string.Format(baseText, Mathf.Round(distanceRemaining), Mathf.Round(timeRemaining));
         }
 
         // End the trial if they reach the max distance allotted
@@ -559,13 +579,13 @@ public class NavigationTask : ExperimentTask
 
         // In order to allow manual progression, allowContinueAfter must not be zero and enough time must have passed
         if (allowContinueAfter != Mathf.Infinity && Time.time - startTime > allowContinueAfter)
-        //fixme 06-01: when the obj is masked ->...
+            //fixme 06-01: when the obj is masked ->...
         {
             // They either need to be allowed to continue from anywhere or be at one of the targets to provide input
             if (!onlyContinueFromTargets || (onlyContinueFromTargets &&
-                                            (manager.currentlyAtTarget != null)
-                                            //(manager.triggeredFromTargetNamed != "" || manager.collidingWithTargetNamed != "")
-                                            ))
+                                             (manager.currentlyAtTarget != null)
+                    //(manager.triggeredFromTargetNamed != "" || manager.collidingWithTargetNamed != "")
+                ))
             {
                 // Take some response input
                 if (vrEnabled)
@@ -577,10 +597,12 @@ public class NavigationTask : ExperimentTask
                         log.log("INPUT_EVENT    Player Arrived at Destination    1", 1);
                         //hud.hudPanel.SetActive(false);
                         //hud.setMessage("");
-                        if (haptics) SteamVR_Actions.default_Haptic.Execute(0f, 2.0f, 65f, 1f, SteamVR_Input_Sources.Any);
+                        if (haptics)
+                            SteamVR_Actions.default_Haptic.Execute(0f, 2.0f, 65f, 1f, SteamVR_Input_Sources.Any);
                         return true;
                     }
                 }
+
                 if (Input.GetKeyDown(KeyCode.Return))
                 {
                     participantEndTarget = manager.currentlyAtTarget;
@@ -591,13 +613,11 @@ public class NavigationTask : ExperimentTask
                     return true;
                 }
             }
-
         }
-        return false;
 
-        
+        return false;
     }
-    
+
 
     public override void endTask()
     {
@@ -615,16 +635,25 @@ public class NavigationTask : ExperimentTask
 
         hud.setMessage("");
         hud.showScore = false;
-
     }
 
     public override void TASK_END()
     {
         base.endTask();
 
+        if (skip)
+        {
+            log.log("INFO    skip task    " + name, 1);
+            return;
+        }
+
         foreach (GameObject obj in listOfNavStarts.objects.Distinct<GameObject>())
         {
-            if (obj.activeSelf == false) { continue; }
+            if (obj.activeSelf == false)
+            {
+                continue;
+            }
+
             obj.SetActive(true);
             foreach (Transform child in obj.GetComponentsInChildren<Transform>(true))
             {
@@ -632,7 +661,7 @@ public class NavigationTask : ExperimentTask
             }
         }
         // Find all instances of InterfacePivot and call stroyAllInterfaces() on each one
-        // Find all instances of InterfacePivot 
+        // Find all instances of InterfacePivot
         //InterfacePivot[] interfacePivots = FindObjectsOfType<InterfacePivot>();
         //foreach (InterfacePivot pivot in interfacePivots)
         //{
@@ -708,11 +737,10 @@ public class NavigationTask : ExperimentTask
         }
 
         // re-enable everything on the gameobject we just finished finding
-        //currentTarget.GetComponentInChildren<MeshRenderer>().enabled = true; June 1st edits, we took this out because it was breaking the task 
-        //currentTarget.GetComponent<Collider>().enabled = true; June 1st edits, we took this out because it was breaking the task 
+        //currentTarget.GetComponentInChildren<MeshRenderer>().enabled = true; June 1st edits, we took this out because it was breaking the task
+        //currentTarget.GetComponent<Collider>().enabled = true; June 1st edits, we took this out because it was breaking the task
         var halo = (Behaviour)currentTarget.GetComponent("Halo");
         if (halo != null) halo.enabled = true;
-
 
 
         hud.setMessage("");
@@ -754,7 +782,7 @@ public class NavigationTask : ExperimentTask
         // 	masterTask.name + "\t" + masterTask.repeatCount + "\t" + parent.repeatCount + "\t" + currentTarget.name + "\t" + optimalDistance + "\t"+ perfDistance + "\t" + excessPath + "\t" + navTime
         //     , 1);
 
-        //calculating average distance to border for trial 
+        //calculating average distance to border for trial
         //private void CalculateAverageDistance()
         //float totaldistancesToBorder = 0f;
 
@@ -764,15 +792,17 @@ public class NavigationTask : ExperimentTask
         //}
 
         var avgDist2border = playerBorderSumAndMeasurements[0] / playerBorderSumAndMeasurements[1];
-        Debug.Log("Sum of all Dist measurements: " + playerBorderSumAndMeasurements[0] + "\t Total Measurements: " + playerBorderSumAndMeasurements[1] + "\t Avg Dist: " + avgDist2border);
+        Debug.Log("Sum of all Dist measurements: " + playerBorderSumAndMeasurements[0] + "\t Total Measurements: " +
+                  playerBorderSumAndMeasurements[1] + "\t Avg Dist: " + avgDist2border);
 
 
         //float averageDistanceToBorder = totaldistancesToBorder / distancesToBorder.Count;
         //Debug.Log("Average Distance: " + averageDistanceToBorder);
 
-        //calculating average distance to wall for trial 
+        //calculating average distance to wall for trial
         var avgDist2wall = playerWallSumAndMeasurements[0] / playerWallSumAndMeasurements[1];
-        Debug.Log("Sum of all Dist to Wall measurements: " + playerWallSumAndMeasurements[0] + "\t Total Measurements: " + playerWallSumAndMeasurements[1] + "\t Avg Dist: " + avgDist2wall);
+        Debug.Log("Sum of all Dist to Wall measurements: " + playerWallSumAndMeasurements[0] +
+                  "\t Total Measurements: " + playerWallSumAndMeasurements[1] + "\t Avg Dist: " + avgDist2wall);
 
         //find finishing location of player (closest target object & distance to that target object)
         GameObject[] objs = GameObject.FindGameObjectsWithTag("Target");
@@ -799,44 +829,48 @@ public class NavigationTask : ExperimentTask
             Debug.Log("Distance to closest target: " + closestobjDistance);
         }
 
-
-
-        // More concise LM_TrialLog logging
-        taskLog.AddData(transform.name + "_start", startingLocation.name);
-        taskLog.AddData(transform.name + "_target", currentTarget.name);
-        taskLog.AddData(transform.name + "_endedAtTarget", participantEndTarget.name); //
-        taskLog.AddData(transform.name + "_endedAtCorrectTarget", (participantEndTarget == destinations.currentObject()).ToString()); //
-        taskLog.AddData(transform.name + "_actualPath", perfDistance.ToString());
-        taskLog.AddData(transform.name + "_optimalPath", optimalDistance.ToString());
-        taskLog.AddData(transform.name + "_excessPath", excessPath.ToString());
-        taskLog.AddData(transform.name + "_clockwiseTravel", clockwiseTravel.ToString());
-        taskLog.AddData(transform.name + "_duration", navTime.ToString());
-        taskLog.AddData(transform.name + "averageDistToBorder", avgDist2border.ToString());
-        taskLog.AddData(transform.name + "averageDistToWall", avgDist2wall.ToString());
-        taskLog.AddData(transform.name + "_trialEndClosestTarget", closest_obj.name);
-        taskLog.AddData(transform.name + "_trialEndClosestTargetDist", closestobjDistance.ToString());
-        //taskLog.AddData("testtesttest" + "_correctPosition", interfacePivots.correctPosition.ToString());
-
-        if (logStartEnd)
+        if (!skip)
         {
+            // More concise LM_TrialLog logging
+            taskLog.AddData(transform.name + "_start", startingLocation.name);
+            taskLog.AddData(transform.name + "_target", currentTarget.name);
 
-            taskLog.AddData(transform.name + "_startX", startXYZ.x.ToString());
-            taskLog.AddData(transform.name + "_startZ", startXYZ.z.ToString());
-            taskLog.AddData(transform.name + "_endX", endXYZ.x.ToString());
-            taskLog.AddData(transform.name + "_endZ", endXYZ.z.ToString());
-
-        }
-
-        // Record any decisions made along the way
-        if (decisionPoints != null)
-        {
-            foreach (LM_DecisionPoint nexus in decisionPoints)
+            if (participantEndTarget != null)
             {
-                taskLog.AddData(nexus.name + "_initialChoice", nexus.initialChoice);
-                taskLog.AddData(nexus.name + "_finalChoice", nexus.currentChoice);
-                taskLog.AddData(nexus.name + "_totalChoices", nexus.totalChoices.ToString());
+                taskLog.AddData(transform.name + "_endedAtTarget", participantEndTarget.name); //
+                taskLog.AddData(transform.name + "_endedAtCorrectTarget",
+                    (participantEndTarget == destinations.currentObject()).ToString()); //
+            }
+            taskLog.AddData(transform.name + "_actualPath", perfDistance.ToString());
+            taskLog.AddData(transform.name + "_optimalPath", optimalDistance.ToString());
+            taskLog.AddData(transform.name + "_excessPath", excessPath.ToString());
+            taskLog.AddData(transform.name + "_clockwiseTravel", clockwiseTravel.ToString());
+            taskLog.AddData(transform.name + "_duration", navTime.ToString());
+            taskLog.AddData(transform.name + "averageDistToBorder", avgDist2border.ToString());
+            taskLog.AddData(transform.name + "averageDistToWall", avgDist2wall.ToString());
+            taskLog.AddData(transform.name + "_trialEndClosestTarget", closest_obj.name);
+            taskLog.AddData(transform.name + "_trialEndClosestTargetDist", closestobjDistance.ToString());
+            //taskLog.AddData("testtesttest" + "_correctPosition", interfacePivots.correctPosition.ToString());
 
-                nexus.ResetDecisionPoint();
+            if (logStartEnd)
+            {
+                taskLog.AddData(transform.name + "_startX", startXYZ.x.ToString());
+                taskLog.AddData(transform.name + "_startZ", startXYZ.z.ToString());
+                taskLog.AddData(transform.name + "_endX", endXYZ.x.ToString());
+                taskLog.AddData(transform.name + "_endZ", endXYZ.z.ToString());
+            }
+
+            // Record any decisions made along the way
+            if (decisionPoints != null)
+            {
+                foreach (LM_DecisionPoint nexus in decisionPoints)
+                {
+                    taskLog.AddData(nexus.name + "_initialChoice", nexus.initialChoice);
+                    taskLog.AddData(nexus.name + "_finalChoice", nexus.currentChoice);
+                    taskLog.AddData(nexus.name + "_totalChoices", nexus.totalChoices.ToString());
+
+                    nexus.ResetDecisionPoint();
+                }
             }
         }
         //if (interfacePivots != null)
@@ -875,6 +909,7 @@ public class NavigationTask : ExperimentTask
         {
             destinations.incrementCurrent();
         }
+
         currentTarget = destinations.currentObject();
 
         timeRemaining = 0f;
@@ -899,7 +934,6 @@ public class NavigationTask : ExperimentTask
 
     public IEnumerator UnmaskStartObjectFor() // handles the "showing and hiding" the starting target object itself
     {
-        
         var startFromTarget = manager.targetObjects.transform.Find(listOfNavStarts.currentObject().name).gameObject;
         startFromTarget.SetActive(true);
         foreach (var mr in startFromTarget.transform.GetComponentsInChildren<MeshRenderer>())
@@ -907,16 +941,18 @@ public class NavigationTask : ExperimentTask
             mr.gameObject.SetActive(true); // Start GO: ON
             mr.enabled = true; // Start GO meshrenderer: ON
         }
+
         transform.Find(startFromTarget.name + "_mask").gameObject.SetActive(false); // Target Red sphere mask: OFF
         yield return new WaitForSeconds(unmaskStartObjectFor);
         foreach (var mr in startFromTarget.transform.GetComponentsInChildren<MeshRenderer>())
         {
-            mr.gameObject.SetActive(false);  // Start GO: OFF
+            mr.gameObject.SetActive(false); // Start GO: OFF
             mr.enabled = false; // Start GO meshrenderer: OFF
             // is this line causing the error??? On subsequent trials, we're UNABLE to get the meshrenderer component, which could be due to 2 reasons:
             // 1. Starting Target Gameobject was set to false in the previous trial, and never reset
             // 2. Starting Target Gameoobject's meshrenderer was set to false in the previous trial, and never reset
         }
+
         transform.Find(startFromTarget.name + "_mask").gameObject.SetActive(true); // Target Red sphere mask: ON
         //END RESULT AFTER FIRST RUN-THRU:
         //  To reset ->...
@@ -929,16 +965,10 @@ public class NavigationTask : ExperimentTask
         timeRemaining = defaultTimeRemaining;
         Debug.Log("Time Remaining After ResetTimeRemaining:" + timeRemaining);
     }
-
 }
 
 
-
-
-
-
-
-//fixme Old Task Script Version Below 
+//fixme Old Task Script Version Below
 ////using System.Collections;
 //using System.Collections.Generic;
 //using UnityEngine;
@@ -1274,7 +1304,7 @@ public class NavigationTask : ExperimentTask
 //        float distanceRemaining = distanceAllotted - playerDistance;
 //        float timeRemaining = timeAllotted - (Time.time - startTime);
 //        // If we have a place to output ongoing trial info (time/dist remaining), use it
-//        if (printRemainingTimeTo != null) 
+//        if (printRemainingTimeTo != null)
 //        {
 //            printRemainingTimeTo.text = string.Format(baseText, Mathf.Round(distanceRemaining), Mathf.Round(timeRemaining));
 //        }
@@ -1310,16 +1340,15 @@ public class NavigationTask : ExperimentTask
 //        //    //}
 
 
-
 //        //}
 //        //return false;
 //        ////if ()
-//        ////void OnTriggerEnter(Collider other) 
+//        ////void OnTriggerEnter(Collider other)
 //        ////{ if (other.gameObject.tag == "TargetObjectColliders")
 
-//        //if (isPlayerInside == true) 
-//        //{ 
-//            if (Time.time - startTime > allowContinueAfter)          
+//        //if (isPlayerInside == true)
+//        //{
+//            if (Time.time - startTime > allowContinueAfter)
 //                {
 //                    if (vrEnabled)
 //                    {
@@ -1393,7 +1422,6 @@ public class NavigationTask : ExperimentTask
 //        currentTarget.GetComponent<Collider>().enabled = true; // is this the root cause of problem??
 //        var halo = (Behaviour) currentTarget.GetComponent("Halo");
 //        if(halo != null) halo.enabled = true;
-
 
 
 //        hud.setMessage("");
@@ -1481,7 +1509,7 @@ public class NavigationTask : ExperimentTask
 
 //	public override bool OnControllerColliderHit(GameObject hit)
 //	{
-//		if ((hit == currentTarget | hit.transform.parent.gameObject == currentTarget) & 
+//		if ((hit == currentTarget | hit.transform.parent.gameObject == currentTarget) &
 //            hideTargetOnStart != HideTargetOnStart.DisableCompletely & hideTargetOnStart != HideTargetOnStart.SetInactive)
 //		{
 //			if (showScoring)
@@ -1495,4 +1523,3 @@ public class NavigationTask : ExperimentTask
 //		return false;
 //	}
 //}
-

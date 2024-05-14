@@ -377,6 +377,9 @@ namespace Landmarks.Scripts.Progress
                         case "OrientationConfig":
                             OrientationSkipSubtasks(trialSubTaskUIDs, numCompletedSubtasks);
                             break;
+                        case "WayfindingConfig":
+                            WayfindingSkipSubtasks(trialSubTaskUIDs, numCompletedSubtasks);
+                            break;
                     }
 
 
@@ -462,6 +465,20 @@ namespace Landmarks.Scripts.Progress
 
         private void WayfindingSkipSubtasks(IReadOnlyList<uint> ids, int numSubtask)
         {
+            numSubtask %= 17;
+            if (numSubtask < 3) return; // If there are less than 3 subtasks, do not skip since it is only 2 ObjectLists
+            var leftover = (numSubtask - 3) % 5;
+            numSubtask -= leftover;
+
+            if (ids.Count < numSubtask)
+                return;
+
+            for (var i = 1; i < numSubtask; i++)
+            {
+                _subTaskSkipList.Enqueue(ids[i]);
+            }
+
+            LM_Debug.Instance.Log($"Skipping {numSubtask} subtasks", 10);
         }
 
         public bool SkipSubtask(Transform tr)

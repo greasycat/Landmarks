@@ -523,7 +523,7 @@ MonoBehaviour:
   lastSaveFile: 
   lastSaveStack: []
   savingFolderPath: 
-  deleteCurrentSaveFileOnEditorQuit: 0
+  deleteCurrentSaveFileOnEditorQuit: 1
 --- !u!4 &34686137
 Transform:
   m_ObjectHideFlags: 0
@@ -7257,7 +7257,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -665.54456, y: -18781.205}
+  m_AnchoredPosition: {x: -1047.8787, y: -29577.857}
   m_SizeDelta: {x: 0, y: 800}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &2017697669
